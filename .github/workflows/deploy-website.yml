@@ -1,0 +1,37 @@
+name: Deploy Website to NAS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'website/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.NAS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.NAS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy website files
+        run: |
+          rsync -avz --delete \
+            --exclude='contact.php' \
+            --exclude='.DS_Store' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
+            website/ \
+            ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }}:/volume1/Websites/simplepitchcounter.com/
+
+      - name: Verify deployment
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} \
+            "ls -la /volume1/Websites/simplepitchcounter.com/"
