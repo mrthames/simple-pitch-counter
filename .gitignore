@@ -1,9 +1,7 @@
 # macOS
 .DS_Store
 
-# Xcode
-*.xcodeproj/
-*.xcworkspace/
+# Xcode build artifacts
 build/
 DerivedData/
 *.pbxuser
