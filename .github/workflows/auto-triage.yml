@@ -11,8 +11,7 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-      - name: Add needs-triage label
-        if: "!contains(toJSON(github.event.issue.labels), 'needs-triage')"
+      - name: Triage new issue
         uses: actions/github-script@v7
         with:
           script: |
