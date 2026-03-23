@@ -1,0 +1,61 @@
+name: Auto-Triage New Issues
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add needs-triage label
+        if: "!contains(toJSON(github.event.issue.labels), 'needs-triage')"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+
+            // Add needs-triage if not already present
+            if (!labels.includes('status: needs-triage')) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['status: needs-triage'],
+              });
+            }
+
+            // Determine priority hint from feedback form severity
+            const body = issue.body || '';
+            let priorityNote = '';
+            if (body.includes('**Severity:** critical')) {
+              priorityNote = '**Severity flagged as critical** — review ASAP.';
+            } else if (body.includes('**Severity:** high')) {
+              priorityNote = '**Severity flagged as high** — prioritize this sprint.';
+            }
+
+            // Post triage reminder comment
+            const isFromFeedback = labels.includes('source: feedback-form');
+            let comment = `### Triage Checklist\n\n`;
+            comment += `- [ ] Reviewed and understood the issue\n`;
+            comment += `- [ ] Priority assigned (P0-P3)\n`;
+            comment += `- [ ] Milestone assigned\n`;
+            comment += `- [ ] Added to project board\n`;
+            if (isFromFeedback) {
+              comment += `\n> This issue was submitted by a user via the [feedback form](https://simplepitchcounter.com/feedback).\n`;
+            }
+            if (priorityNote) {
+              comment += `\n> ${priorityNote}\n`;
+            }
+            comment += `\n---\n*Auto-triage by GitHub Actions*`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: comment,
+            });
