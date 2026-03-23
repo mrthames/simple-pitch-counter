@@ -28,9 +28,10 @@ jobs:
 
       - name: Deploy website files
         run: |
-          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -r \
-            website/index.html website/privacy.html website/contact.html \
-            ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }}:/volume1/Websites/simplepitchcounter.com/
+          tar -cf - -C website index.html privacy.html contact.html | \
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} \
+            "tar -xf - -C /volume1/Websites/simplepitchcounter.com/"
 
       - name: Verify deployment
         run: |
