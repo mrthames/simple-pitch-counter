@@ -1,0 +1,67 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+labels: ["type: bug", "status: needs-triage"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - iOS App
+        - Website (simplepitchcounter.com)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How impactful is this bug?
+      options:
+        - Critical — app crashes or data loss
+        - High — feature broken, no workaround
+        - Medium — feature broken, workaround exists
+        - Low — cosmetic or minor annoyance
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Walk us through exactly how to trigger the bug.
+      placeholder: |
+        1. Open the app
+        2. Start a new game with...
+        3. Tap '+ Pitch' until...
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device & OS version
+      placeholder: "iPhone 15, iOS 17.4"
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Screenshots, screen recordings, or anything else that helps.
