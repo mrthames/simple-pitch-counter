@@ -19,17 +19,17 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.NAS_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.NAS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -p ${{ secrets.NAS_SSH_PORT }} -H ${{ secrets.NAS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy website files
         run: |
           tar -cf - -C website index.html privacy.html contact.html | \
-            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            ssh -i ~/.ssh/deploy_key -p ${{ secrets.NAS_SSH_PORT }} -o StrictHostKeyChecking=accept-new \
             ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} \
             "tar -xf - -C /volume1/Websites/simplepitchcounter.com/"
 
       - name: Verify deployment
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+          ssh -i ~/.ssh/deploy_key -p ${{ secrets.NAS_SSH_PORT }} -o StrictHostKeyChecking=accept-new \
             ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} \
             "ls -la /volume1/Websites/simplepitchcounter.com/"
