@@ -28,10 +28,10 @@ You can also trigger a deploy manually from GitHub → Actions → "Deploy Websi
 2. Added the public key to `~/.ssh/authorized_keys` on the NAS
 3. Enabled `PubkeyAuthentication` in `/etc/ssh/sshd_config` on the NAS
 4. Set correct permissions: `~` = 755, `~/.ssh` = 700, `authorized_keys` = 600
-5. Added three GitHub Actions secrets:
-   - `NAS_SSH_KEY` — the private key
-   - `NAS_HOST` — `<nas-host>`
-   - `NAS_USER` — `justin`
+5. Added three GitHub Actions secrets (values stored in GitHub, not in this repo):
+   - `NAS_SSH_KEY` — the private deploy key
+   - `NAS_HOST` — the NAS hostname
+   - `NAS_USER` — the SSH username
 
 ### Important: contact.php
 
@@ -102,9 +102,9 @@ When shipping a new version:
 
 ### Website deploy fails
 
-- **SSH connection refused:** Check that port 22 is forwarded to the NAS and SSH is enabled in DSM → Control Panel → Terminal & SNMP
-- **Permission denied:** Verify the deploy key is in `~/.ssh/authorized_keys` on the NAS and file permissions are correct
-- **rsync not found:** Synology DSM includes rsync by default, but verify with `ssh justin@<nas-host> which rsync`
+- **SSH connection refused:** Check that SSH port forwarding is active and SSH is enabled in DSM → Control Panel → Terminal & SNMP
+- **Permission denied:** Verify the deploy key is in `~/.ssh/authorized_keys` on the NAS and file permissions are correct (home=755, .ssh=700, authorized_keys=600)
+- **Transfer fails:** The workflow uses SSH+tar. Verify the NAS user has write access to the web root directory.
 
 ### iOS build fails
 
