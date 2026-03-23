@@ -64,29 +64,7 @@ xcodebuild -exportArchive \
   -exportOptionsPlist "$REPO_ROOT/scripts/ExportOptions.plist" \
   -quiet
 
-echo "✓ IPA exported to $EXPORT_PATH"
+echo "✓ IPA exported and uploaded to App Store Connect"
 echo ""
-
-# Step 5: Upload to App Store Connect
-echo "→ Uploading to App Store Connect..."
-xcrun altool --upload-app \
-  -f "$EXPORT_PATH/Simple Pitch Counter.ipa" \
-  -t ios \
-  --apiKey "${APP_STORE_API_KEY:-}" \
-  --apiIssuer "${APP_STORE_API_ISSUER:-}" \
-  2>/dev/null || {
-    echo ""
-    echo "⚠ Automatic upload failed or API key not configured."
-    echo "  You can upload manually:"
-    echo "  1. Open Xcode → Window → Organizer"
-    echo "  2. Select the archive → Distribute App"
-    echo "  3. Follow the App Store Connect prompts"
-    echo ""
-    echo "  Or use Transporter.app to upload the IPA from:"
-    echo "  $EXPORT_PATH"
-    exit 0
-  }
-
-echo ""
-echo "✓ Upload complete. Check App Store Connect for processing status."
+echo "✓ Done. Check App Store Connect for processing status."
 echo "  https://appstoreconnect.apple.com"
