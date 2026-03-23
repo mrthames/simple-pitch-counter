@@ -21,11 +21,6 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.NAS_HOST }} >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Test SSH connection
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -v \
-            ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} echo "SSH OK" 2>&1 | head -50
-
       - name: Deploy website files
         run: |
           tar -cf - -C website index.html privacy.html contact.html | \
