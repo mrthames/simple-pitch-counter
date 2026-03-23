@@ -34,3 +34,36 @@ if (ri.days < 1) return null;
 ```
 
 ---
+
+## [2026-03-21] UI — White top bar on game screen
+
+**File:** `index.html`
+**Element:** `.game-top-bar` (CSS)
+
+Changed the inning banner / hamburger top bar background from `#ebebe5` (grey) to `#ffffff` (white) with a `1.5px solid rgba(0,0,0,0.28)` border to match the card style.
+
+---
+
+## [2026-03-21] UI — Compact inline scoreboard
+
+**File:** `index.html`
+**Elements:** `.scoreboard` and related CSS classes; scoreboard HTML in `#screen-game`
+
+Replaced the two-column stacked scoreboard (team name → big score → +/− buttons below) with a compact single-row layout:
+
+- Both teams sit on one row inside a single card, separated by a `–` divider
+- Each team: `−` button · team name (above) + score (below) · `+` button
+- Score font reduced from 32px → 28px
+- Removed `.sb-score-btns`; replaced with `.sb-adj-btn`, `.sb-team-inner`, `.sb-divider`
+- Grid changed from `1fr 1fr` to `1fr auto 1fr`
+
+---
+
+## [2026-03-21] Feature — Edit pitcher and catcher name/number in-game
+
+**File:** `index.html`
+**Functions:** `editPitcher(i)`, `saveEditPitcher(i)`, `editCatcher(i)`, `saveEditCatcher(i)`; updated `renderPitcherSection()` and `renderCatcherSection()`
+
+Added a pencil (✏) icon button to each player row in the Change Pitcher and Change Catcher list views. Tapping the icon opens a modal to edit that player's name and jersey number without closing the list or switching players. `event.stopPropagation()` prevents the row's select action from firing when the edit button is tapped.
+
+---
