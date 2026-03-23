@@ -206,30 +206,43 @@
   }
   .phone-content { padding: 14px 12px; }
   .pc-inning {
-    background: #ebebe5;
+    background: #ffffff;
+    border: 1.5px solid rgba(0,0,0,0.28);
     border-radius: 8px;
     padding: 8px 10px;
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 8px;
   }
   .pc-inning-text { font-size: 10px; font-weight: 700; color: #111; }
-  .pc-inning-sub { font-size: 8px; color: #666; }
-  .pc-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-  .pc-score-col { background: #f0efe9; border-radius: 8px; padding: 7px 8px; text-align: center; border: 1px solid rgba(0,0,0,0.12); }
-  .pc-score-label { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #888; margin-bottom: 2px; }
-  .pc-score-num { font-size: 22px; font-weight: 800; color: #111; line-height: 1; margin-bottom: 5px; }
-  .pc-score-btns { display: flex; gap: 4px; }
-  .pc-score-btns span { flex: 1; background: #fff; border: 1px solid rgba(0,0,0,0.2); border-radius: 5px; text-align: center; font-size: 11px; font-weight: 700; padding: 3px 0; color: #111; }
-  .pc-card { background: #fff; border: 1.5px solid rgba(0,0,0,0.18); border-radius: 10px; padding: 10px 10px 8px; margin-bottom: 8px; }
-  .pc-card-label { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #888; margin-bottom: 6px; }
+  .pc-inning-sub { font-size: 8px; color: #4a4945; }
+  .pc-scoreboard {
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    background: #f5f4ef; border: 1px solid rgba(0,0,0,0.22);
+    border-radius: 10px; padding: 8px 10px; margin-bottom: 8px;
+    align-items: center; gap: 0;
+  }
+  .pc-sb-team { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .pc-sb-name { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #706f68; }
+  .pc-sb-score-row { display: flex; align-items: center; gap: 5px; }
+  .pc-sb-num { font-size: 20px; font-weight: 700; color: #111; min-width: 18px; text-align: center; }
+  .pc-sb-btn { width: 22px; height: 22px; border: 1px solid rgba(0,0,0,0.22); border-radius: 5px; background: #fff; font-size: 13px; font-weight: 500; color: #111; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .pc-sb-divider { font-size: 14px; color: #706f68; padding: 0 3px; text-align: center; }
+  .pc-card { background: #fff; border: 1.5px solid rgba(0,0,0,0.28); border-radius: 10px; padding: 10px 10px 8px; margin-bottom: 8px; }
+  .pc-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .pc-card-label { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #888; }
+  .pc-card-btn { font-size: 7px; font-weight: 600; color: #1e5fa0; background: #f0f7ff; border: 1px solid #b5d4f4; border-radius: 4px; padding: 2px 6px; }
   .pc-batter { background: #ebebe5; border-radius: 6px; padding: 6px 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .pc-batter-label { font-size: 7px; font-weight: 600; color: #555; }
+  .pc-batter-label { font-size: 7px; font-weight: 600; color: #4a4945; }
   .pc-batter-num { font-size: 14px; font-weight: 800; color: #111; }
-  .pc-pitch-num { text-align: center; padding: 4px 0 6px; }
-  .pc-pitch-big { font-size: 40px; font-weight: 900; color: #e24b4a; line-height: 1; letter-spacing: -2px; }
-  .pc-pitch-sub { font-size: 7px; color: #888; }
-  .pc-btn-pitch { background: #1e5fa0; color: #fff; border: none; border-radius: 8px; padding: 8px; text-align: center; font-size: 10px; font-weight: 700; width: 100%; margin-bottom: 5px; }
-  .pc-btn-next { background: #0a5c41; color: #fff; border: none; border-radius: 8px; padding: 7px; text-align: center; font-size: 9px; font-weight: 700; width: 100%; }
+  .pc-pitch-num { text-align: center; padding: 4px 0 2px; }
+  .pc-pitcher-name { font-size: 9px; color: #4a4945; margin-bottom: 2px; }
+  .pc-pitch-big { font-size: 48px; font-weight: 700; color: #ba7517; line-height: 1; letter-spacing: -2px; }
+  .pc-pitch-sub { font-size: 7px; color: #706f68; }
+  .pc-pitch-rest { font-size: 8px; font-weight: 600; color: #ba7517; margin-top: 2px; }
+  .pc-action-row { display: flex; gap: 5px; margin-bottom: 5px; }
+  .pc-btn-pitch { background: #1e5fa0; color: #fff; border: 1.5px solid #2a6db5; border-radius: 8px; padding: 8px; text-align: center; font-size: 10px; font-weight: 700; flex: 1; }
+  .pc-btn-undo { background: #dddcd6; color: #000; border: 1.5px solid rgba(0,0,0,0.32); border-radius: 6px; padding: 6px 8px; font-size: 7px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .pc-btn-next { background: #0a5c41; color: #fff; border: 1.5px solid #0d6e4e; border-radius: 8px; padding: 7px; text-align: center; font-size: 9px; font-weight: 700; width: 100%; }
 
   /* ── FEATURES ── */
   .features {
@@ -469,29 +482,44 @@
             <div><div class="pc-inning-text">Top of Inning 3</div><div class="pc-inning-sub">Home fielding · Away batting</div></div>
             <div style="background:#f0f7ff;border:1px solid #b5d4f4;border-radius:5px;padding:4px 7px;font-size:8px;font-weight:700;color:#185fa5">End half →</div>
           </div>
-          <div class="pc-scores">
-            <div class="pc-score-col">
-              <div class="pc-score-label">Home</div>
-              <div class="pc-score-num">4</div>
-              <div class="pc-score-btns"><span>+</span><span>−</span></div>
+          <div class="pc-scoreboard">
+            <div class="pc-sb-team">
+              <div class="pc-sb-name">Home</div>
+              <div class="pc-sb-score-row">
+                <div class="pc-sb-btn">−</div>
+                <div class="pc-sb-num">4</div>
+                <div class="pc-sb-btn">+</div>
+              </div>
             </div>
-            <div class="pc-score-col">
-              <div class="pc-score-label">Away</div>
-              <div class="pc-score-num">2</div>
-              <div class="pc-score-btns"><span>+</span><span>−</span></div>
+            <div class="pc-sb-divider">–</div>
+            <div class="pc-sb-team">
+              <div class="pc-sb-name">Away</div>
+              <div class="pc-sb-score-row">
+                <div class="pc-sb-btn">−</div>
+                <div class="pc-sb-num">2</div>
+                <div class="pc-sb-btn">+</div>
+              </div>
             </div>
           </div>
           <div class="pc-card">
-            <div class="pc-card-label">Pitcher</div>
+            <div class="pc-card-header">
+              <div class="pc-card-label">Pitcher</div>
+              <div class="pc-card-btn">Change pitcher</div>
+            </div>
             <div class="pc-batter">
-              <div><div class="pc-batter-label">Current batter</div><div class="pc-batter-label">Pitches this at-bat</div></div>
+              <div><div class="pc-batter-label">Pitches this at-bat</div></div>
               <div class="pc-batter-num">3</div>
             </div>
             <div class="pc-pitch-num">
+              <div class="pc-pitcher-name">Jake M. #12</div>
               <div class="pc-pitch-big">28</div>
-              <div class="pc-pitch-sub">of 50 max pitches · 1 day rest required</div>
+              <div class="pc-pitch-sub">of 50 max pitches</div>
+              <div class="pc-pitch-rest">1 day rest required</div>
             </div>
-            <button class="pc-btn-pitch">+ Pitch</button>
+            <div class="pc-action-row">
+              <button class="pc-btn-pitch">+ Pitch</button>
+              <button class="pc-btn-undo">Undo</button>
+            </div>
             <button class="pc-btn-next">Next batter →</button>
           </div>
         </div>
@@ -588,7 +616,7 @@
     <a href="privacy.html">Privacy Policy</a>
     <a href="contact.html">Contact</a>
   </div>
-  <div class="footer-copy">&copy; 2025 Simple Pitch Counter. All rights reserved.</div>
+  <div class="footer-copy">&copy; 2026 Simple Pitch Counter. All rights reserved.</div>
 </footer>
 
 </body>
