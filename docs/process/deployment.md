@@ -14,8 +14,8 @@ A GitHub Action (`.github/workflows/deploy-website.yml`) runs on every push that
 
 1. Checks out the repo
 2. Connects to the NAS via SSH using a deploy key
-3. Syncs `website/` to `/volume1/Websites/simplepitchcounter.com/` via rsync
-4. Excludes `contact.php` (credentials — managed separately on the NAS)
+3. Transfers `website/` files to `/volume1/Websites/simplepitchcounter.com/` via SSH+tar (Synology doesn't support rsync/scp over SSH by default)
+4. `contact.php` is not tracked in git, so it's never overwritten (credentials — managed separately on the NAS)
 5. Verifies the deployment by listing the remote directory
 
 ### Manual trigger
