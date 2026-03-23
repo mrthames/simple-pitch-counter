@@ -28,11 +28,8 @@ jobs:
 
       - name: Deploy website files
         run: |
-          rsync -avz --delete \
-            --exclude='contact.php' \
-            --exclude='.DS_Store' \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
-            website/ \
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -r \
+            website/index.html website/privacy.html website/contact.html \
             ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }}:/volume1/Websites/simplepitchcounter.com/
 
       - name: Verify deployment
