@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Simple Pitch Counter — the iOS app for tracking baseball and softball pitcher counts and catcher innings during little league and youth games.">
+<title>Simple Pitch Counter — Baseball & Softball Pitch Tracking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1c3a;
+    --navy-mid: #122547;
+    --cream: #f7f4ed;
+    --cream-dark: #ede9e0;
+    --red: #c8392b;
+    --red-light: #e8453a;
+    --gold: #e8a030;
+    --text: #0b1c3a;
+    --text-muted: #4a5568;
+    --white: #ffffff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,28,58,0.96);
+    backdrop-filter: blur(12px);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--cream);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .nav-logo .ball {
+    width: 28px; height: 28px;
+    background: var(--cream);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .nav-logo .ball::before, .nav-logo .ball::after {
+    content: '';
+    position: absolute;
+    border: 1.5px solid var(--red);
+    border-radius: 50%;
+    width: 60%; height: 200%;
+    top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(20deg);
+  }
+  .nav-logo .ball::after { transform: translate(-50%, -50%) rotate(-20deg); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a {
+    color: rgba(247,244,237,0.75);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--cream); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: var(--navy);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 100px 8% 80px;
+    gap: 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,57,43,0.15) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(232,160,48,0.08) 0%, transparent 70%);
+    bottom: 0; left: 20%;
+    pointer-events: none;
+  }
+  .hero-text { position: relative; z-index: 1; }
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block; width: 28px; height: 1.5px;
+    background: var(--gold);
+  }
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    line-height: 1.08;
+    color: var(--cream);
+    margin-bottom: 24px;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--red-light);
+  }
+  .hero-sub {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: rgba(247,244,237,0.7);
+    margin-bottom: 40px;
+    max-width: 420px;
+    font-weight: 300;
+  }
+  .cta-group { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary-cta {
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-flex; align-items: center; gap: 8px;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary-cta:hover { background: var(--red-light); transform: translateY(-1px); }
+  .btn-ghost-cta {
+    background: transparent;
+    color: rgba(247,244,237,0.8);
+    border: 1.5px solid rgba(247,244,237,0.25);
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost-cta:hover { border-color: rgba(247,244,237,0.6); color: var(--cream); }
+
+  /* App mockup */
+  .hero-visual {
+    display: flex; justify-content: center; align-items: center;
+    position: relative; z-index: 1;
+  }
+  .phone-frame {
+    width: 220px;
+    background: var(--navy-mid);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 36px;
+    padding: 12px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+    position: relative;
+  }
+  .phone-screen {
+    background: #f7f4ed;
+    border-radius: 26px;
+    overflow: hidden;
+    aspect-ratio: 9/19;
+    position: relative;
+  }
+  .phone-notch {
+    background: var(--navy-mid);
+    height: 24px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .phone-notch-pill {
+    width: 80px; height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+  }
+  .phone-content { padding: 14px 12px; }
+  .pc-inning {
+    background: #ebebe5;
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .pc-inning-text { font-size: 10px; font-weight: 700; color: #111; }
+  .pc-inning-sub { font-size: 8px; color: #666; }
+  .pc-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+  .pc-score-col { background: #f0efe9; border-radius: 8px; padding: 7px 8px; text-align: center; border: 1px solid rgba(0,0,0,0.12); }
+  .pc-score-label { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #888; margin-bottom: 2px; }
+  .pc-score-num { font-size: 22px; font-weight: 800; color: #111; line-height: 1; margin-bottom: 5px; }
+  .pc-score-btns { display: flex; gap: 4px; }
+  .pc-score-btns span { flex: 1; background: #fff; border: 1px solid rgba(0,0,0,0.2); border-radius: 5px; text-align: center; font-size: 11px; font-weight: 700; padding: 3px 0; color: #111; }
+  .pc-card { background: #fff; border: 1.5px solid rgba(0,0,0,0.18); border-radius: 10px; padding: 10px 10px 8px; margin-bottom: 8px; }
+  .pc-card-label { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #888; margin-bottom: 6px; }
+  .pc-batter { background: #ebebe5; border-radius: 6px; padding: 6px 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .pc-batter-label { font-size: 7px; font-weight: 600; color: #555; }
+  .pc-batter-num { font-size: 14px; font-weight: 800; color: #111; }
+  .pc-pitch-num { text-align: center; padding: 4px 0 6px; }
+  .pc-pitch-big { font-size: 40px; font-weight: 900; color: #e24b4a; line-height: 1; letter-spacing: -2px; }
+  .pc-pitch-sub { font-size: 7px; color: #888; }
+  .pc-btn-pitch { background: #1e5fa0; color: #fff; border: none; border-radius: 8px; padding: 8px; text-align: center; font-size: 10px; font-weight: 700; width: 100%; margin-bottom: 5px; }
+  .pc-btn-next { background: #0a5c41; color: #fff; border: none; border-radius: 8px; padding: 7px; text-align: center; font-size: 9px; font-weight: 700; width: 100%; }
+
+  /* ── FEATURES ── */
+  .features {
+    padding: 100px 8%;
+    background: var(--cream);
+  }
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    line-height: 1.15;
+    color: var(--navy);
+    margin-bottom: 60px;
+    max-width: 520px;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .feature-card {
+    background: var(--white);
+    border: 1.5px solid rgba(11,28,58,0.12);
+    border-radius: 14px;
+    padding: 32px 28px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .feature-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(11,28,58,0.1); }
+  .feature-icon {
+    width: 44px; height: 44px;
+    background: var(--navy);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+  .feature-icon i { font-size: 24px; color: white; }
+  .feature-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+  .feature-desc {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how {
+    padding: 100px 8%;
+    background: var(--navy);
+    position: relative;
+    overflow: hidden;
+  }
+  .how::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    border: 1px solid rgba(247,244,237,0.05);
+    top: -200px; right: -200px;
+  }
+  .how .section-label { color: var(--gold); }
+  .how .section-title { color: var(--cream); }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; position: relative; }
+  .steps::before {
+    content: '';
+    position: absolute;
+    height: 1px;
+    background: rgba(247,244,237,0.12);
+    top: 22px; left: 22px; right: 22px;
+    z-index: 0;
+  }
+  .step { position: relative; z-index: 1; }
+  .step-num {
+    width: 44px; height: 44px;
+    background: var(--red);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; font-weight: 700;
+    color: var(--white);
+    margin-bottom: 20px;
+  }
+  .step-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    color: var(--cream);
+    margin-bottom: 10px;
+  }
+  .step-desc {
+    font-size: 0.84rem;
+    line-height: 1.7;
+    color: rgba(247,244,237,0.6);
+    font-weight: 300;
+  }
+
+  /* ── DOWNLOAD ── */
+  .download {
+    padding: 100px 8%;
+    background: var(--cream-dark);
+    text-align: center;
+  }
+  .download .section-title {
+    margin: 0 auto 20px;
+    text-align: center;
+    max-width: 560px;
+  }
+  .download-sub {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-bottom: 44px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+  .app-store-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--navy);
+    color: var(--cream);
+    text-decoration: none;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s, transform 0.15s;
+    border: 1.5px solid rgba(255,255,255,0.08);
+  }
+  .app-store-btn:hover { background: var(--navy-mid); transform: translateY(-2px); }
+  .app-store-btn svg { width: 24px; height: 24px; }
+  .app-store-label { text-align: left; }
+  .app-store-label small { display: block; font-size: 0.7rem; opacity: 0.6; letter-spacing: 0.04em; }
+  .app-store-label strong { font-size: 1rem; font-weight: 600; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy);
+    padding: 50px 8% 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    color: rgba(247,244,237,0.8);
+  }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a {
+    color: rgba(247,244,237,0.5);
+    text-decoration: none;
+    font-size: 0.82rem;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--cream); }
+  .footer-copy {
+    color: rgba(247,244,237,0.3);
+    font-size: 0.78rem;
+    width: 100%;
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 10px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding: 100px 6% 60px; text-align: center; }
+    .hero-eyebrow { justify-content: center; }
+    .hero-sub { margin: 0 auto 40px; }
+    .cta-group { justify-content: center; }
+    .hero-visual { order: -1; }
+    .phone-frame { width: 180px; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .steps::before { display: none; }
+  }
+  @media (max-width: 600px) {
+    .features-grid { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="ball"></div>
+    Simple Pitch Counter
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-eyebrow">iOS App · Free</div>
+    <h1>Track every pitch. <em>Every game.</em></h1>
+    <p class="hero-sub">Simple Pitch Counter keeps accurate pitch counts and catcher innings for baseball and softball coaches — built for the dugout, not a desk.</p>
+    <div class="cta-group">
+      <a href="#download" class="btn-primary-cta">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v10M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download on App Store
+      </a>
+      <a href="#features" class="btn-ghost-cta">See features</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="phone-notch"><div class="phone-notch-pill"></div></div>
+        <div class="phone-content">
+          <div class="pc-inning">
+            <div><div class="pc-inning-text">Top of Inning 3</div><div class="pc-inning-sub">Home fielding · Away batting</div></div>
+            <div style="background:#f0f7ff;border:1px solid #b5d4f4;border-radius:5px;padding:4px 7px;font-size:8px;font-weight:700;color:#185fa5">End half →</div>
+          </div>
+          <div class="pc-scores">
+            <div class="pc-score-col">
+              <div class="pc-score-label">Home</div>
+              <div class="pc-score-num">4</div>
+              <div class="pc-score-btns"><span>+</span><span>−</span></div>
+            </div>
+            <div class="pc-score-col">
+              <div class="pc-score-label">Away</div>
+              <div class="pc-score-num">2</div>
+              <div class="pc-score-btns"><span>+</span><span>−</span></div>
+            </div>
+          </div>
+          <div class="pc-card">
+            <div class="pc-card-label">Pitcher</div>
+            <div class="pc-batter">
+              <div><div class="pc-batter-label">Current batter</div><div class="pc-batter-label">Pitches this at-bat</div></div>
+              <div class="pc-batter-num">3</div>
+            </div>
+            <div class="pc-pitch-num">
+              <div class="pc-pitch-big">28</div>
+              <div class="pc-pitch-sub">of 50 max pitches · 1 day rest required</div>
+            </div>
+            <button class="pc-btn-pitch">+ Pitch</button>
+            <button class="pc-btn-next">Next batter →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">What it does</div>
+  <h2 class="section-title">Everything you need, nothing you don't.</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ph-bold ph-target"></i></div>
+      <div class="feature-title">Pitch count tracking</div>
+      <p class="feature-desc">Track every pitch in real time with a single tap. Configurable limits and rest-day thresholds alert you before a pitcher hits mandatory rest requirements.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ph-bold ph-hand"></i></div>
+      <div class="feature-title">Catcher innings</div>
+      <p class="feature-desc">Automatically tracks innings behind the plate and flags when a catcher approaches limits. Pitcher-catcher eligibility conflicts are highlighted immediately.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ph-bold ph-clock-counter-clockwise"></i></div>
+      <div class="feature-title">Game history</div>
+      <p class="feature-desc">Every game is saved automatically. Review past pitcher counts, rest requirements, and scores at a glance — even when offline.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ph-bold ph-sliders-horizontal"></i></div>
+      <div class="feature-title">League configurations</div>
+      <p class="feature-desc">Create named configurations with custom pitch limits, rest thresholds, and catcher rules. Switch between league settings when starting a new game.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ph-bold ph-paper-plane-right"></i></div>
+      <div class="feature-title">Game summaries</div>
+      <p class="feature-desc">Generate and email a formatted game summary with pitcher data, umpire notes, and final scores — ready to send to your league administrator.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ph-bold ph-wifi-slash"></i></div>
+      <div class="feature-title">Fully offline</div>
+      <p class="feature-desc">No account, no internet required. All data stays on your device. Works in the dugout even without a signal.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how-it-works">
+  <div class="section-label">How it works</div>
+  <h2 class="section-title">Up and running before first pitch.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Configure your league</div>
+      <p class="step-desc">Set pitch limits, rest thresholds, and catcher inning rules once — save them as a named configuration to reuse every game.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">Start a game</div>
+      <p class="step-desc">Enter team names, field, date, and your opening pitcher and catcher for each team. Takes under a minute.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Tap to track</div>
+      <p class="step-desc">Hit + Pitch for each throw, Next Batter when the at-bat ends, End Half Inning when sides change. Undo if you miscount.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-title">Send the report</div>
+      <p class="step-desc">After the game, generate the summary and email it directly from the app to your player agent or league office.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DOWNLOAD -->
+<section class="download" id="download">
+  <div class="section-label">Available now</div>
+  <h2 class="section-title">Free on the App Store.</h2>
+  <p class="download-sub">Works on iPhone and iPad. No subscription, no ads, no account required.</p>
+  <a href="https://apps.apple.com/app/simple-pitch-counter" class="app-store-btn">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+    <div class="app-store-label">
+      <small>Download on the</small>
+      <strong>App Store</strong>
+    </div>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Simple Pitch Counter</div>
+  <div class="footer-links">
+    <a href="#features">Features</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <div class="footer-copy">&copy; 2025 Simple Pitch Counter. All rights reserved.</div>
+</footer>
+
+</body>
+</html>

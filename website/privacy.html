@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Simple Pitch Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1c3a;
+    --cream: #f7f4ed;
+    --cream-dark: #ede9e0;
+    --red: #c8392b;
+    --gold: #e8a030;
+    --text: #0b1c3a;
+    --text-muted: #4a5568;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,28,58,0.96); backdrop-filter: blur(12px);
+    padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+    height: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: rgba(247,244,237,0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
+  .nav-links a:hover { color: #f7f4ed; }
+
+  .page-header {
+    padding: 130px 8% 70px;
+    background: var(--navy);
+  }
+  .page-header-eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-header-eyebrow::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--gold); }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: #f7f4ed; margin-bottom: 14px;
+  }
+  .page-header-sub { font-size: 0.9rem; color: rgba(247,244,237,0.55); font-weight: 300; }
+
+  .content { max-width: 760px; margin: 0 auto; padding: 70px 8% 100px; }
+
+  .policy-section { margin-bottom: 50px; }
+  .policy-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem; color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--cream-dark);
+  }
+  .policy-section p {
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-muted);
+    margin-bottom: 14px; font-weight: 300;
+  }
+  .policy-section p:last-child { margin-bottom: 0; }
+  .policy-section ul {
+    list-style: none; padding: 0;
+    margin-bottom: 14px;
+  }
+  .policy-section ul li {
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-muted);
+    padding: 6px 0 6px 20px; font-weight: 300;
+    position: relative;
+  }
+  .policy-section ul li::before {
+    content: '—';
+    position: absolute; left: 0;
+    color: var(--red); font-weight: 600;
+  }
+  .policy-section strong { color: var(--text); font-weight: 600; }
+  .policy-section a { color: var(--red); text-decoration: none; }
+  .policy-section a:hover { text-decoration: underline; }
+
+  .highlight-box {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 50px;
+  }
+  .highlight-box p {
+    color: rgba(247,244,237,0.8);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    font-weight: 300;
+    margin: 0;
+  }
+  .highlight-box p strong { color: #f7f4ed; font-weight: 600; }
+
+  footer {
+    background: var(--navy); padding: 40px 8%;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; color: rgba(247,244,237,0.8); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: rgba(247,244,237,0.5); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: #f7f4ed; }
+  .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
+
+  @media (max-width: 600px) { .nav-links { display: none; } footer { flex-direction: column; text-align: center; } .footer-links { flex-wrap: wrap; justify-content: center; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Simple Pitch Counter</a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">Legal</div>
+  <h1>Privacy Policy</h1>
+  <p class="page-header-sub">Last updated: March 20, 2026</p>
+</div>
+
+<div class="content">
+
+  <div class="highlight-box">
+    <p><strong>The short version:</strong> Simple Pitch Counter does not collect, store, or transmit any personal data. Everything you enter stays on your device. We have no servers, no accounts, and no analytics.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Overview</h2>
+    <p>Simple Pitch Counter ("the App") is an iOS application designed to help coaches, parents, and volunteers track pitch counts and catcher innings during baseball and softball games.</p>
+    <p>This Privacy Policy explains how we handle information in connection with your use of the App. We are committed to protecting your privacy and being transparent about our practices.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Information We Collect</h2>
+    <p><strong>We do not collect any information.</strong></p>
+    <p>The App operates entirely on your device. All data you enter — including game records, player names, jersey numbers, pitch counts, scores, and configuration settings — is stored locally on your iPhone using Apple's standard local storage (localStorage within a WKWebView). This data:</p>
+    <ul>
+      <li>Never leaves your device unless you explicitly choose to export or email it</li>
+      <li>Is not accessible to us or any third party</li>
+      <li>Is not backed up to any external server by the App itself</li>
+      <li>May be included in your device's standard iCloud or iTunes backup if you have those enabled</li>
+    </ul>
+  </div>
+
+  <div class="policy-section">
+    <h2>Data You Choose to Share</h2>
+    <p>The App includes features that allow you to voluntarily share data:</p>
+    <ul>
+      <li><strong>Email game summaries:</strong> When you use the "Email" button in the App, it opens your device's native Mail app with a pre-filled message. The App does not send this email — your Mail app does. The recipient, content, and transmission are entirely under your control.</li>
+      <li><strong>Export CSV:</strong> When you export game history as a CSV file, the file is generated on your device. You choose how and where to share it.</li>
+    </ul>
+    <p>We do not receive copies of any summaries or exports you send.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Analytics and Tracking</h2>
+    <p>The App does not include any analytics, tracking SDKs, advertising SDKs, or crash reporting tools. We do not use:</p>
+    <ul>
+      <li>Firebase, Amplitude, Mixpanel, or any analytics service</li>
+      <li>Facebook SDK, Google Ads, or any advertising network</li>
+      <li>Crashlytics, Sentry, or any crash reporting service</li>
+      <li>Any third-party SDK that accesses your data</li>
+    </ul>
+  </div>
+
+  <div class="policy-section">
+    <h2>Children's Privacy</h2>
+    <p>The App may be used to record information about youth athletes (names and jersey numbers). We want to be clear: this data is stored only on your device and is never transmitted to us. The App does not knowingly collect any personal information from children. The App is intended for use by adults (coaches, parents, league officials).</p>
+    <p>We recommend not entering full last names of minors in the App as a best practice, though this is at your discretion.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Apple App Store</h2>
+    <p>When you download the App from the Apple App Store, Apple may collect certain information as part of the download process. This is governed by <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">Apple's Privacy Policy</a>, not ours.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>This Website</h2>
+    <p>This website (simplepitchcounter.com) may collect basic web server logs (IP addresses, pages visited, browser type) as part of normal web server operation on our self-hosted server. These logs are used only for server administration and are not shared with third parties. This website does not use cookies for tracking purposes.</p>
+    <p>The contact form on this site transmits your name and email address solely to allow us to respond to your inquiry. We do not add you to any mailing list or share your information.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Data Retention and Deletion</h2>
+    <p>Since all App data is stored locally on your device, you can delete it at any time by:</p>
+    <ul>
+      <li>Deleting individual game records within the App</li>
+      <li>Deleting the App from your iPhone, which removes all associated local data</li>
+    </ul>
+    <p>For contact form inquiries sent through our website, you may request deletion of your message by contacting us at the address below.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Changes to This Policy</h2>
+    <p>If we make material changes to this policy, we will update the "Last updated" date at the top of this page and, where appropriate, note it in App Store release notes. Continued use of the App after changes constitutes acceptance of the updated policy.</p>
+  </div>
+
+  <div class="policy-section">
+    <h2>Contact Us</h2>
+    <p>If you have questions about this Privacy Policy or our privacy practices, please contact us:</p>
+    <ul>
+      <li><a href="contact.html">Contact form</a> — simplepitchcounter.com/contact</li>
+      <li>Email: <a href="mailto:privacy@simplepitchcounter.com">privacy@simplepitchcounter.com</a></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Simple Pitch Counter</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Simple Pitch Counter. All rights reserved.</div>
+</footer>
+
+</body>
+</html>

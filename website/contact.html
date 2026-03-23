@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Simple Pitch Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1c3a;
+    --navy-mid: #122547;
+    --cream: #f7f4ed;
+    --cream-dark: #ede9e0;
+    --red: #c8392b;
+    --red-light: #e8453a;
+    --gold: #e8a030;
+    --text: #0b1c3a;
+    --text-muted: #4a5568;
+    --white: #ffffff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,28,58,0.96); backdrop-filter: blur(12px);
+    padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+    height: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: rgba(247,244,237,0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
+  .nav-links a:hover { color: #f7f4ed; }
+
+  .page-header {
+    padding: 130px 8% 70px;
+    background: var(--navy);
+  }
+  .page-header-eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-header-eyebrow::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--gold); }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 4vw, 3rem); color: #f7f4ed; margin-bottom: 14px; }
+  .page-header-sub { font-size: 0.9rem; color: rgba(247,244,237,0.55); font-weight: 300; max-width: 480px; line-height: 1.7; }
+
+  .contact-wrap {
+    max-width: 1000px; margin: 0 auto;
+    padding: 80px 8% 100px;
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  /* Left sidebar info */
+  .contact-info h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem; color: var(--navy);
+    margin-bottom: 16px; line-height: 1.2;
+  }
+  .contact-info p {
+    font-size: 0.9rem; line-height: 1.8; color: var(--text-muted);
+    margin-bottom: 32px; font-weight: 300;
+  }
+  .contact-detail { margin-bottom: 24px; }
+  .contact-detail-label {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--red); margin-bottom: 5px;
+  }
+  .contact-detail-val {
+    font-size: 0.9rem; color: var(--text);
+    text-decoration: none; font-weight: 400;
+    display: block;
+  }
+  .contact-detail-val:hover { color: var(--red); }
+  .response-note {
+    background: var(--cream-dark);
+    border-left: 3px solid var(--gold);
+    padding: 16px 18px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 32px;
+  }
+  .response-note p {
+    font-size: 0.82rem; color: var(--text-muted); margin: 0; line-height: 1.6; font-weight: 300;
+  }
+
+  /* Form */
+  .contact-form-wrap {}
+  .form-group { margin-bottom: 22px; }
+  .form-group label {
+    display: block;
+    font-size: 0.78rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid rgba(11,28,58,0.22);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+  .form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%230b1c3a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+    cursor: pointer;
+  }
+  .form-group textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(11,28,58,0.1);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .form-submit {
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 15px 36px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.02em;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .form-submit:hover { background: var(--red-light); transform: translateY(-1px); }
+  .form-submit:active { transform: none; }
+  .form-submit:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+  /* Success / error states */
+  .form-feedback {
+    display: none;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+  .form-feedback.success {
+    background: #e8f5e9;
+    color: #1b5e20;
+    border: 1.5px solid #a5d6a7;
+  }
+  .form-feedback.error {
+    background: #fce8e8;
+    color: #7f1010;
+    border: 1.5px solid #f5a0a0;
+  }
+
+  footer {
+    background: var(--navy); padding: 40px 8%;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; color: rgba(247,244,237,0.8); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: rgba(247,244,237,0.5); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: #f7f4ed; }
+  .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
+
+  @media (max-width: 760px) {
+    .contact-wrap { grid-template-columns: 1fr; gap: 50px; padding: 60px 6% 80px; }
+    .form-row { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Simple Pitch Counter</a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">Get in touch</div>
+  <h1>Contact us</h1>
+  <p class="page-header-sub">Questions about the app, feedback, or a bug report? We'd love to hear from you.</p>
+</div>
+
+<div class="contact-wrap">
+
+  <!-- Sidebar -->
+  <div class="contact-info">
+    <h2>We're happy to help.</h2>
+    <p>Whether you have a question about how the app works, found a bug, or have a feature idea for a future version — send us a message.</p>
+
+    <div class="contact-detail">
+      <div class="contact-detail-label">Email</div>
+      <a href="mailto:hello@simplepitchcounter.com" class="contact-detail-val">hello@simplepitchcounter.com</a>
+    </div>
+
+    <div class="contact-detail">
+      <div class="contact-detail-label">Privacy inquiries</div>
+      <a href="mailto:privacy@simplepitchcounter.com" class="contact-detail-val">privacy@simplepitchcounter.com</a>
+    </div>
+
+    <div class="contact-detail">
+      <div class="contact-detail-label">App version</div>
+      <span class="contact-detail-val">Simple Pitch Counter · iOS</span>
+    </div>
+
+    <div class="response-note">
+      <p>We typically respond within 1–3 business days. For App Store issues, you may also leave a review on the App Store and we'll respond there.</p>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="contact-form-wrap">
+    <form id="contact-form" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first-name">First name</label>
+          <input type="text" id="first-name" name="first_name" placeholder="Coach" required autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label for="last-name">Last name</label>
+          <input type="text" id="last-name" name="last_name" placeholder="Smith" required autocomplete="family-name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label for="topic">Topic</label>
+        <select id="topic" name="topic" required>
+          <option value="">Select a topic…</option>
+          <option value="bug">Bug report</option>
+          <option value="feature">Feature request</option>
+          <option value="question">General question</option>
+          <option value="privacy">Privacy inquiry</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" placeholder="Describe your question or issue in as much detail as you'd like…" required></textarea>
+      </div>
+
+      <button type="submit" class="form-submit" id="submit-btn">Send message</button>
+
+      <div class="form-feedback success" id="form-success">
+        ✓ Message sent! We'll get back to you within 1–3 business days.
+      </div>
+      <div class="form-feedback error" id="form-error">
+        Something went wrong. Please email us directly at <a href="mailto:hello@simplepitchcounter.com">hello@simplepitchcounter.com</a>.
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Simple Pitch Counter</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <div class="footer-copy">&copy; 2025 Simple Pitch Counter. All rights reserved.</div>
+</footer>
+
+<script>
+  const form = document.getElementById('contact-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const successEl = document.getElementById('form-success');
+  const errorEl = document.getElementById('form-error');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    const firstName = document.getElementById('first-name').value.trim();
+    const lastName  = document.getElementById('last-name').value.trim();
+    const email     = document.getElementById('email').value.trim();
+    const topic     = document.getElementById('topic').value;
+    const message   = document.getElementById('message').value.trim();
+
+    if (!firstName || !lastName || !email || !topic || !message) {
+      errorEl.textContent = 'Please fill in all fields before submitting.';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errorEl.textContent = 'Please enter a valid email address.';
+      errorEl.style.display = 'block';
+      successEl.style.display = 'none';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    // ── Form submission ──
+    // This uses a simple fetch to a server-side endpoint.
+    // On Synology, you can handle this with a PHP script (contact.php)
+    // or any other server-side handler. See contact.php included in this package.
+    try {
+      const response = await fetch('contact.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, topic, message })
+      });
+
+      if (response.ok) {
+        successEl.style.display = 'block';
+        form.reset();
+      } else {
+        throw new Error('Server error');
+      }
+    } catch (err) {
+      // Fallback: open native mail client with pre-filled body
+      const mailBody = encodeURIComponent(
+        `Name: ${firstName} ${lastName}\nEmail: ${email}\nTopic: ${topic}\n\n${message}`
+      );
+      const mailLink = `mailto:hello@simplepitchcounter.com?subject=Simple Pitch Counter - ${topic}&body=${mailBody}`;
+
+      errorEl.innerHTML = 'Could not send automatically. <a href="' + mailLink + '">Click here to send via your email app</a>, or email us directly at <a href="mailto:hello@simplepitchcounter.com">hello@simplepitchcounter.com</a>.';
+      errorEl.style.display = 'block';
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Send message';
+  });
+</script>
+</body>
+</html>
