@@ -48,25 +48,32 @@ function onFormSubmit(e) {
   const response = e.response;
   const answers = response.getItemResponses();
 
-  // Map form answers by question title (case-insensitive partial match)
+  // Map ALL form answers by question title and track which ones we use
   const data = {};
+  const used = {};
   answers.forEach(a => {
-    const title = a.getItem().getTitle().toLowerCase();
-    data[title] = a.getResponse();
+    const title = a.getItem().getTitle();
+    const value = a.getResponse();
+    if (value && value.toString().trim()) {
+      data[title] = value.toString().trim();
+    }
   });
 
-  // Extract fields — these match the Google Form question titles
-  const type      = (find(data, 'type') || 'bug').toLowerCase();
-  const summary   = find(data, 'summary') || find(data, 'title') || 'No summary provided';
-  const name      = find(data, 'name') || 'Anonymous';
-  const role      = find(data, 'role') || '';
-  const details   = find(data, 'details') || find(data, 'description') || '';
-  const severity  = find(data, 'severity') || find(data, 'priority') || '';
-  const steps     = find(data, 'steps') || '';
-  const expected  = find(data, 'expected') || '';
-  const actual    = find(data, 'actual') || '';
-  const problem   = find(data, 'problem') || '';
-  const solution  = find(data, 'solution') || find(data, 'suggestion') || '';
+  // Log all received data for debugging
+  Logger.log('Form data received: ' + JSON.stringify(data));
+
+  // Extract fields — uses flexible partial matching against question titles
+  const type      = (extract(data, used, ['type']) || 'bug').toLowerCase();
+  const summary   = extract(data, used, ['summary', 'title', 'subject']) || 'No summary provided';
+  const name      = extract(data, used, ['name']) || 'Anonymous';
+  const role      = extract(data, used, ['role']);
+  const severity  = extract(data, used, ['severity', 'priority']);
+  const steps     = extract(data, used, ['steps', 'reproduce']);
+  const expected  = extract(data, used, ['expected']);
+  const actual    = extract(data, used, ['actual']);
+  const problem   = extract(data, used, ['problem']);
+  const solution  = extract(data, used, ['solution', 'suggestion']);
+  const details   = extract(data, used, ['detail', 'description', 'additional']);
 
   // Build issue title and body
   let issueTitle, body, labels;
@@ -80,8 +87,6 @@ function onFormSubmit(e) {
     if (expected) body += '### Expected Behavior\n' + expected + '\n\n';
     if (actual)   body += '### Actual Behavior\n' + actual + '\n\n';
     if (details)  body += '### Additional Details\n' + details + '\n\n';
-    body += '---\n*Submitted via internal Google Form*';
-    labels = ['type: bug', 'source: internal', 'status: needs-triage'];
   } else {
     issueTitle = 'Feature request: ' + truncate(summary, 200);
     body = '## Feature Request (via internal feedback form)\n\n';
@@ -89,9 +94,23 @@ function onFormSubmit(e) {
     if (problem)  body += '### Problem\n' + problem + '\n\n';
     if (solution) body += '### Suggested Solution\n' + solution + '\n\n';
     if (details)  body += '### Additional Details\n' + details + '\n\n';
-    body += '---\n*Submitted via internal Google Form*';
-    labels = ['type: feature', 'source: internal', 'status: needs-triage'];
   }
+
+  // Append any fields that weren't matched by keyword — ensures nothing is lost
+  const unmatched = [];
+  for (const title in data) {
+    if (!used[title]) {
+      unmatched.push('**' + title + ':** ' + data[title]);
+    }
+  }
+  if (unmatched.length > 0) {
+    body += '### Other Responses\n' + unmatched.join('\n') + '\n\n';
+  }
+
+  body += '---\n*Submitted via internal Google Form*';
+  labels = type.includes('bug')
+    ? ['type: bug', 'source: internal', 'status: needs-triage']
+    : ['type: feature', 'source: internal', 'status: needs-triage'];
 
   // Create GitHub Issue
   const token = PropertiesService.getScriptProperties().getProperty('GITHUB_TOKEN');
@@ -131,10 +150,16 @@ function onFormSubmit(e) {
 
 // ── Helpers ──
 
-/** Find a key in the data object by partial match */
-function find(data, keyword) {
+/** Find a key in the data object by partial match, mark it as used */
+function extract(data, used, keywords) {
   for (const key in data) {
-    if (key.includes(keyword)) return data[key];
+    const lower = key.toLowerCase();
+    for (const kw of keywords) {
+      if (lower.includes(kw)) {
+        used[key] = true;
+        return data[key];
+      }
+    }
   }
   return '';
 }
