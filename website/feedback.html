@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback — Simple Pitch Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1c3a;
+    --navy-mid: #122547;
+    --cream: #f7f4ed;
+    --cream-dark: #ede9e0;
+    --red: #c8392b;
+    --red-light: #e8453a;
+    --gold: #e8a030;
+    --text: #0b1c3a;
+    --text-muted: #4a5568;
+    --white: #ffffff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,28,58,0.96); backdrop-filter: blur(12px);
+    padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+    height: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: rgba(247,244,237,0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
+  .nav-links a:hover { color: #f7f4ed; }
+
+  .page-header {
+    padding: 130px 8% 70px;
+    background: var(--navy);
+  }
+  .page-header-eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-header-eyebrow::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--gold); }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 4vw, 3rem); color: #f7f4ed; margin-bottom: 14px; }
+  .page-header-sub { font-size: 0.9rem; color: rgba(247,244,237,0.55); font-weight: 300; max-width: 480px; line-height: 1.7; }
+
+  .feedback-wrap {
+    max-width: 1000px; margin: 0 auto;
+    padding: 80px 8% 100px;
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .feedback-info h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem; color: var(--navy);
+    margin-bottom: 16px; line-height: 1.2;
+  }
+  .feedback-info p {
+    font-size: 0.9rem; line-height: 1.8; color: var(--text-muted);
+    margin-bottom: 32px; font-weight: 300;
+  }
+  .feedback-how { margin-bottom: 24px; }
+  .feedback-how-step {
+    display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;
+  }
+  .feedback-how-num {
+    width: 26px; height: 26px; flex-shrink: 0;
+    background: var(--navy); color: var(--white);
+    border-radius: 50%; font-size: 0.72rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feedback-how-text {
+    font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; font-weight: 300; padding-top: 3px;
+  }
+  .response-note {
+    background: var(--cream-dark);
+    border-left: 3px solid var(--gold);
+    padding: 16px 18px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 32px;
+  }
+  .response-note p {
+    font-size: 0.82rem; color: var(--text-muted); margin: 0; line-height: 1.6; font-weight: 300;
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 22px; }
+  .form-group label {
+    display: block;
+    font-size: 0.78rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid rgba(11,28,58,0.22);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+  .form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%230b1c3a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+    cursor: pointer;
+  }
+  .form-group textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(11,28,58,0.1);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* Type toggle */
+  .type-toggle { display: flex; gap: 10px; margin-bottom: 22px; }
+  .type-btn {
+    flex: 1; padding: 14px 16px;
+    border: 1.5px solid rgba(11,28,58,0.22);
+    border-radius: 8px; background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; font-weight: 500;
+    color: var(--text-muted); cursor: pointer;
+    transition: all 0.2s; text-align: center;
+  }
+  .type-btn:hover { border-color: var(--navy); color: var(--text); }
+  .type-btn.active-bug {
+    border-color: var(--red); background: #fce8e8;
+    color: var(--red); font-weight: 600;
+  }
+  .type-btn.active-feature {
+    border-color: #0a5c41; background: #e8f5e9;
+    color: #0a5c41; font-weight: 600;
+  }
+
+  /* Conditional fields */
+  .bug-fields, .feature-fields { display: none; }
+  .bug-fields.visible, .feature-fields.visible { display: block; }
+
+  .form-submit {
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 15px 36px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.02em;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .form-submit:hover { background: var(--red-light); transform: translateY(-1px); }
+  .form-submit:active { transform: none; }
+  .form-submit:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+  .form-feedback {
+    display: none;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+  .form-feedback.success { background: #e8f5e9; color: #1b5e20; border: 1.5px solid #a5d6a7; }
+  .form-feedback.error { background: #fce8e8; color: #7f1010; border: 1.5px solid #f5a0a0; }
+
+  footer {
+    background: var(--navy); padding: 40px 8%;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; color: rgba(247,244,237,0.8); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: rgba(247,244,237,0.5); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: #f7f4ed; }
+  .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
+
+  @media (max-width: 760px) {
+    .feedback-wrap { grid-template-columns: 1fr; gap: 50px; padding: 60px 6% 80px; }
+    .form-row { grid-template-columns: 1fr; }
+    .type-toggle { flex-direction: column; }
+    .nav-links { display: none; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Simple Pitch Counter</a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="contact.html">Contact</a>
+    <a href="feedback.html" style="color:#e8a030">Feedback</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">Help us improve</div>
+  <h1>Send feedback</h1>
+  <p class="page-header-sub">Found a bug or have an idea? Your feedback goes directly into our product backlog and gets reviewed every week.</p>
+</div>
+
+<div class="feedback-wrap">
+
+  <div class="feedback-info">
+    <h2>Your input shapes the app.</h2>
+    <p>Every piece of feedback is reviewed and prioritized. Bug reports get fixed. Feature requests get considered for the roadmap. You'll see your input reflected in future updates.</p>
+
+    <div class="feedback-how">
+      <div class="feedback-how-step">
+        <div class="feedback-how-num">1</div>
+        <div class="feedback-how-text"><strong>You submit feedback</strong> using this form. It creates a tracked item in our system.</div>
+      </div>
+      <div class="feedback-how-step">
+        <div class="feedback-how-num">2</div>
+        <div class="feedback-how-text"><strong>We triage weekly.</strong> Every submission is reviewed, labeled, and prioritized.</div>
+      </div>
+      <div class="feedback-how-step">
+        <div class="feedback-how-num">3</div>
+        <div class="feedback-how-text"><strong>We ship fixes and features</strong> in two-week sprints. High-priority bugs are addressed within 48 hours.</div>
+      </div>
+    </div>
+
+    <div class="response-note">
+      <p>Bug reports with specific steps to reproduce are the most helpful. Include what you expected vs. what happened, and your device/iOS version if possible.</p>
+    </div>
+  </div>
+
+  <div class="feedback-form-wrap">
+    <form id="feedback-form" novalidate>
+
+      <div class="type-toggle">
+        <button type="button" class="type-btn" id="btn-bug" onclick="setType('bug')">Bug Report</button>
+        <button type="button" class="type-btn" id="btn-feature" onclick="setType('feature')">Feature Request</button>
+      </div>
+
+      <input type="hidden" id="feedback-type" name="type" value="">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fb-name">Your name</label>
+          <input type="text" id="fb-name" name="name" placeholder="Coach Smith" autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="fb-email">Email (optional)</label>
+          <input type="email" id="fb-email" name="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fb-title">Short summary</label>
+        <input type="text" id="fb-title" name="title" placeholder="e.g., Undo button doesn't work after switching pitchers" required>
+      </div>
+
+      <!-- Bug-specific fields -->
+      <div class="bug-fields" id="bug-fields">
+        <div class="form-group">
+          <label for="fb-steps">Steps to reproduce</label>
+          <textarea id="fb-steps" name="steps" placeholder="1. Start a game&#10;2. Add a pitcher&#10;3. Tap undo after switching&#10;4. Nothing happens"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fb-expected">Expected behavior</label>
+            <input type="text" id="fb-expected" name="expected" placeholder="Undo should revert the last pitch">
+          </div>
+          <div class="form-group">
+            <label for="fb-actual">What actually happened</label>
+            <input type="text" id="fb-actual" name="actual" placeholder="Nothing happened, pitch count stayed">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fb-device">Device</label>
+            <input type="text" id="fb-device" name="device" placeholder="iPhone 15, iOS 18.3">
+          </div>
+          <div class="form-group">
+            <label for="fb-severity">Severity</label>
+            <select id="fb-severity" name="severity">
+              <option value="">How bad is it?</option>
+              <option value="critical">Critical — can't use the app</option>
+              <option value="high">High — major feature broken</option>
+              <option value="medium">Medium — annoying but workable</option>
+              <option value="low">Low — cosmetic / minor</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature-specific fields -->
+      <div class="feature-fields" id="feature-fields">
+        <div class="form-group">
+          <label for="fb-problem">What problem does this solve?</label>
+          <textarea id="fb-problem" name="problem" placeholder="Describe the situation where you wish the app did something different..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="fb-solution">Your suggested solution</label>
+          <textarea id="fb-solution" name="solution" placeholder="How would you like it to work?" style="min-height:80px"></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fb-details">Additional details</label>
+        <textarea id="fb-details" name="details" placeholder="Anything else that would help us understand..." style="min-height:80px"></textarea>
+      </div>
+
+      <button type="submit" class="form-submit" id="submit-btn" disabled>Select bug or feature above</button>
+
+      <div class="form-feedback success" id="form-success">
+        Your feedback has been submitted and added to our backlog. Thank you!
+      </div>
+      <div class="form-feedback error" id="form-error"></div>
+    </form>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Simple Pitch Counter</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="contact.html">Contact</a>
+    <a href="feedback.html">Feedback</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Simple Pitch Counter. All rights reserved.</div>
+</footer>
+
+<script>
+  let selectedType = '';
+
+  function setType(type) {
+    selectedType = type;
+    document.getElementById('feedback-type').value = type;
+    document.getElementById('btn-bug').className = 'type-btn' + (type === 'bug' ? ' active-bug' : '');
+    document.getElementById('btn-feature').className = 'type-btn' + (type === 'feature' ? ' active-feature' : '');
+    document.getElementById('bug-fields').className = 'bug-fields' + (type === 'bug' ? ' visible' : '');
+    document.getElementById('feature-fields').className = 'feature-fields' + (type === 'feature' ? ' visible' : '');
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = false;
+    btn.textContent = type === 'bug' ? 'Submit bug report' : 'Submit feature request';
+  }
+
+  const form = document.getElementById('feedback-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const successEl = document.getElementById('form-success');
+  const errorEl = document.getElementById('form-error');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById('fb-title').value.trim();
+    if (!selectedType) {
+      errorEl.textContent = 'Please select Bug Report or Feature Request above.';
+      errorEl.style.display = 'block';
+      return;
+    }
+    if (!title) {
+      errorEl.textContent = 'Please enter a short summary.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    const data = {
+      type: selectedType,
+      name: document.getElementById('fb-name').value.trim(),
+      email: document.getElementById('fb-email').value.trim(),
+      title: title,
+      details: document.getElementById('fb-details').value.trim()
+    };
+
+    if (selectedType === 'bug') {
+      data.steps = document.getElementById('fb-steps').value.trim();
+      data.expected = document.getElementById('fb-expected').value.trim();
+      data.actual = document.getElementById('fb-actual').value.trim();
+      data.device = document.getElementById('fb-device').value.trim();
+      data.severity = document.getElementById('fb-severity').value;
+    } else {
+      data.problem = document.getElementById('fb-problem').value.trim();
+      data.solution = document.getElementById('fb-solution').value.trim();
+    }
+
+    try {
+      const response = await fetch('feedback.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        successEl.textContent = result.message || 'Your feedback has been submitted and added to our backlog. Thank you!';
+        successEl.style.display = 'block';
+        form.reset();
+        selectedType = '';
+        document.getElementById('btn-bug').className = 'type-btn';
+        document.getElementById('btn-feature').className = 'type-btn';
+        document.getElementById('bug-fields').className = 'bug-fields';
+        document.getElementById('feature-fields').className = 'feature-fields';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Select bug or feature above';
+      } else {
+        throw new Error(result.error || 'Submission failed');
+      }
+    } catch (err) {
+      errorEl.textContent = 'Could not submit automatically. Please email your feedback to hello@simplepitchcounter.com.';
+      errorEl.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = selectedType === 'bug' ? 'Submit bug report' : 'Submit feature request';
+    }
+  });
+</script>
+</body>
+</html>
