@@ -7,9 +7,12 @@ How user feedback flows from submission to shipped fix.
 ## The Full Flow
 
 ```
-User submits feedback at simplepitchcounter.com/feedback
-  → feedback.php creates a GitHub Issue (labeled, structured)
-  → Auto-triage workflow adds "needs-triage" label + checklist comment
+Public user → simplepitchcounter.com/feedback → feedback.php → GitHub Issue
+Internal team → Google Form → Apps Script → GitHub Issue
+                                                    │
+                                          Both paths merge here:
+                                                    ▼
+Auto-triage workflow adds "needs-triage" label + checklist comment
   → PM triages weekly: assign priority, milestone, project board
   → Developer creates fix branch: fix/short-name
   → Push triggers PR preview deployment (GitHub Pages)
@@ -44,6 +47,41 @@ Users choose Bug Report or Feature Request. The form collects structured data:
 - Formatted markdown body with all fields
 - Labels: `type: bug` or `type: feature`, `source: feedback-form`, `status: needs-triage`
 - Rate limiting: 5 submissions per hour per IP
+
+### Internal Feedback Form (Google Forms)
+
+**For:** Coaches, board members, league officials — anyone involved with EDHLL who isn't a public end user.
+
+A Google Form feeds directly into GitHub Issues, just like the website form but labeled `source: internal` instead of `source: feedback-form`.
+
+**Bug reports collect:**
+- Short summary (required)
+- Steps to reproduce
+- Expected vs. actual behavior
+- Severity (critical / high / medium / low)
+
+**Feature requests collect:**
+- Short summary (required)
+- Problem it solves
+- Suggested solution
+
+**Backend:** Google Apps Script (`scripts/google-apps-script.js`) triggers on form submission and calls the GitHub API to create an Issue with:
+- Formatted markdown body with all fields
+- Labels: `type: bug` or `type: feature`, `source: internal`, `status: needs-triage`
+- Submitter name and role included in the issue body
+
+**Setup (if recreating):**
+1. Create a Google Form with fields: Name, Role (dropdown), Type (Bug/Feature), Summary, Severity (dropdown), Steps to Reproduce, Expected/Actual Behavior, Problem, Solution, Details
+2. Open the form → three-dot menu → Script editor
+3. Paste `scripts/google-apps-script.js` into Code.gs
+4. Add the GitHub token to Script Properties (gear icon → Script Properties → `GITHUB_TOKEN`)
+5. Add a trigger: clock icon → + Add Trigger → `onFormSubmit` / From form / On form submit
+
+**Why Google Forms over Slack:**
+- Zero learning curve for non-technical stakeholders
+- Structured data (not free-text chat that gets lost)
+- Automatic issue creation — no manual conversion needed
+- Clear audit trail in GitHub Issues
 
 ### Other Intake Channels
 
@@ -132,20 +170,22 @@ git commit -m "Fix undo button at-bat counter (#3)"
 ## Pipeline Diagram
 
 ```
-                    ┌─────────────────────┐
-                    │  User Feedback Form  │
-                    │  /feedback           │
-                    └─────────┬───────────┘
-                              │
-                    ┌─────────▼───────────┐
-                    │  feedback.php        │
-                    │  Creates GitHub Issue│
-                    └─────────┬───────────┘
-                              │
-                    ┌─────────▼───────────┐
-                    │  Auto-Triage Action  │
-                    │  Labels + Checklist  │
-                    └─────────┬───────────┘
+  ┌─────────────────────┐     ┌─────────────────────┐
+  │  Public Feedback     │     │  Internal Feedback   │
+  │  /feedback           │     │  Google Form         │
+  └─────────┬───────────┘     └─────────┬───────────┘
+            │                           │
+  ┌─────────▼───────────┐     ┌─────────▼───────────┐
+  │  feedback.php        │     │  Google Apps Script  │
+  │  Creates GitHub Issue│     │  Creates GitHub Issue│
+  └─────────┬───────────┘     └─────────┬───────────┘
+            │                           │
+            └───────────┬───────────────┘
+                        │
+              ┌─────────▼───────────┐
+              │  Auto-Triage Action  │
+              │  Labels + Checklist  │
+              └─────────┬───────────┘
                               │
                     ┌─────────▼───────────┐
                     │  Weekly Triage       │
@@ -180,4 +220,5 @@ git commit -m "Fix undo button at-bat counter (#3)"
 - Rate limiting prevents abuse (5 submissions/hour/IP)
 - All user input is sanitized with `strip_tags()` and length-limited
 - CORS restricted to simplepitchcounter.com
-- The GitHub token uses a fine-grained PAT with only `issues:write` scope
+- Both `feedback.php` and Apps Script use the same fine-grained PAT with only `issues:write` scope
+- The Apps Script token is stored in Google Script Properties (encrypted at rest), not in code
