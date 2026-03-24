@@ -10,6 +10,7 @@ DerivedData/
 *.perspectivev3
 xcuserdata/
 
-# Sensitive credentials
+# Sensitive credentials and NAS-only files
 website/contact.php
 website/feedback.php
+website/phpmailer/
