@@ -49,7 +49,7 @@ A real iOS app built for volunteer scorekeepers at youth baseball games. This pr
 
 ## Live Product
 
-- [iOS App Store](https://apps.apple.com/app/simple-pitch-counter) — Production app
+- [iOS App Store](https://apps.apple.com/us/app/simple-pitch-counter/id6760922314) — Production app
 - [simplepitchcounter.com](https://simplepitchcounter.com) — Marketing site and contact form
 - [GitHub Releases](https://github.com/mrthames/simple-pitch-counter/releases) — Tagged releases with PM-written release notes
 

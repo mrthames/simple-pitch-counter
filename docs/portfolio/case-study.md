@@ -117,4 +117,4 @@ These aren't vanity metrics. Every one maps to a real problem a scorekeeper face
 
 ---
 
-*Simple Pitch Counter is available on the [iOS App Store](https://apps.apple.com/app/simple-pitch-counter) and at [simplepitchcounter.com](https://simplepitchcounter.com).*
+*Simple Pitch Counter is available on the [iOS App Store](https://apps.apple.com/us/app/simple-pitch-counter/id6760922314) and at [simplepitchcounter.com](https://simplepitchcounter.com).*
