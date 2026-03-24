@@ -46,8 +46,9 @@ The following files contain credentials and are **not tracked in git**. They liv
 
 To update credentials: edit the file locally (gitignored) and deploy manually:
 ```bash
-scp -O -i ~/.ssh/spc_deploy -P 2222 website/contact.php website/feedback.php justin@192.168.1.234:/volume1/Websites/simplepitchcounter.com/
+scp -O -i ~/.ssh/spc_deploy -P $NAS_SSH_PORT website/contact.php website/feedback.php $NAS_USER@$NAS_HOST:/volume1/Websites/simplepitchcounter.com/
 ```
+*(Connection details are stored as GitHub Actions secrets — see Setup below.)*
 
 ---
 
