@@ -1,0 +1,15 @@
+# Normalize line endings to LF on commit
+* text=auto eol=lf
+
+# Xcode project files
+*.pbxproj text eol=lf
+*.xcworkspacedata text eol=lf
+*.xcsettings text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
