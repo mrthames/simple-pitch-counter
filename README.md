@@ -2,7 +2,7 @@
 
 A pitch counter app for youth baseball and softball coaches, built for the dugout.
 
-**App Store:** [Simple Pitch Counter on iOS](https://apps.apple.com/app/simple-pitch-counter)
+**App Store:** [Simple Pitch Counter on iOS](https://apps.apple.com/us/app/simple-pitch-counter/id6760922314)
 **Website:** [simplepitchcounter.com](https://simplepitchcounter.com)
 
 ## What it does
