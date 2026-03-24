@@ -26,11 +26,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build preview site
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           mkdir -p _preview
           cp website/index.html website/privacy.html website/contact.html _preview/ 2>/dev/null || true
           # Add a preview banner to the top of the page
-          sed -i 's|<body>|<body><div style="background:#e8a030;color:#0b1c3a;text-align:center;padding:8px;font-family:sans-serif;font-size:13px;font-weight:600;">⚠ PR #${{ github.event.pull_request.number }} Preview — Not production</div>|' _preview/index.html
+          sed -i "s|<body>|<body><div style=\"background:#e8a030;color:#0b1c3a;text-align:center;padding:8px;font-family:sans-serif;font-size:13px;font-weight:600;\">⚠ PR #${PR_NUMBER} Preview — Not production</div>|" _preview/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

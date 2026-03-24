@@ -7,6 +7,9 @@ on:
       - 'website/**'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -24,12 +27,12 @@ jobs:
       - name: Deploy website files
         run: |
           tar -cf - -C website index.html privacy.html contact.html feedback.html | \
-            ssh -i ~/.ssh/deploy_key -p ${{ secrets.NAS_SSH_PORT }} -o StrictHostKeyChecking=accept-new \
+            ssh -i ~/.ssh/deploy_key -p ${{ secrets.NAS_SSH_PORT }} -o StrictHostKeyChecking=yes \
             ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} \
             "tar -xf - -C /volume1/Websites/simplepitchcounter.com/"
 
       - name: Verify deployment
         run: |
-          ssh -i ~/.ssh/deploy_key -p ${{ secrets.NAS_SSH_PORT }} -o StrictHostKeyChecking=accept-new \
+          ssh -i ~/.ssh/deploy_key -p ${{ secrets.NAS_SSH_PORT }} -o StrictHostKeyChecking=yes \
             ${{ secrets.NAS_USER }}@${{ secrets.NAS_HOST }} \
             "ls -la /volume1/Websites/simplepitchcounter.com/"
