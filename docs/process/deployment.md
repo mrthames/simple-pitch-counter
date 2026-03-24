@@ -15,7 +15,7 @@ A GitHub Action (`.github/workflows/deploy-website.yml`) runs on every push that
 1. Checks out the repo
 2. Connects to the NAS via SSH using a deploy key
 3. Transfers `website/` files to `/volume1/Websites/simplepitchcounter.com/` via SSH+tar (Synology doesn't support rsync/scp over SSH by default)
-4. `contact.php` is not tracked in git, so it's never overwritten (credentials — managed separately on the NAS)
+4. `contact.php` and `feedback.php` are not tracked in git, so they're never overwritten (credentials — managed separately on the NAS)
 5. Verifies the deployment by listing the remote directory
 
 ### Manual trigger
@@ -28,14 +28,26 @@ You can also trigger a deploy manually from GitHub → Actions → "Deploy Websi
 2. Added the public key to `~/.ssh/authorized_keys` on the NAS
 3. Enabled `PubkeyAuthentication` in `/etc/ssh/sshd_config` on the NAS
 4. Set correct permissions: `~` = 755, `~/.ssh` = 700, `authorized_keys` = 600
-5. Added three GitHub Actions secrets (values stored in GitHub, not in this repo):
+5. Added four GitHub Actions secrets (values stored in GitHub, not in this repo):
    - `NAS_SSH_KEY` — the private deploy key
    - `NAS_HOST` — the NAS hostname
    - `NAS_USER` — the SSH username
+   - `NAS_SSH_PORT` — the SSH port (2222)
 
-### Important: contact.php
+### Important: NAS-only files
 
-The contact form backend (`contact.php`) contains SMTP credentials and is **not tracked in git**. It lives only on the NAS. The rsync `--exclude='contact.php'` flag ensures it's never overwritten during deployment. If you need to update it, edit it directly on the NAS.
+The following files contain credentials and are **not tracked in git**. They live only on the NAS at `/volume1/Websites/simplepitchcounter.com/` and are never overwritten by automated deploys:
+
+| File | Purpose | Credentials |
+|------|---------|-------------|
+| `contact.php` | Contact form mailer | AWS WorkMail SMTP password |
+| `feedback.php` | Feedback form → GitHub Issues | GitHub fine-grained PAT (issues: write) |
+| `phpmailer/` | PHPMailer library (required by contact.php) | — |
+
+To update credentials: edit the file locally (gitignored) and deploy manually:
+```bash
+scp -O -i ~/.ssh/spc_deploy -P 2222 website/contact.php website/feedback.php justin@192.168.1.234:/volume1/Websites/simplepitchcounter.com/
+```
 
 ---
 
@@ -48,7 +60,7 @@ The iOS build requires Xcode on the Mac. A deploy script handles the build-to-up
 From your Mac, in the repo directory:
 
 ```bash
-cd ~/Documents/simple-pitch-counter
+cd ~/Projects/Sub-Projects/simple-pitch-counter
 ./scripts/deploy-ios.sh
 ```
 
