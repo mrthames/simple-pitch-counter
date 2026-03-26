@@ -308,6 +308,7 @@ textarea{resize:vertical;min-height:56px}
           <button class="hbg-btn" onclick="toggleHbg()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg></button>
           <div class="hbg-menu" id="hbg-menu">
             <button class="hbg-item" onclick="closeHbg();showStats()">Quick stats</button>
+            <button class="hbg-item" onclick="closeHbg();goSummary()">Game summary</button>
             <button class="hbg-item" onclick="closeHbg();closeGameToHistory()">Close</button>
             <div style="border-top:0.5px solid rgba(0,0,0,0.20);margin:5px 0"></div>
             <button class="hbg-item danger" onclick="closeHbg();confirmEndGame()">End game</button>
@@ -573,9 +574,10 @@ function confirmEndHalf() {
   ]);
 }
 function confirmEndGame() {
-  showModal('End game?', 'This will end the game, save it to history, and open the game summary.', [
+  showModal('End game?', 'This will close the game and save it to history. Generate the summary first to send the required report.', [
     { label: 'Cancel', fn: 'closeModal()' },
-    { label: 'End game', fn: 'closeModal();endGame()', cls: 'btn-red' }
+    { label: 'Go to summary', fn: 'closeModal();goSummary()', cls: 'btn-primary' },
+    { label: 'End now', fn: 'closeModal();endGame()', cls: 'btn-red' }
   ]);
 }
 function cancelSetup() {
@@ -1067,7 +1069,11 @@ function endGame() {
   // Remove any in-progress copy first
   state.games = state.games.filter(x => x.id !== g.id);
   state.games.unshift(g); state.currentGame = null; saveState();
-  renderHistory(); openSavedGameSummary(0);
+  showModal('Game saved', 'Generate the game summary to send the required report, or start a new game.', [
+    { label: 'View summary', fn: 'closeModal();openSavedGameSummary(0)', cls: 'btn-primary' },
+    { label: 'New game', fn: 'closeModal();goSetup()' }
+  ], true);
+  renderHistory(); showScreen('history');
 }
 
 // History — LIVE badge in red for in-progress games
