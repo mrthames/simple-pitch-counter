@@ -923,7 +923,7 @@ function renderCatcherSection() {
     if (ac) { const inn = ac.innings.filter(Boolean).length; const atLim = inn >= C_INN_LIM; h += `<div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:600;color:#111110">${ac.name}${ac.num ? ' #' + ac.num : ''}</div><div style="font-size:12px;color:#4a4945">${inn} inn caught</div></div>${atLim ? '<span class="badge b-red">Limit</span>' : ''}</div>`; }
     else h = '<div style="font-size:13px;color:#4a4945">No catcher selected.</div>';
   }
-  roster.catchers.forEach(c => { const inn = c.innings.filter(Boolean).length; if (inn >= C_INN_LIM) h += alertHtml({ t: 'danger', m: `${c.name} caught ${inn} innings — cannot pitch today (Sec. 15f).` }); else if (inn === 3) h += alertHtml({ t: 'warn', m: `${c.name} at 3 innings — 1 more and no pitching today.` }); });
+  roster.catchers.forEach(c => { const inn = c.innings.filter(Boolean).length; if (inn >= C_INN_LIM) h += alertHtml({ t: 'danger', m: `${c.name} caught ${inn} innings — cannot pitch today.` }); else if (inn === 3) h += alertHtml({ t: 'warn', m: `${c.name} at 3 innings — 1 more and no pitching today.` }); });
   document.getElementById('catcher-display').innerHTML = h;
 }
 function addNewCatcherMidGame() { const nm = document.getElementById('new-c-name')?.value.trim(); const nu = document.getElementById('new-c-num')?.value.trim(); if (!nm) return; fRoster().catchers.push({ name: nm, num: nu || '', innings: [] }); selectCatcher(fRoster().catchers.length - 1); }
