@@ -1,9 +1,16 @@
 import UIKit
 import WebKit
 
-class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
+class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
 
     var webView: WKWebView!
+
+    // Haptic generators — pre-instantiated for responsiveness
+    private let impactLight = UIImpactFeedbackGenerator(style: .light)
+    private let impactMedium = UIImpactFeedbackGenerator(style: .medium)
+    private let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+    private let notificationFeedback = UINotificationFeedbackGenerator()
+    private let selectionFeedback = UISelectionFeedbackGenerator()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,6 +25,14 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
         let prefs = WKWebpagePreferences()
         prefs.allowsContentJavaScript = true
         config.defaultWebpagePreferences = prefs
+
+        // Register JS → native haptic message handler
+        config.userContentController.add(self, name: "haptic")
+
+        // Pre-warm haptic generators
+        impactLight.prepare()
+        impactMedium.prepare()
+        impactHeavy.prepare()
 
         // --- Create and fill the view ---
         webView = WKWebView(frame: .zero, configuration: config)
@@ -120,6 +135,36 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate {
             completionHandler(alert.textFields?.first?.text)
         })
         present(alert, animated: true)
+    }
+
+    // MARK: - WKScriptMessageHandler (haptic feedback from JS)
+
+    func userContentController(_ userContentController: WKUserContentController,
+                                didReceive message: WKScriptMessage) {
+        guard message.name == "haptic", let type = message.body as? String else { return }
+        switch type {
+        case "light":
+            impactLight.impactOccurred()
+            impactLight.prepare()
+        case "medium":
+            impactMedium.impactOccurred()
+            impactMedium.prepare()
+        case "heavy":
+            impactHeavy.impactOccurred()
+            impactHeavy.prepare()
+        case "success":
+            notificationFeedback.notificationOccurred(.success)
+        case "warning":
+            notificationFeedback.notificationOccurred(.warning)
+        case "error":
+            notificationFeedback.notificationOccurred(.error)
+        case "selection":
+            selectionFeedback.selectionChanged()
+            selectionFeedback.prepare()
+        default:
+            impactMedium.impactOccurred()
+            impactMedium.prepare()
+        }
     }
 
     // MARK: - Error fallback
