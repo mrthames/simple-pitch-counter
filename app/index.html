@@ -967,8 +967,7 @@ function goSummary() {
   function pFields(pitchers, cid) {
     let h = '';
     pitchers.filter(p => p.pitches > 0).forEach((p, i) => {
-      const isAbnormal = p.lastBatterPitches >= BATTER_WARN;
-      h += `<div style="display:flex;gap:9px;align-items:center;margin-bottom:9px"><div style="flex:1;font-size:14px;font-weight:600">${p.name}${p.num ? ' #' + p.num : ''}<div style="font-size:12px;color:#4a4945;font-weight:400">${p.pitches} total pitches</div></div><div style="text-align:right"><div class="lbl" style="margin-bottom:4px;${isAbnormal ? 'color:#a32d2d' : ''}">Last batter ${isAbnormal ? '(!!)' : ''}</div><input type="number" id="${cid}-lb-${i}" value="${p.lastBatterPitches || 0}" min="0" style="width:76px;text-align:center;${isAbnormal ? 'border-color:#f7c1c1;' : ''}"></div></div>`;
+      h += `<div style="display:flex;gap:9px;align-items:center;margin-bottom:9px"><div style="flex:1;font-size:14px;font-weight:600">${p.name}${p.num ? ' #' + p.num : ''}<div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#4a4945;font-weight:400"><span id="${cid}-total-${i}">${p.pitches}</span> total pitches <button onclick="editSummaryPitchCount('${cid}',${i})" style="padding:2px 7px;border:0.5px solid rgba(0,0,0,0.28);border-radius:var(--radius);background:#ffffff;cursor:pointer;font-size:11px;font-weight:600;color:#4a4945;font-family:inherit">Edit</button></div></div><div style="text-align:right"><div class="lbl" style="margin-bottom:4px">Last batter</div><input type="number" id="${cid}-lb-${i}" value="${p.lastBatterPitches || 0}" min="0" style="width:76px;text-align:center"></div></div>`;
     });
     document.getElementById(cid).innerHTML = h || '<div style="font-size:13px;color:#4a4945">None recorded.</div>';
   }
@@ -982,6 +981,41 @@ function collectSummaryData() {
   g.umpBaseName = document.getElementById('sum-bu-name').value; g.umpBaseIssue = document.querySelector('input[name="bu-iss"]:checked')?.value || 'No'; g.umpBaseComments = document.getElementById('sum-bu-comments').value;
   const sl = (ps, cid) => { ps.filter(p => p.pitches > 0).forEach((p, i) => { const v = document.getElementById(`${cid}-lb-${i}`); if (v) p.lastBatterPitches = parseInt(v.value) || 0; }); };
   sl(g.home.pitchers, 'sum-home-pitchers'); sl(g.away.pitchers, 'sum-away-pitchers'); saveState();
+}
+function editSummaryPitchCount(cid, idx) {
+  const g = state.currentGame; if (!g) return;
+  const pitchers = cid === 'sum-home-pitchers' ? g.home.pitchers : g.away.pitchers;
+  const active = pitchers.filter(p => p.pitches > 0);
+  const p = active[idx]; if (!p) return;
+  const modal = document.createElement('div'); modal.className = 'modal-overlay'; modal.id = 'active-modal';
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  modal.innerHTML = `<div class="modal-box">
+    <button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/></svg></button>
+    <div class="modal-title">Edit pitch count</div>
+    <div class="modal-sub">Correct the total pitch count for ${p.name}${p.num ? ' #' + p.num : ''}.</div>
+    <div style="margin-bottom:14px">
+      <div class="lbl">Total pitch count</div>
+      <input type="number" id="sum-edit-total" value="${p.pitches}" min="0" style="font-size:28px;font-weight:700;text-align:center;padding:14px">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" style="flex:1" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveSummaryPitchCount('${cid}',${idx})">Save</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  setTimeout(() => document.getElementById('sum-edit-total')?.focus(), 100);
+}
+function saveSummaryPitchCount(cid, idx) {
+  const g = state.currentGame; if (!g) return;
+  const pitchers = cid === 'sum-home-pitchers' ? g.home.pitchers : g.away.pitchers;
+  const active = pitchers.filter(p => p.pitches > 0);
+  const p = active[idx]; if (!p) return;
+  const val = parseInt(document.getElementById('sum-edit-total')?.value);
+  if (isNaN(val) || val < 0) { alert('Enter a valid pitch count.'); return; }
+  p.pitches = val;
+  const span = document.getElementById(`${cid}-total-${idx}`);
+  if (span) span.textContent = val;
+  saveState(); closeModal();
 }
 function buildSummaryText() {
   const g = state.currentGame || state._exportGame;
