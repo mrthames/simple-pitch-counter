@@ -97,8 +97,16 @@ A single-purpose app that makes pitch count tracking effortless during a live ga
 - Single developer (AI-assisted). Keep architecture simple — one HTML file, no build step.
 - App Store review: no web-only apps, must provide native value. The WKWebView wrapper must feel native (no bounce scroll, proper status bar, portrait lock).
 
+## Deferred Features
+
+### Live Coach View ([#33](https://github.com/mrthames/simple-pitch-counter/issues/33))
+
+Real-time, read-only sharing of live game data so coaches can check pitch counts from their own device. Full spec at [feature-live-coach-view.md](feature-live-coach-view.md).
+
+**Status:** Deferred (2026-03-26). All real-time sync options introduce infrastructure cost that conflicts with the app's zero-cost operating model. Revisit when user demand is validated or a zero-cost solution matures.
+
 ## Open Questions
 
 - Should the app support tracking for both teams simultaneously, or only the user's team? (Currently supports both)
-- Is there demand for a shared/synced pitch count between scorekeeper and coach on different devices?
+- ~~Is there demand for a shared/synced pitch count between scorekeeper and coach on different devices?~~ → Explored and deferred. See [Live Coach View spec](feature-live-coach-view.md).
 - Should we add push notification reminders about pitcher rest eligibility before the next game?
