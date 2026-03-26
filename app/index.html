@@ -61,6 +61,8 @@ textarea{resize:vertical;min-height:56px}
 .lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#706f68;margin-bottom:5px}
 .card{background:#ffffff;border:1.5px solid rgba(0,0,0,0.28);border-radius:var(--radius-lg);padding:.95rem 1.05rem;margin-bottom:10px}
 .divider{border:none;border-top:0.5px solid rgba(0,0,0,0.20);margin:.8rem 0}
+.section-borderless{background:transparent;border:none;padding:0.95rem 0;margin-bottom:0}
+.section-divider{border:none;border-top:0.5px solid rgba(0,0,0,0.15);margin:4px 0}
 
 /* ── Alerts ── */
 .alert{padding:10px 13px;border-radius:var(--radius);font-size:13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:7px}
@@ -71,8 +73,12 @@ textarea{resize:vertical;min-height:56px}
 .a-critical{background:#501313;color:#fbeaea;border:0.5px solid #a32d2d;border-radius:var(--radius);padding:11px 13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px;font-size:13px}
 .a-critical .ai{background:#a32d2d;color:#fff;width:16px;height:16px;font-size:10px;font-weight:600;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 
+/* ── Game header (combined inning bar + scoreboard) ── */
+.game-header{background:#f5f4ef;border-radius:var(--radius-lg);padding:10px 12px;margin-bottom:12px}
+.game-header-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:9px;margin-bottom:9px;border-bottom:0.5px solid rgba(0,0,0,0.15)}
+
 /* ── Scoreboard ── */
-.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;gap:0;margin-bottom:8px;background:#f5f4ef;border:1px solid rgba(0,0,0,0.22);border-radius:var(--radius-lg);padding:10px 12px;align-items:center}
+.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;gap:0;align-items:center}
 .sb-team-col{display:flex;flex-direction:column;align-items:center;gap:6px}
 .sb-team-col.home{align-items:center}
 .sb-team-col.away{align-items:center}
@@ -83,8 +89,8 @@ textarea{resize:vertical;min-height:56px}
 .sb-adj-btn:active{background:#e8e7e2}
 .sb-divider{font-size:18px;font-weight:300;color:#706f68;text-align:center;padding:0 4px;align-self:flex-end;padding-bottom:5px}
 
-/* ── Game top bar — inning banner + hamburger combined ── */
-.game-top-bar{display:flex;align-items:center;justify-content:space-between;background:#ffffff;border:1.5px solid rgba(0,0,0,0.28);border-radius:var(--radius);padding:9px 12px;margin-bottom:10px;gap:10px}
+/* ── Game top bar (now inside .game-header, no border) ── */
+.game-top-bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .inn-info{flex:1;min-width:0}
 .inn-tag{font-size:14px;font-weight:600;color:#111110;white-space:nowrap}
 .inn-sub{font-size:11px;color:#4a4945;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -289,50 +295,50 @@ textarea{resize:vertical;min-height:56px}
 <!-- ══ GAME ══ -->
 <div id="screen-game" class="screen">
 
-  <!-- Combined inning banner + hamburger at top -->
-  <div class="game-top-bar">
-    <div class="inn-info">
-      <div class="inn-tag" id="inn-tag"></div>
-      <div class="inn-sub" id="inn-sub"></div>
+  <!-- Unified game header: inning bar + scoreboard -->
+  <div class="game-header">
+    <div class="game-header-top">
+      <div class="inn-info">
+        <div class="inn-tag" id="inn-tag"></div>
+        <div class="inn-sub" id="inn-sub"></div>
+      </div>
+      <div class="inn-right">
+        <button class="btn btn-sm" style="border-color:#b5d4f4;color:#185fa5;background:#f0f7ff" onclick="confirmEndHalf()">End half <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,1 9,6 4,11"/></svg></button>
+        <div class="hbg-wrap">
+          <button class="hbg-btn" onclick="toggleHbg()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg></button>
+          <div class="hbg-menu" id="hbg-menu">
+            <button class="hbg-item" onclick="closeHbg();showStats()">Quick stats</button>
+            <button class="hbg-item" onclick="closeHbg();goSummary()">Game summary</button>
+            <button class="hbg-item" onclick="closeHbg();closeGameToHistory()">Close</button>
+            <div style="border-top:0.5px solid rgba(0,0,0,0.20);margin:5px 0"></div>
+            <button class="hbg-item danger" onclick="closeHbg();confirmEndGame()">End game</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="inn-right">
-      <button class="btn btn-sm" style="border-color:#b5d4f4;color:#185fa5;background:#f0f7ff" onclick="confirmEndHalf()">End half <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,1 9,6 4,11"/></svg></button>
-      <div class="hbg-wrap">
-        <button class="hbg-btn" onclick="toggleHbg()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg></button>
-        <div class="hbg-menu" id="hbg-menu">
-          <button class="hbg-item" onclick="closeHbg();showStats()">Quick stats</button>
-          <button class="hbg-item" onclick="closeHbg();goSummary()">Game summary</button>
-          <button class="hbg-item" onclick="closeHbg();closeGameToHistory()">Close</button>
-          <div style="border-top:0.5px solid rgba(0,0,0,0.20);margin:5px 0"></div>
-          <button class="hbg-item danger" onclick="closeHbg();confirmEndGame()">End game</button>
+    <div class="scoreboard">
+      <div class="sb-team-col home">
+        <div class="sb-team-name" id="sb-home-name">Home</div>
+        <div class="sb-score-row">
+          <button class="sb-adj-btn" onclick="adjScore('home',-1)">−</button>
+          <div class="sb-score-num" id="sb-home-score">0</div>
+          <button class="sb-adj-btn" onclick="adjScore('home',1)">+</button>
+        </div>
+      </div>
+      <div class="sb-divider">–</div>
+      <div class="sb-team-col away">
+        <div class="sb-team-name" id="sb-away-name">Away</div>
+        <div class="sb-score-row">
+          <button class="sb-adj-btn" onclick="adjScore('away',-1)">−</button>
+          <div class="sb-score-num" id="sb-away-score">0</div>
+          <button class="sb-adj-btn" onclick="adjScore('away',1)">+</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Score -->
-  <div class="scoreboard">
-    <div class="sb-team-col home">
-      <div class="sb-team-name" id="sb-home-name">Home</div>
-      <div class="sb-score-row">
-        <button class="sb-adj-btn" onclick="adjScore('home',-1)">−</button>
-        <div class="sb-score-num" id="sb-home-score">0</div>
-        <button class="sb-adj-btn" onclick="adjScore('home',1)">+</button>
-      </div>
-    </div>
-    <div class="sb-divider">–</div>
-    <div class="sb-team-col away">
-      <div class="sb-team-name" id="sb-away-name">Away</div>
-      <div class="sb-score-row">
-        <button class="sb-adj-btn" onclick="adjScore('away',-1)">−</button>
-        <div class="sb-score-num" id="sb-away-score">0</div>
-        <button class="sb-adj-btn" onclick="adjScore('away',1)">+</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Pitcher card -->
-  <div class="card">
+  <!-- Pitcher section -->
+  <div class="section-borderless">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
       <div class="lbl" style="margin-bottom:0">Pitcher</div>
       <button class="btn btn-sm" onclick="togglePSelect()" id="pselect-toggle">Change pitcher</button>
@@ -341,11 +347,10 @@ textarea{resize:vertical;min-height:56px}
     <div id="pitcher-display"></div>
   </div>
 
-  <!-- Pitch alerts zone — sits between pitcher and catcher cards, never shifts layout -->
-  <div id="pitch-alerts"></div>
+  <hr class="section-divider">
 
-  <!-- Catcher card — no "required" text -->
-  <div class="card">
+  <!-- Catcher section -->
+  <div class="section-borderless">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
       <div class="lbl" style="margin-bottom:0">Catcher</div>
       <button class="btn btn-sm" onclick="toggleCSelect()" id="cselect-toggle">Change catcher</button>
@@ -778,7 +783,7 @@ function renderPitcherSection() {
     h += `<div class="add-player-form"><input type="text" id="new-p-name" placeholder="New pitcher name" style="flex:2"><input type="text" id="new-p-num" placeholder="#" style="width:58px;flex:0 0 58px"><button class="btn btn-sm btn-primary" onclick="addNewPitcherMidGame()">Add</button></div>`;
     psl.innerHTML = h;
   } else { psl.style.display = 'none'; tog.textContent = 'Change pitcher'; }
-  if (!ap) { document.getElementById('pitcher-display').innerHTML = '<div class="empty-state">No pitcher selected.</div>'; const az = document.getElementById('pitch-alerts'); if (az) az.innerHTML = ''; return; }
+  if (!ap) { document.getElementById('pitcher-display').innerHTML = '<div class="empty-state">No pitcher selected.</div>'; return; }
   const ri = restInfo(ap.pitches);
   const cc = ap.pitches >= PITCH_MAX ? 'r' : ap.pitches >= 36 ? 'r' : ap.pitches >= 21 ? 'y' : '';
   const rcol = !ri ? '#706f68' : ri.days === 0 ? '#639922' : ri.days === 1 ? '#ba7517' : '#a32d2d';
@@ -786,9 +791,6 @@ function renderPitcherSection() {
   const bc = ap.currentBatterPitches;
   const bcCls = bc >= BATTER_CRIT ? 'bc-crit' : bc >= BATTER_WARN ? 'bc-warn' : '';
   const batAlert = batterAlertHtml(bc);
-  // Write alerts to the dedicated zone between pitcher and catcher cards
-  const alertZone = document.getElementById('pitch-alerts');
-  if (alertZone) alertZone.innerHTML = (warns || batAlert) ? `<div style="margin-bottom:10px">${warns}${batAlert}</div>` : '';
   const batterBox = `<div class="batter-counter"><div><div style="font-size:12px;color:#4a4945">Pitches this at-bat</div></div><div class="batter-count-num ${bcCls}">${bc}</div></div>`;
   let h = batterBox;
   h += `<div class="hero">
@@ -802,6 +804,8 @@ function renderPitcherSection() {
   </div>`;
   h += `<div class="action-row"><button class="big-btn pitch" onclick="addPitch()">+ Pitch</button><button class="undo-btn" onclick="undoLast()" ${undoLen === 0 ? 'disabled' : ''}>${UNDO_SVG} Undo</button></div>`;
   h += `<button class="big-btn next-b" onclick="nextBatter()" style="margin-bottom:0">Next batter <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,1 9,6 4,11"/></svg></button>`;
+  // Alerts below action buttons — prevents layout shift during rapid tapping
+  if (warns || batAlert) h += `<div style="margin-top:10px">${warns}${batAlert}</div>`;
   // No inning dots — removed per change #8
   document.getElementById('pitcher-display').innerHTML = h;
 }
