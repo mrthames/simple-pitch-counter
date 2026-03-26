@@ -194,6 +194,13 @@ textarea{resize:vertical;min-height:56px}
 /* ── Export ── */
 #export-box{background:#ebebe5;border:0.5px solid rgba(0,0,0,0.35);border-radius:var(--radius);padding:1rem;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word;margin-bottom:10px;color:#111110;max-height:300px;overflow-y:auto;font-family:'SF Mono',Menlo,monospace}
 .empty-state{text-align:center;padding:2rem 1rem;color:#4a4945;font-size:14px}
+
+/* ── View Transitions ── */
+@keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fade-out{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-4px)}}
+::view-transition-old(screen-content){animation:fade-out .15s ease-out both}
+::view-transition-new(screen-content){animation:fade-in .18s ease-out both}
+.screen.active{view-transition-name:screen-content}
 </style>
 </head>
 <body>
@@ -491,12 +498,15 @@ function applyActiveConfig() {
   if (cfg) { PITCH_MAX = cfg.pitchMax; C_INN_LIM = cfg.catcherInnMax; }
 }
 function showScreen(n) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + n).classList.add('active');
-  window.scrollTo(0, 0);
-  if (n === 'config') renderConfigScreen();
-  if (n === 'history') renderHistory();
-  if (n === 'setup') renderFieldSelector();
+  const go = () => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + n).classList.add('active');
+    window.scrollTo(0, 0);
+    if (n === 'config') renderConfigScreen();
+    if (n === 'history') renderHistory();
+    if (n === 'setup') renderFieldSelector();
+  };
+  if (document.startViewTransition) { document.startViewTransition(go); } else { go(); }
 }
 
 // Hamburger — game screen
