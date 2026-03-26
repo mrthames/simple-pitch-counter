@@ -439,6 +439,11 @@ textarea{resize:vertical;min-height:56px}
 
 </div><!-- end .app -->
 <script>
+// Haptic feedback bridge — calls native UIImpactFeedbackGenerator via WKWebView
+function haptic(type) {
+  try { window.webkit?.messageHandlers?.haptic?.postMessage(type || 'medium'); } catch(e) {}
+}
+
 let PITCH_MAX = 50, C_INN_LIM = 4;
 const BATTER_WARN = 6, BATTER_CRIT = 9, PITCH_C_LIM = 41;
 
@@ -636,6 +641,7 @@ function undoLast() {
   if (a.type === 'pitch') { const p = g[a.side].pitchers[a.pIdx]; if (p.pitches > 0) p.pitches--; if (p.currentBatterPitches > 0) p.currentBatterPitches--; if (p.history.length) p.history.pop(); }
   else if (a.type === 'nextBatter') { const p = g[a.side].pitchers[a.pIdx]; p.currentBatterPitches = a.prevBatterPitches; if (p.batterBreaks.length) p.batterBreaks.pop(); if (p.history.length) p.history.pop(); }
   else if (a.type === 'scoreAdj') { if (a.side === 'home') g.homeScore = a.prev; else g.awayScore = a.prev; document.getElementById('sb-home-score').textContent = g.homeScore; document.getElementById('sb-away-score').textContent = g.awayScore; }
+  haptic('light');
   saveState(); renderGame();
 }
 
@@ -655,7 +661,7 @@ function renderGame() {
 function adjScore(side, d) {
   const g = state.currentGame; const prev = side === 'home' ? g.homeScore : g.awayScore;
   if (side === 'home') g.homeScore = Math.max(0, (g.homeScore || 0) + d); else g.awayScore = Math.max(0, (g.awayScore || 0) + d);
-  pushUndo({ type: 'scoreAdj', side, prev }); saveState();
+  pushUndo({ type: 'scoreAdj', side, prev }); haptic('selection'); saveState();
   document.getElementById('sb-home-score').textContent = g.homeScore;
   document.getElementById('sb-away-score').textContent = g.awayScore;
 }
@@ -668,6 +674,7 @@ function endHalfInning() {
   g.isTop = !g.isTop; g.pSelectOpen = false; g.cSelectOpen = false;
   const ci = getCI(); if (ci !== null && fRoster().catchers[ci]) { const c = fRoster().catchers[ci]; while (c.innings.length < g.inning) c.innings.push(false); c.innings[g.inning - 1] = true; }
   const pi = getPI(); if (fRoster().pitchers[pi]) { const p = fRoster().pitchers[pi]; while (p.innings.length < g.inning) p.innings.push(false); p.innings[g.inning - 1] = true; }
+  haptic('success');
   saveState(); renderGame(); window.scrollTo(0, 0);
 }
 
@@ -818,7 +825,7 @@ function saveEditCatcher(i) {
   c.num = document.getElementById('edit-c-num')?.value.trim() || '';
   saveState(); closeModal(); renderCatcherSection();
 }
-function selectPitcher(i) { const g = state.currentGame; const old = fRoster().pitchers[getPI()]; if (old && old.currentBatterPitches > 0) { old.batterBreaks.push(old.currentBatterPitches); old.lastBatterPitches = old.currentBatterPitches; old.currentBatterPitches = 0; } if (old) old.done = true; setPI(i); g.pSelectOpen = false; const p = fRoster().pitchers[i]; while (p.innings.length < g.inning) p.innings.push(false); p.innings[g.inning - 1] = true; saveState(); renderPitcherSection(); }
+function selectPitcher(i) { const g = state.currentGame; const old = fRoster().pitchers[getPI()]; if (old && old.currentBatterPitches > 0) { old.batterBreaks.push(old.currentBatterPitches); old.lastBatterPitches = old.currentBatterPitches; old.currentBatterPitches = 0; } if (old) old.done = true; setPI(i); g.pSelectOpen = false; const p = fRoster().pitchers[i]; while (p.innings.length < g.inning) p.innings.push(false); p.innings[g.inning - 1] = true; haptic('selection'); saveState(); renderPitcherSection(); }
 
 function showEditPitchCount() {
   const p = fRoster().pitchers[getPI()]; if (!p) return;
@@ -879,11 +886,11 @@ function renderCatcherSection() {
   document.getElementById('catcher-display').innerHTML = h;
 }
 function addNewCatcherMidGame() { const nm = document.getElementById('new-c-name')?.value.trim(); const nu = document.getElementById('new-c-num')?.value.trim(); if (!nm) return; fRoster().catchers.push({ name: nm, num: nu || '', innings: [] }); selectCatcher(fRoster().catchers.length - 1); }
-function selectCatcher(i) { const g = state.currentGame; setCI(i); g.cSelectOpen = false; const c = fRoster().catchers[i]; while (c.innings.length < g.inning) c.innings.push(false); c.innings[g.inning - 1] = true; saveState(); renderCatcherSection(); }
+function selectCatcher(i) { const g = state.currentGame; setCI(i); g.cSelectOpen = false; const c = fRoster().catchers[i]; while (c.innings.length < g.inning) c.innings.push(false); c.innings[g.inning - 1] = true; haptic('selection'); saveState(); renderCatcherSection(); }
 
 // Pitch actions
-function addPitch() { const g = state.currentGame; const side = ft(); const p = fRoster().pitchers[getPI()]; if (!p) return; p.pitches++; p.currentBatterPitches++; p.history.push('p'); while (p.innings.length < g.inning) p.innings.push(false); p.innings[g.inning - 1] = true; pushUndo({ type: 'pitch', side, pIdx: getPI() }); saveState(); renderPitcherSection(); }
-function nextBatter() { const g = state.currentGame; const side = ft(); const p = fRoster().pitchers[getPI()]; if (!p) return; pushUndo({ type: 'nextBatter', side, pIdx: getPI(), prevBatterPitches: p.currentBatterPitches }); if (p.currentBatterPitches > 0) { p.batterBreaks.push(p.currentBatterPitches); p.lastBatterPitches = p.currentBatterPitches; } p.currentBatterPitches = 0; p.history.push('nb'); saveState(); renderPitcherSection(); }
+function addPitch() { const g = state.currentGame; const side = ft(); const p = fRoster().pitchers[getPI()]; if (!p) return; p.pitches++; p.currentBatterPitches++; p.history.push('p'); while (p.innings.length < g.inning) p.innings.push(false); p.innings[g.inning - 1] = true; pushUndo({ type: 'pitch', side, pIdx: getPI() }); saveState(); renderPitcherSection(); haptic(p.pitches >= PITCH_MAX ? 'error' : p.pitches >= PITCH_MAX - 5 ? 'warning' : 'light'); }
+function nextBatter() { const g = state.currentGame; const side = ft(); const p = fRoster().pitchers[getPI()]; if (!p) return; pushUndo({ type: 'nextBatter', side, pIdx: getPI(), prevBatterPitches: p.currentBatterPitches }); if (p.currentBatterPitches > 0) { p.batterBreaks.push(p.currentBatterPitches); p.lastBatterPitches = p.currentBatterPitches; } p.currentBatterPitches = 0; p.history.push('nb'); saveState(); renderPitcherSection(); haptic('medium'); }
 
 // Stats
 function showStats() {
