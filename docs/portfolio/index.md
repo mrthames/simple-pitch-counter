@@ -32,6 +32,7 @@ A real iOS app built for volunteer scorekeepers at youth baseball games. This pr
 ## Decision Records
 
 - [Go/No-Go: Web App (PWA)](../stakeholder/decision-go-no-go-web-app.md) — Trade-off analysis for cross-platform strategy
+- [Live Coach View — Deferred](../product/feature-live-coach-view.md) — Full feature spec, architecture design, and deferral rationale ([#33](https://github.com/mrthames/simple-pitch-counter/issues/33))
 - [Changelog](../../CHANGELOG.md) — Release history with technical context
 
 ## Process Documentation
