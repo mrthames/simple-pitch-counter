@@ -114,10 +114,9 @@ test.describe('Advanced mode', () => {
 
     // Confirm end half inning
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
-    await page.click('text=End half inning');
+    await page.click('.modal-btn.amber');
 
-    const inningAfter = await getInningText(page);
-    expect(inningAfter).toContain('BOT');
+    await expect(page.locator('#inn-pill')).toContainText('BOT', { timeout: 3000 });
   });
 
   test('three BIP outs auto-end the half and reset outs', async ({ page }) => {
@@ -136,7 +135,7 @@ test.describe('Advanced mode', () => {
 
     // Confirm end half inning
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
-    await page.click('text=End half inning');
+    await page.click('.modal-btn.amber');
 
     // Wait for half inning to advance
     await expect(page.locator('#inn-pill')).toContainText('BOT', { timeout: 5000 });
@@ -188,10 +187,10 @@ test.describe('Advanced mode', () => {
     await page.click('text=+ Out');
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
     const modalText = await page.locator('.modal-box').textContent();
-    expect(modalText).toContain('Side retired');
+    expect(modalText).toContain('End half inning');
 
     // Confirm and verify half advances
-    await page.click('text=End half inning');
+    await page.click('.modal-btn.amber');
     await expect(page.locator('#inn-pill')).toContainText('BOT', { timeout: 3000 });
     await expect(page.locator('.out-dot.filled')).toHaveCount(0);
   });

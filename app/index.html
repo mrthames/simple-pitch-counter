@@ -106,7 +106,8 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .pitch-count-badge-num{font-size:16px;font-weight:800;transition:color .3s,transform .22s cubic-bezier(.36,1.6,.5,1)}
 .pitch-count-badge-lbl{font-size:10px;color:var(--t2);font-weight:600}
 .stats-link{font-size:12px;color:var(--blue);font-weight:600;padding:4px 0;cursor:pointer}
-.rest-lbl{font-size:12px;font-weight:600;margin-top:2px}
+.rest-lbl{font-size:12px;font-weight:600;margin-top:2px;min-height:18px;visibility:visible}
+.rest-lbl:empty{visibility:hidden}
 
 /* Pitcher picker */
 .player-picker{background:var(--card);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--sep)}
@@ -532,6 +533,14 @@ textarea{resize:vertical;min-height:56px}
         <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Away</div><input class="form-input" type="text" id="s-away" placeholder="Away team name"></div>
       </div>
     </div>
+    <!-- Umpires -->
+    <div>
+      <div class="section-header-lbl">Umpires (optional)</div>
+      <div class="form-card">
+        <div class="form-row"><div class="form-row-lbl">Plate</div><input class="form-input" type="text" id="s-ump-plate" placeholder="Name"></div>
+        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Base</div><input class="form-input" type="text" id="s-ump-base" placeholder="Name"></div>
+      </div>
+    </div>
     <!-- Home pitchers -->
     <div>
       <div class="section-header-lbl">Home Team</div>
@@ -726,9 +735,8 @@ textarea{resize:vertical;min-height:56px}
         </div>
       </div>
     </div>
-    <div style="display:flex;gap:8px">
+    <div id="sum-actions" style="display:flex;gap:8px">
       <div class="summary-action-btn" style="background:var(--blue)" onclick="generateExport()">Generate Report</div>
-      <div class="summary-action-btn" style="background:var(--green)" onclick="confirmEndGame()">End &amp; Save</div>
     </div>
   </div>
 </div>
@@ -856,6 +864,7 @@ function showScreen(n){
     if(n==='summary')initSummary();
   };
   if(document.startViewTransition)document.startViewTransition(go);else go();
+  if(window.webkit?.messageHandlers?.screenChange)window.webkit.messageHandlers.screenChange.postMessage(n);
 }
 
 // ── Setup ──
@@ -935,8 +944,8 @@ function startGame(){
     pSelectOpen:false,cSelectOpen:false,
     snapshots:[],
     hrHome:'',hrAway:'',
-    umpPlateName:'',umpPlateIssue:'No',umpPlateComments:'',
-    umpBaseName:'',umpBaseIssue:'No',umpBaseComments:'',
+    umpPlateName:document.getElementById('s-ump-plate')?.value.trim()||'',umpPlateIssue:'No',umpPlateComments:'',
+    umpBaseName:document.getElementById('s-ump-base')?.value.trim()||'',umpBaseIssue:'No',umpBaseComments:'',
     configId:state.activeConfigId,
   };
   const g=state.currentGame;
@@ -1133,9 +1142,9 @@ function advanceBatter(result){
 }
 function confirmSideRetired(){
   const g=state.currentGame;if(!g)return;
-  showModal('Side retired',`3 outs recorded — end the ${g.isTop?'Top':'Bottom'} of Inning ${g.inning}?`,[
+  showModal('End half inning?',`3 outs recorded — end the ${g.isTop?'Top':'Bottom'} of Inning ${g.inning}?`,[
     {label:'Undo',fn:'closeModal();undoLast()'},
-    {label:'End half inning',fn:'closeModal();endHalfInning()',cls:'amber'},
+    {label:'End',fn:'closeModal();setTimeout(endHalfInning,50)',cls:'amber'},
   ]);
 }
 function doNextBatter(){
@@ -1233,8 +1242,8 @@ function renderAdvanced(){
   // Rest
   const ri=restInfo(ap.pitches);
   const restLbl=document.querySelector('.rest-lbl');
-  if(restLbl&&ri){restLbl.textContent=ri.label;restLbl.style.color=ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';restLbl.style.display='block';}
-  else if(restLbl)restLbl.style.display='none';
+  if(restLbl&&ri){restLbl.textContent=ri.label;restLbl.style.color=ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';restLbl.style.visibility='visible';}
+  else if(restLbl){restLbl.textContent='\u00A0';restLbl.style.visibility='hidden';}
 }
 
 // ── Render simple ──
@@ -1403,7 +1412,7 @@ function showPitcherStats(){
   const ap=activePitcher();if(!ap)return;
   const g=state.currentGame;
   const types=['B','CS','SS','F','BIP'];
-  const total=ap.pitches||1;
+  const total=ap.pitches||0;const denom=total||1;
   const el=document.getElementById('screen-game');
   const existing=document.getElementById('stats-sheet-overlay');if(existing)existing.remove();
   const ov=document.createElement('div');ov.className='stats-sheet-overlay';ov.id='stats-sheet-overlay';
@@ -1415,7 +1424,7 @@ function showPitcherStats(){
   let barsHtml='';
   if(g&&g.mode==='advanced'){
     barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>`+types.map(k=>{
-      const p=PT_TYPES[k];const v=(ap.pitchTypes||{})[k]||0;const pct=total?Math.round(v/total*100):0;
+      const p=PT_TYPES[k];const v=(ap.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;
       return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${p.bg};color:${p.color}">${p.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${p.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;
     }).join('');
   }
@@ -1426,7 +1435,7 @@ function showPitcherStats(){
     <div style="font-size:12px;font-weight:600;color:${restColor};margin-bottom:16px">${restText}</div>
     ${statLineHtml(ap)}
     ${barsHtml}
-    <div onclick="document.getElementById('stats-sheet-overlay').remove()" style="margin-top:16px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
+    <div onclick="document.getElementById('stats-sheet-overlay').remove();showStatsQuick()" style="margin-top:16px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">‹ All Pitchers</div>
   </div>`;
   el.appendChild(ov);
 }
@@ -1546,8 +1555,8 @@ function showStatsQuick(){
     const pid='qs-detail-'+(pidCounter++);
     let barsHtml='';
     if(g.mode==='advanced'){
-      const total=p.pitches||1;
-      barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin:12px 0 10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=total?Math.round(v/total*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
+      const total=p.pitches||0;const denom=total||1;
+      barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin:12px 0 10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
     }
     const detailHtml=`<div id="${pid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
       ${statLineHtml(p)}
@@ -1657,8 +1666,7 @@ function renderHistory(){
         </div>
         ${allRest.length?`<div class="rest-section"><div class="rest-section-lbl">Rest required</div>${allRest.map(r=>`<div class="rest-row"><div class="rest-name">${r.name}${r.num?' <span style="color:var(--t3)">#'+r.num+'</span>':''} <span class="rest-sub">· ${r.pitches} pitches</span></div><div class="rest-chip" style="background:${r.days>=2?'var(--red-bg)':'var(--amber-bg)'};color:${r.days>=2?'var(--red)':'var(--amber)'}">${r.days}d rest</div></div>`).join('')}</div>`:''}
         <div class="hist-card-actions">
-          ${live?`<div class="hist-action-btn primary" onclick="resumeGame(${gi})">Resume</div>`:`<div class="hist-action-btn secondary" onclick="openSavedStats(${gi})">View stats</div>`}
-          <div class="hist-action-btn secondary" onclick="openExportForGame(${gi})">Summary</div>
+          ${live?`<div class="hist-action-btn primary" onclick="resumeGame(${gi})">Resume</div>`:`<div class="hist-action-btn secondary" onclick="openSavedStats(${gi})">View stats</div><div class="hist-action-btn secondary" onclick="openExportForGame(${gi})">Summary</div>`}
         </div>
       </div>
     </div>`;
@@ -1735,16 +1743,22 @@ function initSummary(){
   };
   document.getElementById('sum-home-pitchers-wrap').innerHTML=mkPitcherSection('home');
   document.getElementById('sum-away-pitchers-wrap').innerHTML=mkPitcherSection('away');
+  const live=!g.endedAt;
+  const sumActions=document.getElementById('sum-actions');
+  if(sumActions){
+    if(live){sumActions.style.display='none';}
+    else{sumActions.style.display='flex';}
+  }
 }
 function showSummaryStats(side,idx){
   const g=state.currentGame||state._expGame;if(!g)return;
   const p=g[side].pitchers[idx];if(!p)return;
   // Use same stats sheet
-  const types=['B','CS','SS','F','BIP'];const total=p.pitches||1;
+  const types=['B','CS','SS','F','BIP'];const total=p.pitches||0;const denom=total||1;
   const existing=document.getElementById('sum-stats-overlay');if(existing)existing.remove();
   const ov=document.createElement('div');ov.className='stats-sheet-overlay';ov.id='sum-stats-overlay';
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
-  let barsHtml=types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=total?Math.round(v/total*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
+  let barsHtml=types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
   ov.innerHTML=`<div class="stats-sheet"><div class="stats-handle"></div><div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${p.name}${p.num?' #'+p.num:''}</div><div style="font-size:13px;color:var(--dark-label);margin-bottom:18px">${total} total pitches</div><div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP</div></div></div><div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>${barsHtml}<div onclick="document.getElementById('sum-stats-overlay').remove()" style="margin-top:16px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div></div>`;
   document.getElementById('screen-summary').appendChild(ov);
 }

@@ -33,6 +33,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         prefs.allowsContentJavaScript = true
         config.defaultWebpagePreferences = prefs
         config.userContentController.add(self, name: "haptic")
+        config.userContentController.add(self, name: "screenChange")
 
         impactLight.prepare()
         impactMedium.prepare()
@@ -139,7 +140,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
 
     // MARK: - Status bar / orientation
 
-    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+    private var currentStatusBarStyle: UIStatusBarStyle = .darkContent
+    override var preferredStatusBarStyle: UIStatusBarStyle { currentStatusBarStyle }
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask { [.portrait, .portraitUpsideDown] }
 
     // MARK: - WKNavigationDelegate
@@ -207,6 +209,17 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
 
     func userContentController(_ userContentController: WKUserContentController,
                                 didReceive message: WKScriptMessage) {
+        if message.name == "screenChange", let screen = message.body as? String {
+            let isDark = (screen == "game")
+            currentStatusBarStyle = isDark ? .lightContent : .darkContent
+            setNeedsStatusBarAppearanceUpdate()
+            UIView.animate(withDuration: 0.2) {
+                self.view.backgroundColor = isDark
+                    ? UIColor(red: 0.043, green: 0.110, blue: 0.227, alpha: 1.0) // #0b1c3a
+                    : UIColor(red: 0.949, green: 0.949, blue: 0.969, alpha: 1.0) // #F2F2F7
+            }
+            return
+        }
         guard message.name == "haptic", let type = message.body as? String else { return }
         switch type {
         case "light":   impactLight.impactOccurred();   impactLight.prepare()
