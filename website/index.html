@@ -196,6 +196,58 @@
     display: flex;
     flex-direction: column;
   }
+  /* Physical hardware buttons */
+  .hw-btn {
+    position: absolute;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 3px;
+  }
+  .hw-action {
+    width: 4px; height: 28px;
+    left: -6px; top: 100px;
+  }
+  .hw-vol-up {
+    width: 4px; height: 44px;
+    left: -6px; top: 155px;
+  }
+  .hw-vol-down {
+    width: 4px; height: 44px;
+    left: -6px; top: 210px;
+  }
+  /* Button labels with connecting lines */
+  .hw-label {
+    position: absolute;
+    left: -165px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    white-space: nowrap;
+  }
+  .hw-label::after {
+    content: '';
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    width: 14px;
+    border-top: 1px dashed rgba(255,255,255,0.3);
+  }
+  .hw-label-name {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .hw-label-map {
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .hw-label-action { top: 94px; }
+  .hw-label-vol-up { top: 149px; }
+  .hw-label-vol-down { top: 204px; }
+
   .phone-notch {
     background: #0b1c3a;
     height: 28px;
@@ -493,6 +545,7 @@
     .cta-group { justify-content: center; }
     .hero-visual { order: -1; }
     .phone-frame { width: 300px; }
+    .hw-label { display: none; }
     .features-grid { grid-template-columns: 1fr 1fr; }
     .steps { grid-template-columns: 1fr 1fr; }
     .steps::before { display: none; }
@@ -660,15 +713,17 @@
               </div>
             </div>
           </div>
-          <!-- Physical button hints -->
-          <div class="pc-btn-hints">
-            <div class="pc-btn-hint" style="background:rgba(52,199,89,.09);border:1px solid rgba(52,199,89,.25)"><span class="pc-btn-hint-lbl">Action</span><div class="pc-btn-hint-dot" style="background:#34C759"></div><span style="color:#34C759">Next Batter</span></div>
-            <div class="pc-btn-hint" style="background:rgba(26,107,255,.09);border:1px solid rgba(26,107,255,.25)"><span class="pc-btn-hint-lbl">Vol +</span><div class="pc-btn-hint-dot" style="background:#1A6BFF"></div><span style="color:#1A6BFF">+ Pitch</span></div>
-            <div class="pc-btn-hint" style="background:rgba(142,142,147,.09);border:1px solid rgba(142,142,147,.25)"><span class="pc-btn-hint-lbl">Vol −</span><div class="pc-btn-hint-dot" style="background:#8E8E93"></div><span style="color:#8E8E93"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:2px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo</span></div>
-          </div>
         </div>
         </div><!-- end phone-inner -->
       </div>
+      <!-- Physical buttons on phone frame -->
+      <div class="hw-btn hw-action"></div>
+      <div class="hw-btn hw-vol-up"></div>
+      <div class="hw-btn hw-vol-down"></div>
+      <!-- Button labels -->
+      <div class="hw-label hw-label-action"><span class="hw-label-name">Action</span><span class="hw-label-map" style="color:#FF9500">+ Out</span></div>
+      <div class="hw-label hw-label-vol-up"><span class="hw-label-name">Vol +</span><span class="hw-label-map" style="color:#34C759">Next Batter</span></div>
+      <div class="hw-label hw-label-vol-down"><span class="hw-label-name">Vol −</span><span class="hw-label-map" style="color:#8E8E93">Undo</span></div>
     </div>
   </div>
 </section>
@@ -696,7 +751,7 @@
     <div class="feature-card">
       <div class="feature-icon"><i class="ph-bold ph-device-mobile"></i></div>
       <div class="feature-title">Physical button support</div>
-      <p class="feature-desc">Map your iPhone's volume buttons or Action Button to add pitches, undo, or advance batters. Keep your eyes on the game, not the screen.</p>
+      <p class="feature-desc">Map your iPhone's volume buttons and Action Button to undo, advance batters, record outs, and more. Keep your eyes on the game, not the screen.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><i class="ph-bold ph-sliders-horizontal"></i></div>
