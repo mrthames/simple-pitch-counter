@@ -34,7 +34,8 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
   position:relative;
 }
 .inn-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
-.inn-tag{display:flex;align-items:center;gap:8px}
+.inn-tag{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.inn-top-row{display:flex;align-items:center;gap:8px}
 .inn-pill{
   padding:4px 10px;border-radius:8px;font-size:13px;font-weight:700;
   letter-spacing:.5px;text-transform:uppercase;
@@ -69,9 +70,6 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .outs-row{display:flex;align-items:center;gap:5px}
 .out-dot{width:10px;height:10px;border-radius:5px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.35);transition:background .2s}
 .out-dot.filled{background:var(--amber)}
-.simple-outs-row{display:flex;align-items:center;gap:8px;padding:10px 0}
-.simple-outs-label{font-size:13px;font-weight:600;color:var(--t2);margin-right:4px}
-.simple-outs-row .out-dot{background:rgba(0,0,0,.08);border-color:rgba(0,0,0,.15)}
 
 /* ── Scoreboard ── */
 .scoreboard{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
@@ -573,11 +571,13 @@ textarea{resize:vertical;min-height:56px}
   <div class="dark-header" id="game-dark-header">
     <div class="inn-bar">
       <div class="inn-tag">
-        <div class="inn-pill" id="inn-pill">▲ TOP 1</div>
-        <div id="outs-row" class="outs-row" style="display:none">
-          <div class="out-dot" id="out0"></div>
-          <div class="out-dot" id="out1"></div>
-          <div class="out-dot" id="out2"></div>
+        <div class="inn-top-row">
+          <div class="inn-pill" id="inn-pill">▲ TOP 1</div>
+          <div id="outs-row" class="outs-row">
+            <div class="out-dot" id="out0"></div>
+            <div class="out-dot" id="out1"></div>
+            <div class="out-dot" id="out2"></div>
+          </div>
         </div>
         <div class="inn-sub-text" id="inn-sub"></div>
       </div>
@@ -628,6 +628,7 @@ textarea{resize:vertical;min-height:56px}
       <div class="btn-sm" id="p-change-btn" onclick="togglePSelect()">Change</div>
     </div>
     <div id="pitcher-select-list" style="display:none"></div>
+    <div id="simple-alerts" style="display:none"></div>
 
     <!-- Advanced mode content -->
     <div id="adv-content" style="display:none">
@@ -677,19 +678,12 @@ textarea{resize:vertical;min-height:56px}
         <div class="hero-rest" id="simple-rest-lbl" style="display:none"></div>
         <div class="pitch-dots" id="simple-pitch-dots"></div>
       </div>
-      <div id="simple-alerts"></div>
-      <div class="simple-outs-row" id="simple-outs-row">
-        <div class="simple-outs-label">Outs</div>
-        <div class="out-dot" id="simple-out0"></div>
-        <div class="out-dot" id="simple-out1"></div>
-        <div class="out-dot" id="simple-out2"></div>
-      </div>
       <div class="big-btn blue h68" onclick="addPitch()">+ Pitch</div>
-      <div style="display:flex;gap:8px">
-        <div class="big-btn green h54" style="flex:1" onclick="doNextBatter()">Next batter ›</div>
-        <div class="big-btn amber h54" style="flex:0 0 auto;padding:0 20px" onclick="recordNonPitchOut()">+ Out</div>
+      <div class="adv-secondary">
+        <div class="adv-secondary-btn" id="undo-btn-simple" onclick="undoLast()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:3px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo</div>
+        <div class="adv-secondary-btn" onclick="recordNonPitchOut()">+ Out</div>
+        <div class="adv-secondary-btn" onclick="doNextBatter()">Next batter ›</div>
       </div>
-      <div class="undo-row"><div class="undo-btn" id="undo-btn-simple" onclick="undoLast()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:3px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg> Undo</div></div>
     </div>
 
     <div class="game-divider"></div>
@@ -1218,15 +1212,12 @@ function renderGame(){
   pill.textContent=`${g.isTop?'▲ TOP':'▼ BOT'} ${g.inning}`;
   pill.className='inn-pill '+(g.isTop?'top':'bot');
   document.getElementById('inn-sub').textContent=`${ftName()} fielding`;
-  // Outs (advanced only)
-  const outsRow=document.getElementById('outs-row');
-  outsRow.style.display=g.mode==='advanced'?'flex':'none';
-  if(g.mode==='advanced'){
-    [0,1,2].forEach(i=>document.getElementById('out'+i).className='out-dot'+(i<(g.outs||0)?' filled':''));
-  }
+  // Outs (both modes)
+  [0,1,2].forEach(i=>document.getElementById('out'+i).className='out-dot'+(i<(g.outs||0)?' filled':''));
   // Mode panels
   document.getElementById('adv-content').style.display=g.mode==='advanced'?'block':'none';
   document.getElementById('simple-content').style.display=g.mode==='simple'?'block':'none';
+  document.getElementById('simple-alerts').style.display=g.mode==='simple'?'block':'none';
   // Pitcher
   renderPitcherSection();
   // Mode-specific
@@ -1297,11 +1288,9 @@ function renderSimple(){
   pitchAlerts(ap).forEach(a=>w.push(a));
   mercyAlerts().forEach(a=>w.push(a));
   document.getElementById('simple-alerts').innerHTML=w.map(a=>`<div class="alert ${a.t==='danger'?'a-danger':'a-warn'}"><div class="alert-dot"></div><span>${a.m}</span></div>`).join('');
-  // Outs
-  for(let i=0;i<3;i++){const d=document.getElementById('simple-out'+i);if(d)d.className='out-dot'+(i<(g.outs||0)?' filled':'');}
   // Undo
   const u=document.getElementById('undo-btn-simple');
-  if(u)u.className='undo-btn'+(g.snapshots?.length?'':' disabled');
+  if(u){u.style.opacity=g.snapshots?.length?'1':'0.35';u.style.pointerEvents=g.snapshots?.length?'auto':'none';}
 }
 
 // ── Pitcher section ──

@@ -47,7 +47,7 @@ test.describe('Core game flow', () => {
     await addSimplePitches(page, 4);
     await expect(page.locator('#simple-batter-num')).toHaveText('4');
 
-    await page.locator('.big-btn.green').click();
+    await page.locator('#simple-content .adv-secondary-btn', { hasText: 'Next batter' }).click();
     await expect(page.locator('#simple-batter-num')).toHaveText('0');
 
     const total = await getPitchCount(page);
