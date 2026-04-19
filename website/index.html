@@ -284,6 +284,17 @@
   .pc-alert-dot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; }
   .pc-alert.warn { background: #FFF5E6; color: #7D4A00; }
   .pc-alert.warn .pc-alert-dot { background: #FF9500; }
+  /* Catcher section */
+  .pc-catcher-section { margin-top: 12px; border-top: 1px solid rgba(60,60,67,.12); padding-top: 10px; }
+  .pc-catcher-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .pc-catcher-name { font-size: 16px; font-weight: 700; color: #000; letter-spacing: -.3px; margin-top: 2px; }
+  .pc-catcher-card { background: #fff; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  .pc-catcher-remaining { font-size: 12px; font-weight: 500; color: rgba(60,60,67,.6); }
+  .pc-inn-pips { display: flex; gap: 5px; margin-top: 6px; }
+  .pc-inn-pip { width: 18px; height: 6px; border-radius: 3px; background: rgba(60,60,67,.12); }
+  .pc-inn-pip.filled { background: #1A6BFF; }
+  .pc-catcher-count { font-size: 28px; font-weight: 900; color: #000; letter-spacing: -1px; text-align: right; }
+  .pc-catcher-of { font-size: 11px; font-weight: 600; color: rgba(60,60,67,.6); text-align: right; }
 
   /* ── FEATURES ── */
   .features {
@@ -608,6 +619,31 @@
           <div class="pc-alert warn">
             <div class="pc-alert-dot"></div>
             <span>37 pitches — approaching 50-pitch limit. 13 remain.</span>
+          </div>
+          <!-- Catcher section -->
+          <div class="pc-catcher-section">
+            <div class="pc-catcher-header">
+              <div>
+                <div class="pc-section-lbl">Catcher</div>
+                <div class="pc-catcher-name">Mike C. <span style="color:rgba(60,60,67,.35);font-weight:500">#8</span></div>
+              </div>
+              <div class="pc-change-btn">Change</div>
+            </div>
+            <div class="pc-catcher-card">
+              <div>
+                <div class="pc-catcher-remaining">2 innings remaining</div>
+                <div class="pc-inn-pips">
+                  <div class="pc-inn-pip filled"></div>
+                  <div class="pc-inn-pip filled"></div>
+                  <div class="pc-inn-pip"></div>
+                  <div class="pc-inn-pip"></div>
+                </div>
+              </div>
+              <div>
+                <div class="pc-catcher-count">2</div>
+                <div class="pc-catcher-of">of 4 inn.</div>
+              </div>
+            </div>
           </div>
         </div>
         </div><!-- end phone-inner -->
