@@ -12,7 +12,7 @@
   --text:#000; --t2:rgba(60,60,67,.6); --t3:rgba(60,60,67,.35);
   --blue:#1A6BFF; --green:#34C759; --red:#FF3B30; --amber:#FF9500; --purple:#AF52DE;
   --blue-bg:#EBF1FF; --green-bg:#E8F9ED; --red-bg:#FFF0EF; --amber-bg:#FFF5E6;
-  --dark:#1C1C1E; --dark2:#2C2C2E; --dark-label:rgba(235,235,245,.6);
+  --dark:#0b1c3a; --dark2:#142a4f; --dark-label:rgba(235,235,245,.6);
   --r:12px; --r-lg:18px; --font:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -271,7 +271,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
   display:flex;align-items:flex-end;justify-content:center;z-index:350;
 }
 .stats-sheet{
-  background:#1C1C1E;border-radius:24px 24px 0 0;
+  background:var(--dark);border-radius:24px 24px 0 0;
   padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 40px);
   width:100%;max-width:430px;max-height:80vh;overflow-y:auto;
 }
@@ -423,7 +423,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .trash-btn:active{background:var(--bg)}
 
 /* ── Modal overlay ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;z-index:500;padding:calc(env(safe-area-inset-top,20px)+20px) 1.2rem calc(env(safe-area-inset-bottom,0px)+1.2rem);overflow-y:auto}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:500;padding:calc(env(safe-area-inset-top,20px)+20px) 1.2rem calc(env(safe-area-inset-bottom,0px)+1.2rem);overflow-y:auto}
 .modal-box{background:var(--card);border-radius:var(--r-lg);padding:1.3rem;width:100%;max-width:360px;position:relative;flex-shrink:0}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:.5rem}
 .modal-sub{font-size:14px;color:var(--t2);margin-bottom:1.1rem;line-height:1.5}
@@ -495,7 +495,7 @@ textarea{resize:vertical;min-height:56px}
         </div>
       </div>
       <div id="mode-info" style="background:var(--blue-bg);border-radius:12px;padding:10px 13px;margin-top:10px;font-size:12px;color:#0050CC;line-height:1.5">
-        <strong>Advanced mode</strong> tracks B, K̲, K, F, and balls in play. Outs and innings advance automatically.
+        <strong>Advanced mode</strong> tracks balls, called/swinging strikes, fouls, and balls in play. Outs and innings advance automatically.
       </div>
     </div>
     <!-- Config -->
@@ -624,17 +624,18 @@ textarea{resize:vertical;min-height:56px}
       <div class="pitch-grid">
         <div class="pitch-row">
           <button class="pitch-btn pt-B row1" onclick="throwPitch('B')"><span class="pt-glyph">B</span><span class="pt-name">Ball</span></button>
-          <button class="pitch-btn pt-CS row1" onclick="throwPitch('CS')"><span class="pt-glyph">K̲</span><span class="pt-name">Called K</span></button>
-          <button class="pitch-btn pt-SS row1" onclick="throwPitch('SS')"><span class="pt-glyph">K</span><span class="pt-name">Swing K</span></button>
+          <button class="pitch-btn pt-CS row1" onclick="throwPitch('CS')"><span class="pt-glyph"><svg width="26" height="26" viewBox="0 0 128 128" fill="currentColor"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z" transform="scale(-1,1) translate(-128,0)"/></svg></span><span class="pt-name">Called K</span></button>
+          <button class="pitch-btn pt-SS row1" onclick="throwPitch('SS')"><span class="pt-glyph"><svg width="26" height="26" viewBox="0 0 128 128" fill="currentColor"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z"/></svg></span><span class="pt-name">Swing K</span></button>
         </div>
         <div class="pitch-row">
           <button class="pitch-btn pt-F row2" onclick="throwPitch('F')"><span class="pt-glyph">F</span><span class="pt-name">Foul</span></button>
-          <button class="pitch-btn pt-BIP row2" onclick="throwPitch('BIP')"><span class="pt-glyph">⊙</span><span class="pt-name">In Play</span></button>
+          <button class="pitch-btn pt-BIP row2" onclick="throwPitch('BIP')"><span class="pt-glyph" style="display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 496.926 496.926" fill="currentColor"><path d="M227.831,233.153c-17.891,32.025-36.395,65.14-44.667,77.982c-6.072,9.438-28.018,41.875-98.063,142.75c-5.737-1.33-11.915,1.004-15.673,6.473c-2.228,3.242-3.05,7.145-2.333,11.008c0.717,3.854,2.907,7.199,6.139,9.428l19.699,13.541c2.467,1.691,5.345,2.592,8.329,2.592h0.01c4.838,0,9.362-2.383,12.431-6.848c3.471-5.049,3.347-11.59,0.115-16.467c13.091-19.258,83.299-122.496,98.13-142.711c9.018-12.316,33.287-41.424,56.744-69.566c19.298-23.151,37.514-45.021,46.244-56.314c19.106-24.729,50.213-66.909,50.624-67.454l58.379-84.943c11.839-17.222,3.979-30.208-2.036-34.817L400.052,2.792C399.583,2.505,395.299,0,389.188,0c-5.871,0-14.487,2.343-22.156,13.512L308.558,98.58c-0.277,0.44-28.506,44.6-44.753,71.298C256.375,182.061,242.51,206.875,227.831,233.153z"/></svg></span><span class="pt-name">In Play</span></button>
         </div>
       </div>
       <div class="adv-secondary">
-        <div class="adv-secondary-btn" id="undo-btn-adv" onclick="undoLast()">↩ Undo</div>
-        <div class="adv-secondary-btn" onclick="doNextBatter()">Next batter (manual) ›</div>
+        <div class="adv-secondary-btn" id="undo-btn-adv" onclick="undoLast()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:3px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo</div>
+        <div class="adv-secondary-btn" onclick="recordNonPitchOut()">+ Out</div>
+        <div class="adv-secondary-btn" onclick="doNextBatter()">Next batter ›</div>
       </div>
     </div>
 
@@ -654,7 +655,7 @@ textarea{resize:vertical;min-height:56px}
       <div id="simple-alerts"></div>
       <div class="big-btn blue h68" onclick="addPitch()">+ Pitch</div>
       <div class="big-btn green h54" onclick="doNextBatter()">Next batter ›</div>
-      <div class="undo-row"><div class="undo-btn" id="undo-btn-simple" onclick="undoLast()"><span>↩</span> Undo</div></div>
+      <div class="undo-row"><div class="undo-btn" id="undo-btn-simple" onclick="undoLast()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:3px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg> Undo</div></div>
     </div>
 
     <div class="game-divider"></div>
@@ -764,11 +765,27 @@ textarea{resize:vertical;min-height:56px}
 function haptic(t){try{window.webkit?.messageHandlers?.haptic?.postMessage(t||'medium')}catch(e){}}
 
 // ── Physical button mapping (JS side) ──
-let btnMapping = { volUp:'pitch', volDown:'undo', action:'nextBatter' };
+const BTN_DEFAULTS_SIMPLE = { volUp:'pitch', volDown:'undo', action:'nextBatter' };
+const BTN_DEFAULTS_ADVANCED = { volUp:'none', volDown:'undo', action:'nextBatter' };
+let btnMapping = { ...BTN_DEFAULTS_SIMPLE };
+function hasActionButton(){
+  const ua=navigator.userAgent;
+  if(!/iPhone/.test(ua))return false;
+  const m=ua.match(/iPhone\s*OS\s*(\d+)/);
+  return m&&parseInt(m[1])>=17;
+}
+function applyModeDefaults(){
+  const g=state.currentGame;if(!g)return;
+  const defs=g.mode==='advanced'?BTN_DEFAULTS_ADVANCED:BTN_DEFAULTS_SIMPLE;
+  const saved=localStorage.getItem('spc_btnmap_'+g.mode);
+  if(saved){try{btnMapping=JSON.parse(saved);}catch(e){btnMapping={...defs};}}
+  else{btnMapping={...defs};}
+  if(g.mode==='advanced'){Object.keys(btnMapping).forEach(k=>{if(btnMapping[k]==='pitch')btnMapping[k]='none';});}
+}
 window.onPhysicalButton = function(type) {
   const action = btnMapping[type];
   if (!action || action === 'none' || !state.currentGame) return;
-  if (action === 'pitch') { addPitch(); haptic('medium'); }
+  if (action === 'pitch') { if(state.currentGame.mode==='advanced')return; addPitch(); haptic('medium'); }
   else if (action === 'nextBatter') { doNextBatter(); haptic('medium'); }
   else if (action === 'undo') { undoLast(); haptic('light'); }
 };
@@ -776,13 +793,13 @@ window.onPhysicalButton = function(type) {
 // ── Constants ──
 const PT_TYPES = {
   B:  {label:'B',  name:'Ball',        color:'#1A6BFF',bg:'#EBF1FF'},
-  CS: {label:'K̲',  name:'Called K',    color:'#FF3B30',bg:'#FFF0EF'},
-  SS: {label:'K',  name:'Swing K',     color:'#C0272D',bg:'#fce8e8'},
+  CS: {label:'<svg width="12" height="12" viewBox="0 0 128 128" fill="currentColor" style="vertical-align:-1px"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z" transform="scale(-1,1) translate(-128,0)"/></svg>',  name:'Called K',    color:'#FF3B30',bg:'#FFF0EF'},
+  SS: {label:'<svg width="12" height="12" viewBox="0 0 128 128" fill="currentColor" style="vertical-align:-1px"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z"/></svg>',  name:'Swing K',     color:'#C0272D',bg:'#fce8e8'},
   F:  {label:'F',  name:'Foul',        color:'#FF9500',bg:'#FFF5E6'},
-  BIP:{label:'⊙',  name:'In Play',     color:'#34C759',bg:'#E8F9ED'},
+  BIP:{label:'<svg width="12" height="12" viewBox="0 0 496.926 496.926" fill="currentColor" style="vertical-align:-1px"><path d="M227.831,233.153c-17.891,32.025-36.395,65.14-44.667,77.982c-6.072,9.438-28.018,41.875-98.063,142.75c-5.737-1.33-11.915,1.004-15.673,6.473c-2.228,3.242-3.05,7.145-2.333,11.008c0.717,3.854,2.907,7.199,6.139,9.428l19.699,13.541c2.467,1.691,5.345,2.592,8.329,2.592h0.01c4.838,0,9.362-2.383,12.431-6.848c3.471-5.049,3.347-11.59,0.115-16.467c13.091-19.258,83.299-122.496,98.13-142.711c9.018-12.316,33.287-41.424,56.744-69.566c19.298-23.151,37.514-45.021,46.244-56.314c19.106-24.729,50.213-66.909,50.624-67.454l58.379-84.943c11.839-17.222,3.979-30.208-2.036-34.817L400.052,2.792C399.583,2.505,395.299,0,389.188,0c-5.871,0-14.487,2.343-22.156,13.512L308.558,98.58c-0.277,0.44-28.506,44.6-44.753,71.298C256.375,182.061,242.51,206.875,227.831,233.153z"/></svg>',  name:'In Play',     color:'#34C759',bg:'#E8F9ED'},
 };
 const DEFAULT_THRESHOLDS=[{pitches:20,days:0},{pitches:35,days:1},{pitches:50,days:2}];
-let PITCH_MAX=50, C_INN_LIM=4, PITCH_C_LIM=41;
+let PITCH_MAX=50, C_INN_LIM=4, PITCH_C_LIM=41, MERCY_RUNS=0;
 const BATTER_WARN=6, BATTER_CRIT=9;
 let selectedMode='advanced'; // for setup
 
@@ -794,7 +811,7 @@ function loadState(){
   if(!state.configs)state.configs=[];
   if(!state.fields)state.fields=[];
   if(!state.configs.length){
-    state.configs.push({id:'default',name:'Default Minors 7-10',pitchMax:50,catcherInnMax:4,isDefault:true,thresholds:JSON.parse(JSON.stringify(DEFAULT_THRESHOLDS))});
+    state.configs.push({id:'default',name:'Default Minors 7-10',pitchMax:50,catcherInnMax:4,mercyRuns:5,isDefault:true,thresholds:JSON.parse(JSON.stringify(DEFAULT_THRESHOLDS))});
     state.activeConfigId='default';
   }
   state.configs.forEach(c=>{if(!c.thresholds)c.thresholds=JSON.parse(JSON.stringify(DEFAULT_THRESHOLDS));});
@@ -802,14 +819,14 @@ function loadState(){
   applyActiveConfig();
   if(state.currentGame){renderGame();showScreen('game');}
   else{renderHistory();showScreen('history');}
-  // Load button mapping
-  try{const bm=localStorage.getItem('spc_btnmap');if(bm)btnMapping=JSON.parse(bm);}catch(e){}
+  // Load button mapping (mode-aware)
+  if(state.currentGame)applyModeDefaults();
 }
 function saveState(){try{localStorage.setItem('spc_v1',JSON.stringify(state));}catch(e){}}
-function saveBtnMapping(){try{localStorage.setItem('spc_btnmap',JSON.stringify(btnMapping));}catch(e){}}
+function saveBtnMapping(){const g=state.currentGame;const mode=g?g.mode:'simple';try{localStorage.setItem('spc_btnmap_'+mode,JSON.stringify(btnMapping));}catch(e){}}
 function applyActiveConfig(){
   const cfg=state.configs.find(c=>c.id===state.activeConfigId)||state.configs[0];
-  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;}
+  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;}
 }
 
 // ── Navigation ──
@@ -867,7 +884,7 @@ function getFieldVal(){
 function showConfigPickerForSetup(){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
   ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
-  let rows=state.configs.map(cfg=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--sep);cursor:pointer" onclick="selectSetupConfig('${cfg.id}')"><div><div style="font-size:14px;font-weight:600">${cfg.name}${cfg.isDefault?'<span class="default-badge">Default</span>':''}</div><div style="font-size:12px;color:var(--t2)">Max ${cfg.pitchMax} pitches · ${cfg.catcherInnMax} catcher inn.</div></div>${cfg.id===state.activeConfigId?'<span style="background:var(--blue-bg);color:var(--blue);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">Selected</span>':''}</div>`).join('');
+  let rows=state.configs.map(cfg=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--sep);cursor:pointer" onclick="selectSetupConfig('${cfg.id}')"><div><div style="font-size:14px;font-weight:600">${cfg.name}${cfg.isDefault?'<span class="default-badge">Default</span>':''}</div><div style="font-size:12px;color:var(--t2)">Max ${cfg.pitchMax} pitches · ${cfg.catcherInnMax} catcher inn.${cfg.mercyRuns?' · '+cfg.mercyRuns+'-run mercy':''}</div></div>${cfg.id===state.activeConfigId?'<span style="background:var(--blue-bg);color:var(--blue);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">Selected</span>':''}</div>`).join('');
   ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()">✕</button><div class="modal-title">Select Configuration</div>${rows}</div>`;
   document.body.appendChild(ov);
 }
@@ -912,6 +929,7 @@ function startGame(){
   const g=state.currentGame;
   if(g.home.catchers.length)g.homeActiveCIdx=0;
   if(g.away.catchers.length)g.awayActiveCIdx=0;
+  applyModeDefaults();
   saveState();renderGame();showScreen('game');
 }
 
@@ -946,7 +964,7 @@ function makeSnap(){
   const deepPitcher=p=>({...p,innings:[...p.innings],history:[...(p.history||[])],batterBreaks:[...(p.batterBreaks||[])],pitchTypes:{...(p.pitchTypes||{})},});
   return{
     homeScore:g.homeScore,awayScore:g.awayScore,
-    inning:g.inning,isTop:g.isTop,
+    inning:g.inning,isTop:g.isTop,halfInningRuns:g.halfInningRuns||0,
     balls:g.balls||0,strikes:g.strikes||0,outs:g.outs||0,
     atBatLog:[...(g.atBatLog||[])],
     homePitchers:g.home.pitchers.map(deepPitcher),
@@ -967,7 +985,7 @@ function undoLast(){
   const g=state.currentGame;if(!g||!g.snapshots?.length)return;
   const prev=g.snapshots.pop();
   g.homeScore=prev.homeScore;g.awayScore=prev.awayScore;
-  g.inning=prev.inning;g.isTop=prev.isTop;
+  g.inning=prev.inning;g.isTop=prev.isTop;g.halfInningRuns=prev.halfInningRuns;
   g.balls=prev.balls;g.strikes=prev.strikes;g.outs=prev.outs;
   g.atBatLog=[...prev.atBatLog];
   const dp=p=>({...p,innings:[...p.innings],history:[...(p.history||[])],batterBreaks:[...(p.batterBreaks||[])],pitchTypes:{...(p.pitchTypes||{})},});
@@ -981,12 +999,33 @@ function undoLast(){
 }
 
 // ── Score ──
+function getBattingSide(){const g=state.currentGame;return g.isTop?'away':'home';}
+function getHalfInningRuns(){const g=state.currentGame;return g.halfInningRuns||0;}
 function adjScore(side,d){
   pushSnap();
   const g=state.currentGame;
   if(side==='home')g.homeScore=Math.max(0,(g.homeScore||0)+d);
   else g.awayScore=Math.max(0,(g.awayScore||0)+d);
+  if(d>0&&side===getBattingSide()){
+    g.halfInningRuns=(g.halfInningRuns||0)+1;
+  }else if(d<0&&side===getBattingSide()){
+    g.halfInningRuns=Math.max(0,(g.halfInningRuns||0)-1);
+  }
   haptic('selection');saveState();renderGame();
+}
+
+// ── Non-pitch out (caught stealing, pickoff, etc.) ──
+function recordNonPitchOut(){
+  const g=state.currentGame;if(!g)return;
+  pushSnap();
+  g.outs=(g.outs||0)+1;
+  haptic('medium');
+  if(g.outs>=3){
+    saveState();renderGame();
+    confirmSideRetired();
+    return;
+  }
+  saveState();renderGame();
 }
 
 // ── Half inning ──
@@ -1001,7 +1040,7 @@ function endHalfInning(){
   if(ci!==null&&fRoster().catchers[ci]){const c=fRoster().catchers[ci];while(c.innings.length<g.inning)c.innings.push(false);c.innings[g.inning-1]=true;}
   if(!g.isTop)g.inning++;
   g.isTop=!g.isTop;
-  g.balls=0;g.strikes=0;g.outs=0;g.atBatLog=[];
+  g.balls=0;g.strikes=0;g.outs=0;g.atBatLog=[];g.halfInningRuns=0;
   g.pSelectOpen=false;g.cSelectOpen=false;
   haptic('success');saveState();renderGame();window.scrollTo(0,0);
 }
@@ -1053,7 +1092,7 @@ function showBIPModal(){
   const g=state.currentGame;
   const outs=g.outs||0;
   document.getElementById('bip-sub').textContent=`${outs} out${outs!==1?'s':''} — batter reached or put out?`;
-  document.getElementById('bip-out-sub').textContent=(outs+1)>=3?'3rd out — inning ends':'Out recorded';
+  document.getElementById('bip-out-sub').textContent=(outs+1)>=3?'3rd out — side retired':'Out recorded';
   document.getElementById('bip-overlay').style.display='flex';
 }
 function handleBIPResult(isOut){
@@ -1071,8 +1110,20 @@ function advanceBatter(result){
   if(ap){ap.batterBreaks.push(ap.currentBatterPitches);ap.lastBatterPitches=ap.currentBatterPitches;ap.currentBatterPitches=0;}
   g.balls=0;g.strikes=0;g.atBatLog=[];
   if(result==='K'||result==='OUT'){g.outs=(g.outs||0)+1;}
-  else if(result==='OUT3'){endHalfInning();return;}
+  else if(result==='OUT3'){g.outs=3;}
+  if((g.outs||0)>=3){
+    saveState();renderGame();
+    confirmSideRetired();
+    return;
+  }
   haptic('success');saveState();renderGame();
+}
+function confirmSideRetired(){
+  const g=state.currentGame;if(!g)return;
+  showModal('Side retired',`3 outs recorded — end the ${g.isTop?'Top':'Bottom'} of Inning ${g.inning}?`,[
+    {label:'Undo',fn:'closeModal();undoLast()'},
+    {label:'End half inning',fn:'closeModal();endHalfInning()',cls:'amber'},
+  ]);
 }
 function doNextBatter(){
   const g=state.currentGame;if(!g)return;
@@ -1108,7 +1159,7 @@ function animatePop(){
 function renderGame(){
   const g=state.currentGame;if(!g)return;
   const cfg=state.configs.find(c=>c.id===g.configId);
-  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;}
+  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;}
   // Scoreboard
   document.getElementById('sb-home-name').textContent=g.homeTeam;
   document.getElementById('sb-away-name').textContent=g.awayTeam;
@@ -1160,7 +1211,8 @@ function renderAdvanced(){
   const badge=document.querySelector('.pitch-count-badge-num');
   if(badge){badge.textContent=ap.pitches;badge.style.color=countColor(ap.pitches);}
   // Alerts
-  const alerts=pitchAlerts(ap).map(a=>`<div class="alert ${a.t==='danger'?'a-danger':'a-warn'}"><div class="alert-dot"></div><span>${a.m}</span></div>`).join('');
+  const allAlerts=[...pitchAlerts(ap),...mercyAlerts()];
+  const alerts=allAlerts.map(a=>`<div class="alert ${a.t==='danger'?'a-danger':'a-warn'}"><div class="alert-dot"></div><span>${a.m}</span></div>`).join('');
   document.getElementById('adv-alerts').innerHTML=alerts;
   // Undo btn
   const undoAdv=document.getElementById('undo-btn-adv');
@@ -1194,6 +1246,7 @@ function renderSimple(){
   const w=[];
   if(ap.currentBatterPitches>=BATTER_WARN&&ap.pitches<PITCH_MAX)w.push({t:'warn',m:`At-bat pitch count is ${ap.currentBatterPitches} — verify or press Next Batter.`});
   pitchAlerts(ap).forEach(a=>w.push(a));
+  mercyAlerts().forEach(a=>w.push(a));
   document.getElementById('simple-alerts').innerHTML=w.map(a=>`<div class="alert ${a.t==='danger'?'a-danger':'a-warn'}"><div class="alert-dot"></div><span>${a.m}</span></div>`).join('');
   // Undo
   const u=document.getElementById('undo-btn-simple');
@@ -1281,13 +1334,26 @@ function pitchAlerts(p){
   if(PITCH_MAX-p.pitches<=4&&p.pitches<PITCH_MAX)a.push({t:'warn',m:`${p.pitches} pitches — approaching ${PITCH_MAX}-pitch limit. ${PITCH_MAX-p.pitches} remain.`});
   return a;
 }
+function mercyAlerts(){
+  const a=[];
+  if(!MERCY_RUNS||MERCY_RUNS<=0)return a;
+  const g=state.currentGame;if(!g)return a;
+  const runs=g.halfInningRuns||0;
+  const batting=getBattingSide();
+  const teamName=batting==='home'?g.homeTeam:g.awayTeam;
+  if(runs>=MERCY_RUNS)a.push({t:'danger',m:`${teamName} has scored ${runs} runs this half inning — ${MERCY_RUNS}-run mercy limit reached.`});
+  else if(runs>=MERCY_RUNS-1)a.push({t:'warn',m:`${teamName} has scored ${runs} runs — 1 away from ${MERCY_RUNS}-run mercy limit.`});
+  return a;
+}
 
 // ── Button hints ──
 function renderBtnHints(){
   const el=document.getElementById('btn-hints-area');if(!el)return;
-  const btns=[{key:'action',label:'Action'},{key:'volUp',label:'Vol +'},{key:'volDown',label:'Vol −'}];
+  const showAction=hasActionButton();
+  const allBtns=[{key:'action',label:'Action',needsAction:true},{key:'volUp',label:'Vol +'},{key:'volDown',label:'Vol −'}];
+  const btns=allBtns.filter(b=>!b.needsAction||showAction);
   const actionColors={pitch:'#1A6BFF',nextBatter:'#34C759',undo:'#8E8E93',none:'#48484A'};
-  const actionLabels={pitch:'+ Pitch',nextBatter:'Next Batter',undo:'↩ Undo',none:'—'};
+  const actionLabels={pitch:'+ Pitch',nextBatter:'Next Batter',undo:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:2px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo',none:'—'};
   const chips=btns.map(({key,label})=>{
     const m=btnMapping[key];if(!m||m==='none')return'';
     const col=actionColors[m]||'#8E8E93';
@@ -1296,29 +1362,56 @@ function renderBtnHints(){
   el.innerHTML=chips?`<div class="btn-hints">${chips}</div>`:'';
 }
 
-// ── Pitcher stats modal ──
+// ── Pitcher stats ──
+function pitcherDerivedStats(p){
+  const ip=p.innings?.filter(Boolean).length||0;
+  const bf=p.batterBreaks?.length||0;
+  const ks=p.ks||0;const bbs=p.bbs||0;
+  const kbb=bbs>0?(ks/bbs).toFixed(2):(ks>0?'∞':'—');
+  const pip=ip>0?(p.pitches/ip).toFixed(1):'—';
+  const pbf=bf>0?(p.pitches/bf).toFixed(1):'—';
+  return{ip,bf,ks,bbs,kbb,pip,pbf};
+}
+function statLineHtml(p){
+  const s=pitcherDerivedStats(p);
+  const mkStat=(label,val)=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)"><span style="font-size:13px;color:rgba(235,235,245,.6)">${label}</span><span style="font-size:13px;font-weight:700;color:#fff">${val}</span></div>`;
+  return`<div style="margin-bottom:14px">
+    ${mkStat('P (Pitches)',p.pitches)}
+    ${mkStat('IP (Innings Pitched)',s.ip)}
+    ${mkStat('BF (Batters Faced)',s.bf)}
+    ${mkStat('K (Strikeouts)',s.ks)}
+    ${mkStat('BB (Walks)',s.bbs)}
+    ${mkStat('K/BB',s.kbb)}
+    ${mkStat('P/IP',s.pip)}
+    ${mkStat('P/BF',s.pbf)}
+  </div>`;
+}
 function showPitcherStats(){
   const ap=activePitcher();if(!ap)return;
+  const g=state.currentGame;
   const types=['B','CS','SS','F','BIP'];
   const total=ap.pitches||1;
   const el=document.getElementById('screen-game');
   const existing=document.getElementById('stats-sheet-overlay');if(existing)existing.remove();
   const ov=document.createElement('div');ov.className='stats-sheet-overlay';ov.id='stats-sheet-overlay';
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
-  let barsHtml=types.map(k=>{
-    const p=PT_TYPES[k];const v=(ap.pitchTypes||{})[k]||0;const pct=total?Math.round(v/total*100):0;
-    return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${p.bg};color:${p.color}">${p.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${p.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;
-  }).join('');
+  const s=pitcherDerivedStats(ap);
+  const ri=restInfo(ap.pitches);
+  const restColor=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
+  const restText=ri?ri.label:'No pitches';
+  let barsHtml='';
+  if(g&&g.mode==='advanced'){
+    barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>`+types.map(k=>{
+      const p=PT_TYPES[k];const v=(ap.pitchTypes||{})[k]||0;const pct=total?Math.round(v/total*100):0;
+      return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${p.bg};color:${p.color}">${p.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${p.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;
+    }).join('');
+  }
   ov.innerHTML=`<div class="stats-sheet">
     <div class="stats-handle"></div>
     <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${ap.name}${ap.num?' #'+ap.num:''}</div>
-    <div style="font-size:13px;color:var(--dark-label);margin-bottom:18px">${total} total pitches · ${ap.innings?.filter(Boolean).length||0} innings</div>
-    <div class="stats-summary-row">
-      <div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${ap.ks||0}</div><div class="stats-summary-lbl">K</div></div>
-      <div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${ap.bbs||0}</div><div class="stats-summary-lbl">BB</div></div>
-      <div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${ap.bips||0}</div><div class="stats-summary-lbl">BIP</div></div>
-    </div>
-    <div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>
+    <div style="font-size:13px;color:var(--dark-label);margin-bottom:4px">${total} total pitches · ${s.ip} innings</div>
+    <div style="font-size:12px;font-weight:600;color:${restColor};margin-bottom:16px">${restText}</div>
+    ${statLineHtml(ap)}
     ${barsHtml}
     <div onclick="document.getElementById('stats-sheet-overlay').remove()" style="margin-top:16px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
   </div>`;
@@ -1326,16 +1419,19 @@ function showPitcherStats(){
 }
 
 // ── Button mapping modal ──
-function showButtonMappingModal(){
-  const el=document.getElementById('screen-game');
-  const existing=document.getElementById('btn-map-overlay');if(existing)existing.remove();
-  const ov=document.createElement('div');ov.className='bip-overlay';ov.id='btn-map-overlay';
-  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
-  const btns=[{key:'action',label:'Action Button',sub:'Top-left key (iPhone 15 Pro+)'},{key:'volUp',label:'Volume Up',sub:'Left side upper'},{key:'volDown',label:'Volume Down',sub:'Left side lower'}];
-  const opts=['pitch','nextBatter','undo','none'];
-  const optLabels={pitch:'+ Pitch',nextBatter:'Next Batter',undo:'↩ Undo',none:'Off'};
+function getBtnMapOpts(){
+  const g=state.currentGame;
+  if(g&&g.mode==='advanced')return['nextBatter','undo','none'];
+  return['pitch','nextBatter','undo','none'];
+}
+function getBtnRows(){
+  const showAction=hasActionButton();
+  const allBtns=[{key:'action',label:'Action Button',sub:'Top-left key (iPhone 15 Pro+)',needsAction:true},{key:'volUp',label:'Volume Up',sub:'Left side upper'},{key:'volDown',label:'Volume Down',sub:'Left side lower'}];
+  const btns=allBtns.filter(b=>!b.needsAction||showAction);
+  const opts=getBtnMapOpts();
+  const optLabels={pitch:'+ Pitch',nextBatter:'Next Batter',undo:'Undo',none:'Off'};
   const optColors={pitch:'var(--blue)',nextBatter:'var(--green)',undo:'#8E8E93',none:'rgba(255,255,255,.08)'};
-  const mkBtnRows=()=>btns.map(({key,label,sub})=>`
+  return btns.map(({key,label,sub})=>`
     <div style="margin-bottom:16px">
       <div style="font-size:12px;font-weight:700;color:rgba(235,235,245,.6);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">${label}</div>
       <div style="font-size:11px;color:rgba(235,235,245,.35);margin-bottom:8px">${sub}</div>
@@ -1343,31 +1439,25 @@ function showButtonMappingModal(){
         ${opts.map(opt=>`<div onclick="setBtnMapping('${key}','${opt}')" style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:${btnMapping[key]===opt?optColors[opt]:'rgba(255,255,255,.08)'};border:1px solid ${btnMapping[key]===opt?'transparent':'rgba(255,255,255,.1)'};cursor:pointer;font-size:11px;font-weight:700;color:${btnMapping[key]===opt?'#fff':'rgba(235,235,245,.6)'}">${optLabels[opt]}</div>`).join('')}
       </div>
     </div>`).join('');
+}
+function showButtonMappingModal(){
+  const el=document.getElementById('screen-game');
+  const existing=document.getElementById('btn-map-overlay');if(existing)existing.remove();
+  const ov=document.createElement('div');ov.className='bip-overlay';ov.id='btn-map-overlay';
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
   ov.innerHTML=`<div class="bip-sheet" id="btn-map-content">
     <div class="bip-handle"></div>
     <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">Physical Button Mapping</div>
     <div style="font-size:13px;color:var(--dark-label);margin-bottom:18px;line-height:1.4">Assign hardware buttons to scorer actions.</div>
-    <div id="btn-map-rows">${mkBtnRows()}</div>
+    <div id="btn-map-rows">${getBtnRows()}</div>
     <div onclick="document.getElementById('btn-map-overlay').remove()" style="width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Done</div>
   </div>`;
   el.appendChild(ov);
 }
 function setBtnMapping(key,val){
   btnMapping[key]=val;saveBtnMapping();
-  // Re-render the mapping rows
-  const btns=[{key:'action',label:'Action Button',sub:'Top-left key (iPhone 15 Pro+)'},{key:'volUp',label:'Volume Up',sub:'Left side upper'},{key:'volDown',label:'Volume Down',sub:'Left side lower'}];
-  const opts=['pitch','nextBatter','undo','none'];
-  const optLabels={pitch:'+ Pitch',nextBatter:'Next Batter',undo:'↩ Undo',none:'Off'};
-  const optColors={pitch:'var(--blue)',nextBatter:'var(--green)',undo:'#8E8E93',none:'rgba(255,255,255,.08)'};
   const rows=document.getElementById('btn-map-rows');
-  if(rows)rows.innerHTML=btns.map(({key:k,label,sub})=>`
-    <div style="margin-bottom:16px">
-      <div style="font-size:12px;font-weight:700;color:rgba(235,235,245,.6);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">${label}</div>
-      <div style="font-size:11px;color:rgba(235,235,245,.35);margin-bottom:8px">${sub}</div>
-      <div style="display:flex;gap:6px">
-        ${opts.map(opt=>`<div onclick="setBtnMapping('${k}','${opt}')" style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:${btnMapping[k]===opt?optColors[opt]:'rgba(255,255,255,.08)'};border:1px solid ${btnMapping[k]===opt?'transparent':'rgba(255,255,255,.1)'};cursor:pointer;font-size:11px;font-weight:700;color:${btnMapping[k]===opt?'#fff':'rgba(235,235,245,.6)'}">${optLabels[opt]}</div>`).join('')}
-      </div>
-    </div>`).join('');
+  if(rows)rows.innerHTML=getBtnRows();
   renderBtnHints();
 }
 
@@ -1378,7 +1468,56 @@ document.addEventListener('click',e=>{
   const wrap=document.getElementById('game-hbg-menu')?.closest('.menu-btn');
   if(wrap&&!wrap.contains(e.target))closeGameMenu();
 });
-function showStatsQuick(){closeGameMenu();showPitcherStats();}
+function showStatsQuick(){
+  closeGameMenu();
+  const g=state.currentGame;if(!g)return;
+  const el=document.getElementById('screen-game');
+  const existing=document.getElementById('stats-sheet-overlay');if(existing)existing.remove();
+  const ov=document.createElement('div');ov.className='stats-sheet-overlay';ov.id='stats-sheet-overlay';
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  const types=['B','CS','SS','F','BIP'];
+  let pidCounter=0;
+  const mkPitcherRow=(p,team)=>{
+    const ri=restInfo(p.pitches);
+    const restColor=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
+    const restText=ri?ri.label:'No pitches';
+    const s=pitcherDerivedStats(p);
+    const pid='qs-detail-'+(pidCounter++);
+    let barsHtml='';
+    if(g.mode==='advanced'){
+      const total=p.pitches||1;
+      barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin:12px 0 10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=total?Math.round(v/total*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
+    }
+    const detailHtml=`<div id="${pid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
+      ${statLineHtml(p)}
+      ${barsHtml}
+    </div>`;
+    return`<div style="background:rgba(255,255,255,.06);border-radius:14px;padding:14px;margin-bottom:8px">
+      <div onclick="const d=document.getElementById('${pid}');if(d)d.style.display=d.style.display==='none'?'block':'none'" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#fff">${p.name}${p.num?' <span style="color:rgba(235,235,245,.4)">#'+p.num+'</span>':''}</div>
+          <div style="font-size:12px;color:rgba(235,235,245,.5);margin-top:2px">${team} · ${s.ip} IP · ${s.bf} BF</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:800;color:#fff">${p.pitches}</div>
+          <div style="font-size:11px;font-weight:600;color:${restColor}">${restText}</div>
+        </div>
+      </div>
+      ${detailHtml}
+    </div>`;
+  };
+  const homePitchers=g.home.pitchers.map(p=>mkPitcherRow(p,g.homeTeam));
+  const awayPitchers=g.away.pitchers.map(p=>mkPitcherRow(p,g.awayTeam));
+  ov.innerHTML=`<div class="stats-sheet">
+    <div class="stats-handle"></div>
+    <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">Quick Stats</div>
+    <div style="font-size:13px;color:var(--dark-label);margin-bottom:16px">All pitchers · pitch counts & rest</div>
+    ${homePitchers.join('')}
+    ${awayPitchers.join('')}
+    <div onclick="document.getElementById('stats-sheet-overlay').remove()" style="margin-top:12px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
+  </div>`;
+  el.appendChild(ov);
+}
 
 // ── Modal helpers ──
 function showModal(title,sub,actions,dismissable=false){
@@ -1469,7 +1608,7 @@ function goSetup(){initSetup();showScreen('setup');}
 function resumeGame(gi){
   const g=state.games[gi];state.currentGame=g;state.games.splice(gi,1);
   const cfg=state.configs.find(c=>c.id===g.configId);
-  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;}
+  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;}
   saveState();renderGame();showScreen('game');
 }
 function confirmDelGame(i){
@@ -1626,7 +1765,7 @@ function renderConfigScreen(){
   const list=document.getElementById('config-list');
   list.innerHTML=state.configs.map(cfg=>`
     <div class="config-item">
-      <div style="flex:1;min-width:0"><div class="config-name">${cfg.name}${cfg.isDefault?'<span class="default-badge">Default</span>':''}</div><div class="config-sub">Max ${cfg.pitchMax} pitches · ${cfg.catcherInnMax} catcher inn.</div></div>
+      <div style="flex:1;min-width:0"><div class="config-name">${cfg.name}${cfg.isDefault?'<span class="default-badge">Default</span>':''}</div><div class="config-sub">Max ${cfg.pitchMax} pitches · ${cfg.catcherInnMax} catcher inn.${cfg.mercyRuns?' · '+cfg.mercyRuns+'-run mercy':''}</div></div>
       <div class="config-actions">
         ${!cfg.isDefault?`<div class="btn-xs" onclick="setDefaultConfig('${cfg.id}')">Set default</div>`:''}
         <div class="btn-xs" onclick="showConfigForm('${cfg.id}')">Edit</div>
@@ -1648,7 +1787,7 @@ function showConfigForm(id){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
   ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
   const thrRows=thr.map((t,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:7px;align-items:end;margin-bottom:8px"><div><div class="lbl">Threshold ${i+1} (pitches)</div><input type="number" id="thr-p-${i}" value="${t.pitches}" min="1" max="200"></div><div><div class="lbl">Days rest</div><input type="number" id="thr-d-${i}" value="${t.days}" min="0" max="10"></div><div class="trash-btn" onclick="this.closest('div[style]').remove()"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 3V2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1M2 3h11M13 3l-.867 9.356A2 2 0 0 1 10.14 14H4.86a2 2 0 0 1-1.993-1.644L2 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div></div>`).join('');
-  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()">✕</button><div class="modal-title">${existing?'Edit':'New'} Configuration</div><div style="margin-bottom:10px"><div class="lbl">Name</div><input type="text" id="cfg-name" value="${existing?existing.name:''}" placeholder="e.g. Minors 7-10"></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Max pitches</div><input type="number" id="cfg-pitch" value="${existing?existing.pitchMax:50}" min="1" max="200"></div><div><div class="lbl">Catcher inn. max</div><input type="number" id="cfg-catch" value="${existing?existing.catcherInnMax:4}" min="1" max="9"></div></div><div class="lbl" style="margin-bottom:8px">Rest thresholds</div><div id="thr-rows">${thrRows}</div><div class="btn-sm" onclick="addThrRow()" style="margin-bottom:14px;display:inline-flex">+ Add threshold</div><div class="modal-actions"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="saveConfigForm('${id||''}')">Save</div></div></div>`;
+  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()">✕</button><div class="modal-title">${existing?'Edit':'New'} Configuration</div><div style="margin-bottom:10px"><div class="lbl">Name</div><input type="text" id="cfg-name" value="${existing?existing.name:''}" placeholder="e.g. Minors 7-10"></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Max pitches</div><input type="number" id="cfg-pitch" value="${existing?existing.pitchMax:50}" min="1" max="200"></div><div><div class="lbl">Catcher inn. max</div><input type="number" id="cfg-catch" value="${existing?existing.catcherInnMax:4}" min="1" max="9"></div></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Mercy runs / half inning</div><input type="number" id="cfg-mercy" value="${existing?existing.mercyRuns||0:5}" min="0" max="99" placeholder="0 = off"></div><div></div></div><div class="lbl" style="margin-bottom:8px">Rest thresholds</div><div id="thr-rows">${thrRows}</div><div class="btn-sm" onclick="addThrRow()" style="margin-bottom:14px;display:inline-flex">+ Add threshold</div><div class="modal-actions"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="saveConfigForm('${id||''}')">Save</div></div></div>`;
   document.body.appendChild(ov);
 }
 function addThrRow(){
@@ -1661,14 +1800,15 @@ function saveConfigForm(id){
   const name=document.getElementById('cfg-name').value.trim();if(!name){alert('Enter a name.');return;}
   const pitchMax=parseInt(document.getElementById('cfg-pitch').value)||50;
   const catcherInnMax=parseInt(document.getElementById('cfg-catch').value)||4;
+  const mercyRuns=parseInt(document.getElementById('cfg-mercy').value)||0;
   const thresholds=[];
   document.getElementById('thr-rows').querySelectorAll('[id^="thr-p-"]').forEach((el,i)=>{
     const pitches=parseInt(el.value);const days=parseInt(document.getElementById('thr-d-'+i)?.value)||0;
     if(pitches>0)thresholds.push({pitches,days});
   });
   thresholds.sort((a,b)=>a.pitches-b.pitches);
-  if(id){const cfg=state.configs.find(c=>c.id===id);if(cfg){cfg.name=name;cfg.pitchMax=pitchMax;cfg.catcherInnMax=catcherInnMax;cfg.thresholds=thresholds;}}
-  else state.configs.push({id:'cfg_'+Date.now(),name,pitchMax,catcherInnMax,thresholds,isDefault:state.configs.length===0});
+  if(id){const cfg=state.configs.find(c=>c.id===id);if(cfg){cfg.name=name;cfg.pitchMax=pitchMax;cfg.catcherInnMax=catcherInnMax;cfg.mercyRuns=mercyRuns;cfg.thresholds=thresholds;}}
+  else state.configs.push({id:'cfg_'+Date.now(),name,pitchMax,catcherInnMax,mercyRuns,thresholds,isDefault:state.configs.length===0});
   applyActiveConfig();saveState();closeModal();renderConfigScreen();
 }
 function setDefaultConfig(id){state.configs.forEach(c=>c.isDefault=(c.id===id));state.activeConfigId=id;applyActiveConfig();saveState();renderConfigScreen();}

@@ -106,11 +106,15 @@ test.describe('Advanced mode', () => {
     await page.click('.pitch-btn.pt-BIP');
     await handleBIP(page, 'out');
 
-    // Third out: BIP out — should auto-advance
+    // Third out: BIP out — should show confirmation modal
     await page.click('.pitch-btn.pt-BIP');
     await page.waitForSelector('#bip-overlay[style*="flex"]');
     await page.click('.bip-btn.out');
     await waitForFlashToClear(page);
+
+    // Confirm end half inning
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await page.click('text=End half inning');
 
     const inningAfter = await getInningText(page);
     expect(inningAfter).toContain('BOT');
@@ -124,11 +128,17 @@ test.describe('Advanced mode', () => {
     await handleBIP(page, 'out');
     expect(await getOutCount(page)).toBe(2);
 
-    // Third BIP out triggers side-retired and auto-advances
+    // Third BIP out triggers side-retired confirmation
     await page.click('.pitch-btn.pt-BIP');
     await page.waitForSelector('#bip-overlay[style*="flex"]');
     await page.click('.bip-btn.out');
-    // Wait for END flash and half inning to advance
+    await waitForFlashToClear(page);
+
+    // Confirm end half inning
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await page.click('text=End half inning');
+
+    // Wait for half inning to advance
     await expect(page.locator('#inn-pill')).toContainText('BOT', { timeout: 5000 });
     // Outs should reset for the new half
     await expect(page.locator('.out-dot.filled')).toHaveCount(0, { timeout: 2000 });
@@ -154,8 +164,75 @@ test.describe('Advanced mode', () => {
     expect(await getBallCount(page)).toBe(2);
     expect(await getStrikeCount(page)).toBe(1);
 
-    await page.click('text=Next batter (manual)');
+    await page.click('text=Next batter');
     expect(await getBallCount(page)).toBe(0);
     expect(await getStrikeCount(page)).toBe(0);
+  });
+
+  test('non-pitch out increments out count without adding pitch', async ({ page }) => {
+    const pitchesBefore = await getPitchCount(page);
+    await page.click('text=+ Out');
+    expect(await getOutCount(page)).toBe(1);
+    expect(await getPitchCount(page)).toBe(pitchesBefore);
+  });
+
+  test('non-pitch out triggers side retired at 3 outs', async ({ page }) => {
+    // Two BIP outs
+    await page.click('.pitch-btn.pt-BIP');
+    await handleBIP(page, 'out');
+    await page.click('.pitch-btn.pt-BIP');
+    await handleBIP(page, 'out');
+    expect(await getOutCount(page)).toBe(2);
+
+    // Third out via non-pitch out
+    await page.click('text=+ Out');
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    const modalText = await page.locator('.modal-box').textContent();
+    expect(modalText).toContain('Side retired');
+
+    // Confirm and verify half advances
+    await page.click('text=End half inning');
+    await expect(page.locator('#inn-pill')).toContainText('BOT', { timeout: 3000 });
+    await expect(page.locator('.out-dot.filled')).toHaveCount(0);
+  });
+
+  test('undo reverts non-pitch out', async ({ page }) => {
+    await page.click('text=+ Out');
+    expect(await getOutCount(page)).toBe(1);
+
+    await page.click('#undo-btn-adv');
+    expect(await getOutCount(page)).toBe(0);
+  });
+
+  test('quick stats shows all pitchers from both teams', async ({ page }) => {
+    // Add a pitch so pitcher has data
+    await throwPitches(page, 'B', 3);
+
+    // Open quick stats via hamburger menu
+    await page.click('.menu-btn');
+    await page.click('text=Quick stats');
+    await page.waitForSelector('.stats-sheet', { timeout: 3000 });
+
+    const statsText = await page.locator('.stats-sheet').textContent();
+    expect(statsText).toContain('Jake M.');
+    expect(statsText).toContain('Sam T.');
+    expect(statsText).toContain('Eagles');
+    expect(statsText).toContain('Hawks');
+  });
+
+  test('pitcher stats show derived metrics', async ({ page }) => {
+    // Throw pitches and get a strikeout
+    await throwPitches(page, 'SS', 3);
+    await waitForFlashToClear(page);
+
+    // Open individual pitcher stats
+    await page.locator('.stats-link').click();
+    await page.waitForSelector('.stats-sheet', { timeout: 3000 });
+
+    const statsText = await page.locator('.stats-sheet').textContent();
+    expect(statsText).toContain('P (Pitches)');
+    expect(statsText).toContain('BF (Batters Faced)');
+    expect(statsText).toContain('K (Strikeouts)');
+    expect(statsText).toContain('K/BB');
   });
 });
