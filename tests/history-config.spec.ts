@@ -118,4 +118,24 @@ test.describe('History and configuration', () => {
     const histCard = page.locator('.hist-card').first();
     await expect(histCard).toContainText('Advanced');
   });
+
+  test('umpire fields clear on new game', async ({ page }) => {
+    // Start a game and fill umpire in setup
+    await page.click('.new-game-btn');
+    await page.click('#mode-simple');
+    await page.fill('#s-ump-plate', 'John Ump');
+    await page.fill('#hp-name', 'Test P.');
+    await page.fill('#ap-name', 'Test Q.');
+    await page.click('.start-btn');
+    await page.waitForSelector('#screen-game.active');
+
+    // End game
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+    await page.click('.modal-btn.red');
+
+    // Start new game — umpire field should be empty
+    await page.click('.new-game-btn');
+    await expect(page.locator('#s-ump-plate')).toHaveValue('');
+  });
 });

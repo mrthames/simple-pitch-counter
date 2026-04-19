@@ -121,4 +121,65 @@ test.describe('Thresholds and alerts', () => {
     // Mercy alert should be gone in new half
     await expect(page.locator('#adv-alerts')).not.toContainText('mercy');
   });
+
+  test('mercy modal appears when run limit reached', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Add 5 runs for away team
+    for (let i = 0; i < 5; i++) {
+      await page.click('.sb-adj >> nth=0');
+    }
+
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    const modalText = await page.locator('.modal-box').textContent();
+    expect(modalText).toContain('Mercy limit reached');
+    expect(modalText).toContain('5 runs scored');
+  });
+
+  test('mercy modal Continue keeps playing', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    for (let i = 0; i < 5; i++) {
+      await page.click('.sb-adj >> nth=0');
+    }
+
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await page.locator('.modal-btn', { hasText: 'Continue' }).click();
+
+    // Should stay in same half inning
+    const inning = await page.locator('#inn-pill').textContent();
+    expect(inning).toContain('TOP');
+    expect(inning).toContain('1');
+  });
+
+  test('mercy modal End half advances inning', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    for (let i = 0; i < 5; i++) {
+      await page.click('.sb-adj >> nth=0');
+    }
+
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await page.click('.modal-btn.amber');
+
+    await expect(page.locator('#inn-pill')).toContainText('BOT', { timeout: 3000 });
+  });
+
+  test('mercy rule tracks runs from fielding team too', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // In TOP 1, home team is fielding — add 5 runs for home (nth=3 is home +)
+    for (let i = 0; i < 5; i++) {
+      await page.click('.sb-adj >> nth=3');
+    }
+
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    const modalText = await page.locator('.modal-box').textContent();
+    expect(modalText).toContain('Mercy limit reached');
+  });
+
+  test('mercy alert shows in simple mode alerts area', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    for (let i = 0; i < 5; i++) {
+      await page.click('.sb-adj >> nth=0');
+    }
+
+    await expect(page.locator('#simple-alerts')).toContainText('mercy limit reached');
+  });
 });

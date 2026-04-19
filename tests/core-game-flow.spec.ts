@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { clearState, startGame, getPitchCount, addSimplePitches, getInningText, getScore } from './helpers';
+import { clearState, startGame, getPitchCount, addSimplePitches, getInningText, getScore, getOutCount } from './helpers';
 
 test.describe('Core game flow', () => {
   test.beforeEach(async ({ page }) => {
@@ -132,5 +132,69 @@ test.describe('Core game flow', () => {
     await page.reload();
     await page.waitForSelector('#screen-game.active');
     expect(await getPitchCount(page)).toBe(7);
+  });
+
+  test('simple mode + Out increments out count', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    expect(await getOutCount(page)).toBe(0);
+
+    await page.locator('#simple-content .adv-secondary-btn', { hasText: '+ Out' }).click();
+    expect(await getOutCount(page)).toBe(1);
+  });
+
+  test('simple mode 3 outs triggers end-of-half modal', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+
+    for (let i = 0; i < 3; i++) {
+      await page.locator('#simple-content .adv-secondary-btn', { hasText: '+ Out' }).click();
+      if (i < 2) await page.waitForTimeout(100);
+    }
+
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    const modalText = await page.locator('.modal-box').textContent();
+    expect(modalText).toContain('End half inning');
+  });
+
+  test('simple mode 3 outs end-of-half advances inning', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    const before = await getInningText(page);
+    expect(before).toContain('TOP');
+
+    for (let i = 0; i < 3; i++) {
+      await page.locator('#simple-content .adv-secondary-btn', { hasText: '+ Out' }).click();
+      if (i < 2) await page.waitForTimeout(100);
+    }
+
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await page.click('.modal-btn.amber');
+
+    await expect(page.locator('#inn-pill')).toContainText('BOT', { timeout: 3000 });
+    expect(await getOutCount(page)).toBe(0);
+  });
+
+  test('outs display in header for simple mode', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await expect(page.locator('#outs-row')).toBeVisible();
+    await expect(page.locator('#outs-row .out-dot')).toHaveCount(3);
+  });
+
+  test('outs display in header for advanced mode', async ({ page }) => {
+    await startGame(page, { mode: 'advanced', homeCatcher: 'Mike C.', awayCatcher: 'Dan R.' });
+    await expect(page.locator('#outs-row')).toBeVisible();
+    await expect(page.locator('#outs-row .out-dot')).toHaveCount(3);
+  });
+
+  test('fielding team label shows below outs in header', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
+    await expect(page.locator('#inn-sub')).toContainText('Tigers fielding');
+  });
+
+  test('simple mode undo reverts + Out', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.locator('#simple-content .adv-secondary-btn', { hasText: '+ Out' }).click();
+    expect(await getOutCount(page)).toBe(1);
+
+    await page.click('#undo-btn-simple');
+    expect(await getOutCount(page)).toBe(0);
   });
 });

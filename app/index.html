@@ -946,7 +946,7 @@ function startGame(){
     awayTeam:document.getElementById('s-away').value.trim()||'Away',
     mode:selectedMode,
     inning:1,isTop:true,homeScore:0,awayScore:0,
-    balls:0,strikes:0,outs:0,atBatLog:[],
+    balls:0,strikes:0,outs:0,atBatLog:[],halfInningRuns:0,
     home:mkRoster(document.getElementById('hp-name').value.trim(),document.getElementById('hp-num').value.trim(),document.getElementById('hc-name').value.trim(),document.getElementById('hc-num').value.trim()),
     away:mkRoster(document.getElementById('ap-name').value.trim(),document.getElementById('ap-num').value.trim(),document.getElementById('ac-name').value.trim(),document.getElementById('ac-num').value.trim()),
     homeActivePIdx:0,homeActiveCIdx:null,awayActivePIdx:0,awayActiveCIdx:null,
@@ -1037,21 +1037,19 @@ function adjScore(side,d){
   const g=state.currentGame;
   if(side==='home')g.homeScore=Math.max(0,(g.homeScore||0)+d);
   else g.awayScore=Math.max(0,(g.awayScore||0)+d);
-  if(d>0&&side===getBattingSide()){
+  if(d>0){
     g.halfInningRuns=(g.halfInningRuns||0)+1;
-  }else if(d<0&&side===getBattingSide()){
+  }else if(d<0){
     g.halfInningRuns=Math.max(0,(g.halfInningRuns||0)-1);
   }
   haptic('selection');saveState();renderGame();
-  if(d>0&&side===getBattingSide()&&MERCY_RUNS>0&&g.halfInningRuns>=MERCY_RUNS){
+  if(d>0&&MERCY_RUNS>0&&g.halfInningRuns>=MERCY_RUNS){
     confirmMercyEnd();
   }
 }
 function confirmMercyEnd(){
   const g=state.currentGame;if(!g)return;
-  const side=getBattingSide();
-  const teamName=side==='home'?g.homeTeam:g.awayTeam;
-  showModal('Mercy limit reached',`${teamName} has scored ${g.halfInningRuns} runs this half inning — ${MERCY_RUNS}-run mercy limit reached. End the half?`,[
+  showModal('Mercy limit reached',`${g.halfInningRuns} runs scored this half inning — ${MERCY_RUNS}-run mercy limit reached. End the half?`,[
     {label:'Continue',fn:'closeModal()'},
     {label:'End half',fn:'closeModal();setTimeout(endHalfInning,50)',cls:'amber'},
   ]);
@@ -1379,10 +1377,8 @@ function mercyAlerts(){
   if(!MERCY_RUNS||MERCY_RUNS<=0)return a;
   const g=state.currentGame;if(!g)return a;
   const runs=g.halfInningRuns||0;
-  const batting=getBattingSide();
-  const teamName=batting==='home'?g.homeTeam:g.awayTeam;
-  if(runs>=MERCY_RUNS)a.push({t:'danger',m:`${teamName} has scored ${runs} runs this half inning — ${MERCY_RUNS}-run mercy limit reached.`});
-  else if(runs>=MERCY_RUNS-1)a.push({t:'warn',m:`${teamName} has scored ${runs} runs — 1 away from ${MERCY_RUNS}-run mercy limit.`});
+  if(runs>=MERCY_RUNS)a.push({t:'danger',m:`${runs} runs scored this half inning — ${MERCY_RUNS}-run mercy limit reached.`});
+  else if(runs>=MERCY_RUNS-1)a.push({t:'warn',m:`${runs} runs scored — 1 away from ${MERCY_RUNS}-run mercy limit.`});
   return a;
 }
 
