@@ -52,18 +52,49 @@ simple-pitch-counter/
 │   ├── AppDelegate.swift   # Native iOS shell — window setup
 │   ├── ViewController.swift # WKWebView config, haptics, and volume button capture
 │   ├── V1/                 # Archived V1 app files
-│   ├── Pitch Counter Redesign.html    # Claude Design iteration 1
-│   ├── Pitch Counter Redesign v2.html # Claude Design iteration 2
 │   └── Assets.xcassets/    # App icons and colors
+├── tests/                  # Playwright E2E tests
+│   ├── helpers.ts          # Shared test utilities (startGame, addPitches, etc.)
+│   ├── core-game-flow.spec.ts      # Game lifecycle, scoring, outs, undo
+│   ├── advanced-mode.spec.ts       # Pitch types, BSO count, BIP, auto-advance
+│   ├── thresholds-alerts.spec.ts   # Rest days, pitch limits, mercy rule
+│   ├── pitcher-catcher.spec.ts     # Roster management, mid-game switches
+│   ├── summary-export.spec.ts      # Game summary, report generation, export
+│   └── history-config.spec.ts      # History cards, config presets, setup flow
+├── .github/workflows/      # CI/CD
+│   └── test.yml            # Runs Playwright tests on push/PR to main
 ├── website/                # simplepitchcounter.com
-│   ├── index.html          # Landing page
+│   ├── index.html          # Landing page with interactive phone mockup
 │   ├── privacy.html        # Privacy policy
 │   ├── contact.html        # Contact form
-│   ├── contact.php         # PHP backend for contact form (not tracked in git — contains credentials)
-│   └── phpmailer/          # PHPMailer library for SMTP
+│   ├── feedback.html       # Feedback form
+│   └── contact.php         # PHP backend (not tracked — contains credentials)
+├── docs/                   # Product and portfolio documentation
+├── playwright.config.ts    # Playwright test configuration
 ├── CHANGELOG.md            # App change history
 └── README.md
 ```
+
+## Testing
+
+The project has **91 Playwright E2E tests** covering all app functionality:
+
+| Spec file | Tests | Coverage |
+|-----------|-------|----------|
+| `core-game-flow` | 20 | Game lifecycle, scoring, outs (both modes), undo, persistence |
+| `advanced-mode` | 17 | Pitch types, BSO count, BIP modal, auto-advance, non-pitch outs |
+| `thresholds-alerts` | 17 | Rest days, pitch limits, mercy rule modal, at-bat warnings |
+| `pitcher-catcher` | 8 | Roster management, mid-game switches, inning tracking |
+| `summary-export` | 11 | Game summary, umpire data, report generation, export |
+| `history-config` | 12 | History cards, config presets, setup flow, umpire clearing |
+
+```bash
+npm test              # Run all tests (headless)
+npm run test:headed   # Run with visible browser
+npm run test:ui       # Open Playwright UI
+```
+
+Tests run automatically on every push and pull request to `main` via GitHub Actions (`test.yml`). The CI pipeline uses Node 20 and Chromium, and uploads test reports as artifacts (14-day retention).
 
 ## Architecture
 
@@ -72,29 +103,39 @@ simple-pitch-counter/
 The app is a native iOS shell wrapping a single-page web application:
 
 - **AppDelegate.swift** — creates the window and sets `ViewController` as root
-- **ViewController.swift** — configures a `WKWebView` with persistent localStorage, portrait lock, native JS alert/confirm/prompt handling, opens external links in Safari, haptic feedback bridge (JS → native), and volume button capture for physical button mapping
-- **index.html** — the entire app in one file: HTML structure, CSS styling, and JavaScript logic. Uses localStorage for all data persistence. V2 redesign features a dark scoreboard header, two game modes (Simple/Advanced), pitch type tracking, and iOS-native visual language
+- **ViewController.swift** — configures a `WKWebView` constrained to the safe area, with persistent localStorage, portrait lock, native JS alert/confirm/prompt handling, external link handling, haptic feedback bridge (JS → native via `WKScriptMessageHandler`), dynamic status bar styling (light on game screen, dark elsewhere), and volume button capture for physical button mapping
+- **index.html** — the entire app in one file: HTML structure, CSS styling, and JavaScript logic. Uses localStorage for all data persistence. Features a dark scoreboard header, two game modes (Simple/Advanced), pitch type tracking, out tracking, mercy rule enforcement, and iOS-native visual language
 
 ### Website (`website/`)
 
 A static marketing site hosted on a Synology NAS via Web Station:
 
-- Landing page with app features, how-it-works steps, and App Store download link
+- Landing page with interactive phone mockup showing the Advanced mode UI
+- App Store download link and feature highlights
 - Privacy policy (required by App Store)
-- Contact form with PHP/SMTP backend
+- Contact and feedback forms with PHP/SMTP backend
 - Deployed at simplepitchcounter.com
 
 ## Deployment
 
 ### iOS app
 
-Built and submitted via Xcode on macOS. The `app/index.html` is bundled into the iOS app and loaded by the WKWebView.
+Built and submitted via Xcode on macOS. The `app/index.html` is bundled into the iOS app and loaded by the WKWebView. Build numbers auto-increment from git commit count.
+
+1. Push changes to `main`, confirm CI tests pass
+2. On Mac: Xcode → Integrate → Pull
+3. Xcode → Product → Archive → Distribute to App Store Connect
+4. Build appears in TestFlight automatically
 
 ### Website
 
-Hosted on Synology NAS using Web Station. Deploy by copying `website/` contents to the web root (e.g., `/web/simplepitchcounter/`). See the website's own setup notes for virtual host, HTTPS, and DNS configuration.
+Hosted on Synology NAS using Web Station. Deployed via SCP over the local network:
 
-**Note:** `contact.php` contains SMTP credentials and is excluded from git via `.gitignore`. Keep a local copy on your NAS and manage credentials separately.
+```bash
+scp -O -P 2222 -i ~/.ssh/<ssh-key> website/* <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
+```
+
+**Note:** `contact.php` contains SMTP credentials and is excluded from git via `.gitignore`.
 
 ## Future plans
 
