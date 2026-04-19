@@ -92,7 +92,7 @@ test.describe('Thresholds and alerts', () => {
     await startGame(page, { mode: 'advanced' });
     // During TOP 1, away team bats — add 5 runs for away
     for (let i = 0; i < 5; i++) {
-      await page.click('.sb-adj >> nth=0'); // away +
+      await page.click('.sb-adj >> nth=1'); // away +
     }
     await expect(page.locator('#adv-alerts')).toContainText('mercy limit reached');
   });
@@ -101,7 +101,7 @@ test.describe('Thresholds and alerts', () => {
     await startGame(page, { mode: 'simple' });
     // During TOP 1, away team bats — add 4 runs for away
     for (let i = 0; i < 4; i++) {
-      await page.click('.sb-adj >> nth=0'); // away +
+      await page.click('.sb-adj >> nth=1'); // away +
     }
     await expect(page.locator('#simple-alerts')).toContainText('1 away from');
   });
@@ -110,7 +110,7 @@ test.describe('Thresholds and alerts', () => {
     await startGame(page, { mode: 'advanced' });
     // Add 5 runs for away (batting in TOP)
     for (let i = 0; i < 5; i++) {
-      await page.click('.sb-adj >> nth=0');
+      await page.click('.sb-adj >> nth=1');
     }
     await expect(page.locator('#adv-alerts')).toContainText('mercy');
 
@@ -126,7 +126,7 @@ test.describe('Thresholds and alerts', () => {
     await startGame(page, { mode: 'simple' });
     // Add 5 runs for away team
     for (let i = 0; i < 5; i++) {
-      await page.click('.sb-adj >> nth=0');
+      await page.click('.sb-adj >> nth=1');
     }
 
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
@@ -138,7 +138,7 @@ test.describe('Thresholds and alerts', () => {
   test('mercy modal Continue keeps playing', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     for (let i = 0; i < 5; i++) {
-      await page.click('.sb-adj >> nth=0');
+      await page.click('.sb-adj >> nth=1');
     }
 
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
@@ -153,7 +153,7 @@ test.describe('Thresholds and alerts', () => {
   test('mercy modal End half advances inning', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     for (let i = 0; i < 5; i++) {
-      await page.click('.sb-adj >> nth=0');
+      await page.click('.sb-adj >> nth=1');
     }
 
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
@@ -177,7 +177,7 @@ test.describe('Thresholds and alerts', () => {
   test('mercy alert shows in simple mode alerts area', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     for (let i = 0; i < 5; i++) {
-      await page.click('.sb-adj >> nth=0');
+      await page.click('.sb-adj >> nth=1');
     }
 
     await expect(page.locator('#simple-alerts')).toContainText('mercy limit reached');
