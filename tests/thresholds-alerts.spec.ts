@@ -86,4 +86,39 @@ test.describe('Thresholds and alerts', () => {
     await addSimplePitches(page, 6);
     await expect(page.locator('#simple-alerts')).toContainText('At-bat pitch count');
   });
+
+  test('mercy rule alert shows when run limit reached in advanced mode', async ({ page }) => {
+    // Default config has mercyRuns=5
+    await startGame(page, { mode: 'advanced' });
+    // During TOP 1, away team bats — add 5 runs for away
+    for (let i = 0; i < 5; i++) {
+      await page.click('.sb-adj >> nth=0'); // away +
+    }
+    await expect(page.locator('#adv-alerts')).toContainText('mercy limit reached');
+  });
+
+  test('mercy rule warning shows at one run before limit in simple mode', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // During TOP 1, away team bats — add 4 runs for away
+    for (let i = 0; i < 4; i++) {
+      await page.click('.sb-adj >> nth=0'); // away +
+    }
+    await expect(page.locator('#simple-alerts')).toContainText('1 away from');
+  });
+
+  test('mercy run count resets after half inning ends', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    // Add 5 runs for away (batting in TOP)
+    for (let i = 0; i < 5; i++) {
+      await page.click('.sb-adj >> nth=0');
+    }
+    await expect(page.locator('#adv-alerts')).toContainText('mercy');
+
+    // End half manually
+    await page.click('.end-half-btn');
+    await page.click('.modal-btn.amber');
+
+    // Mercy alert should be gone in new half
+    await expect(page.locator('#adv-alerts')).not.toContainText('mercy');
+  });
 });
