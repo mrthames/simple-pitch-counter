@@ -24,6 +24,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        view.backgroundColor = UIColor(red: 0.949, green: 0.949, blue: 0.969, alpha: 1.0) // #F2F2F7
+
         // ── WebView configuration ──────────────────────────────
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.default()
