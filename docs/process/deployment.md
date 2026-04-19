@@ -22,6 +22,19 @@ A GitHub Action (`.github/workflows/deploy-website.yml`) runs on every push that
 
 You can also trigger a deploy manually from GitHub → Actions → "Deploy Website to NAS" → Run workflow.
 
+### Local SCP fallback
+
+If the GitHub Action fails (e.g., NAS not reachable externally), deploy from any machine on the local network:
+
+```bash
+scp -O -P 2222 -i ~/.ssh/<ssh-key> website/index.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
+scp -O -P 2222 -i ~/.ssh/<ssh-key> website/privacy.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
+scp -O -P 2222 -i ~/.ssh/<ssh-key> website/contact.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
+scp -O -P 2222 -i ~/.ssh/<ssh-key> website/feedback.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
+```
+
+Connection details: `<user>@<nas-ip>:2222` with `~/.ssh/<ssh-key>`.
+
 ### Setup (one-time, already completed)
 
 1. Generated an ED25519 SSH key pair (`~/.ssh/spc_deploy` on the Mac)
