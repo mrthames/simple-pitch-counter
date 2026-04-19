@@ -1,46 +1,45 @@
 import UIKit
 import WebKit
+import AVFoundation
+import MediaPlayer
 
 class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
 
     var webView: WKWebView!
 
-    // Haptic generators — pre-instantiated for responsiveness
-    private let impactLight = UIImpactFeedbackGenerator(style: .light)
-    private let impactMedium = UIImpactFeedbackGenerator(style: .medium)
-    private let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+    // Haptic generators
+    private let impactLight   = UIImpactFeedbackGenerator(style: .light)
+    private let impactMedium  = UIImpactFeedbackGenerator(style: .medium)
+    private let impactHeavy   = UIImpactFeedbackGenerator(style: .heavy)
     private let notificationFeedback = UINotificationFeedbackGenerator()
-    private let selectionFeedback = UISelectionFeedbackGenerator()
+    private let selectionFeedback    = UISelectionFeedbackGenerator()
+
+    // Volume button tracking
+    private var prevVolume: Float = 0.5
+    private var volumeKVOActive = false
+    // Debounce: ignore rapid repeat presses within 0.25s
+    private var lastVolumeFire: TimeInterval = 0
+    private let volumeDebounce: TimeInterval = 0.25
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // --- WKWebView configuration ---
+        // ── WebView configuration ──────────────────────────────
         let config = WKWebViewConfiguration()
-
-        // Allow localStorage to persist between launches
         config.websiteDataStore = WKWebsiteDataStore.default()
-
-        // Allow file-access so the HTML can read itself from the bundle
         let prefs = WKWebpagePreferences()
         prefs.allowsContentJavaScript = true
         config.defaultWebpagePreferences = prefs
-
-        // Register JS → native haptic message handler
         config.userContentController.add(self, name: "haptic")
 
-        // Pre-warm haptic generators
         impactLight.prepare()
         impactMedium.prepare()
         impactHeavy.prepare()
 
-        // --- Create and fill the view ---
         webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
         webView.uiDelegate = self
         webView.translatesAutoresizingMaskIntoConstraints = false
-
-        // Prevent rubber-band scroll so the app feels native
         webView.scrollView.bounces = false
         webView.scrollView.showsVerticalScrollIndicator = false
 
@@ -49,42 +48,107 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
             webView.topAnchor.constraint(equalTo: view.topAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
 
-        // --- Load the bundled HTML file ---
         guard let htmlPath = Bundle.main.url(forResource: "index", withExtension: "html") else {
-            showLoadError()
+            showLoadError(); return
+        }
+        webView.loadFileURL(htmlPath, allowingReadAccessTo: htmlPath.deletingLastPathComponent())
+
+        // ── Volume button setup ────────────────────────────────
+        setupVolumeButtonCapture()
+    }
+
+    // MARK: - Volume Button Capture
+
+    private func setupVolumeButtonCapture() {
+        // Activate audio session so we can observe outputVolume
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setActive(true)
+        } catch {
+            print("AVAudioSession activate error: \(error)")
+        }
+        prevVolume = session.outputVolume
+        session.addObserver(self,
+                            forKeyPath: "outputVolume",
+                            options: [.new, .old],
+                            context: nil)
+        volumeKVOActive = true
+
+        // Add an invisible MPVolumeView — this suppresses the system volume HUD
+        // so the volume overlay doesn't appear when the user presses the buttons.
+        let volumeView = MPVolumeView(frame: CGRect(x: -100, y: -100, width: 1, height: 1))
+        volumeView.alpha = 0.001
+        volumeView.isUserInteractionEnabled = false
+        view.addSubview(volumeView)
+    }
+
+    override func observeValue(forKeyPath keyPath: String?,
+                               of object: Any?,
+                               change: [NSKeyValueChangeKey : Any]?,
+                               context: UnsafeMutableRawPointer?) {
+        guard keyPath == "outputVolume" else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
             return
         }
 
-        // allowingReadAccessTo must be the directory, not the file itself
-        let bundleDir = htmlPath.deletingLastPathComponent()
-        webView.loadFileURL(htmlPath, allowingReadAccessTo: bundleDir)
+        let newVol = AVAudioSession.sharedInstance().outputVolume
+        let now = Date().timeIntervalSinceReferenceDate
+
+        // Debounce: skip if fired too recently
+        guard now - lastVolumeFire >= volumeDebounce else { return }
+
+        if newVol > prevVolume {
+            lastVolumeFire = now
+            firePhysicalButton("volUp")
+        } else if newVol < prevVolume {
+            lastVolumeFire = now
+            firePhysicalButton("volDown")
+        }
+        prevVolume = newVol
+
+        // Reset volume toward center (0.5) so there's room for future presses
+        // without hitting the system min/max.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            let slider = MPVolumeView.volumeSlider()
+            slider?.value = 0.5
+            self.prevVolume = 0.5
+        }
     }
 
-    // Keep the status bar readable over the app
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .darkContent
+    private func firePhysicalButton(_ type: String) {
+        // Call window.onPhysicalButton(type) in the JS layer
+        let js = "window.onPhysicalButton && window.onPhysicalButton('\(type)')"
+        DispatchQueue.main.async {
+            self.webView.evaluateJavaScript(js, completionHandler: nil)
+        }
+        // Provide haptic feedback for the button press
+        impactMedium.impactOccurred()
+        impactMedium.prepare()
     }
 
-    // Lock to portrait — makes field use easier
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return [.portrait, .portraitUpsideDown]
+    deinit {
+        if volumeKVOActive {
+            AVAudioSession.sharedInstance().removeObserver(self, forKeyPath: "outputVolume")
+        }
     }
+
+    // MARK: - Status bar / orientation
+
+    override var preferredStatusBarStyle: UIStatusBarStyle { .lightContent }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { [.portrait, .portraitUpsideDown] }
 
     // MARK: - WKNavigationDelegate
 
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
-        // Allow local file navigation; open any external http/https link in Safari
         if let url = navigationAction.request.url {
             if url.isFileURL {
                 decisionHandler(.allow)
             } else if url.scheme == "mailto" {
-                // Let the mail compose handler open
                 UIApplication.shared.open(url)
                 decisionHandler(.cancel)
             } else if url.scheme == "http" || url.scheme == "https" {
@@ -102,7 +166,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         showLoadError()
     }
 
-    // MARK: - WKUIDelegate (handles window.alert / confirm / prompt from JS)
+    // MARK: - WKUIDelegate (alert / confirm / prompt)
 
     func webView(_ webView: WKWebView,
                  runJavaScriptAlertPanelWithMessage message: String,
@@ -137,33 +201,20 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         present(alert, animated: true)
     }
 
-    // MARK: - WKScriptMessageHandler (haptic feedback from JS)
+    // MARK: - WKScriptMessageHandler (haptic from JS)
 
     func userContentController(_ userContentController: WKUserContentController,
                                 didReceive message: WKScriptMessage) {
         guard message.name == "haptic", let type = message.body as? String else { return }
         switch type {
-        case "light":
-            impactLight.impactOccurred()
-            impactLight.prepare()
-        case "medium":
-            impactMedium.impactOccurred()
-            impactMedium.prepare()
-        case "heavy":
-            impactHeavy.impactOccurred()
-            impactHeavy.prepare()
-        case "success":
-            notificationFeedback.notificationOccurred(.success)
-        case "warning":
-            notificationFeedback.notificationOccurred(.warning)
-        case "error":
-            notificationFeedback.notificationOccurred(.error)
-        case "selection":
-            selectionFeedback.selectionChanged()
-            selectionFeedback.prepare()
-        default:
-            impactMedium.impactOccurred()
-            impactMedium.prepare()
+        case "light":   impactLight.impactOccurred();   impactLight.prepare()
+        case "medium":  impactMedium.impactOccurred();  impactMedium.prepare()
+        case "heavy":   impactHeavy.impactOccurred();   impactHeavy.prepare()
+        case "success": notificationFeedback.notificationOccurred(.success)
+        case "warning": notificationFeedback.notificationOccurred(.warning)
+        case "error":   notificationFeedback.notificationOccurred(.error)
+        case "selection": selectionFeedback.selectionChanged(); selectionFeedback.prepare()
+        default:        impactMedium.impactOccurred();  impactMedium.prepare()
         }
     }
 
@@ -181,7 +232,16 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 32),
-            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32)
+            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -32),
         ])
+    }
+}
+
+// MARK: - MPVolumeView helper (access hidden slider)
+
+private extension MPVolumeView {
+    static func volumeSlider() -> UISlider? {
+        let v = MPVolumeView(frame: .zero)
+        return v.subviews.first(where: { $0 is UISlider }) as? UISlider
     }
 }

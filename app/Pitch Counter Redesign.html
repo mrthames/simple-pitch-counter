@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Pitch Counter — Redesign</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #E8E8ED; font-family: -apple-system, system-ui, sans-serif; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px 24px 60px; gap: 48px; }
+
+  /* Tweaks panel */
+  #tweaks-panel { display: none; position: fixed; bottom: 24px; right: 24px; background: #fff; border-radius: 16px; padding: 16px; width: 220px; box-shadow: 0 8px 32px rgba(0,0,0,0.18); z-index: 9999; font-size: 13px; }
+  #tweaks-panel label { display: block; margin-bottom: 10px; color: #333; }
+  #tweaks-panel select, #tweaks-panel input[type=range] { width: 100%; margin-top: 4px; }
+  #tweaks-panel .tw-title { font-weight: 700; font-size: 14px; margin-bottom: 12px; color: #111; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="tweaks-panel">
+  <div class="tw-title">Tweaks</div>
+  <label>Pitch count
+    <input type="range" id="tw-pitches" min="0" max="50" value="34">
+  </label>
+  <label>At-bat pitches
+    <input type="range" id="tw-batter" min="0" max="12" value="4">
+  </label>
+  <label>Screen
+    <select id="tw-screen">
+      <option value="game">Game</option>
+      <option value="history">History</option>
+      <option value="setup">Setup</option>
+      <option value="summary">Summary</option>
+    </select>
+  </label>
+</div>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+
+// ── Design tokens ──────────────────────────────────────────────
+const C = {
+  dark:     '#1C1C1E',
+  dark2:    '#2C2C2E',
+  dark3:    '#3A3A3C',
+  label:    'rgba(235,235,245,0.6)',
+  bg:       '#F2F2F7',
+  bg2:      '#FFFFFF',
+  card:     '#FFFFFF',
+  sep:      'rgba(60,60,67,0.12)',
+  text:     '#000000',
+  text2:    'rgba(60,60,67,0.6)',
+  text3:    'rgba(60,60,67,0.4)',
+  blue:     '#1A6BFF',
+  green:    '#34C759',
+  red:      '#FF3B30',
+  amber:    '#FF9500',
+  blueBg:   '#EBF1FF',
+  greenBg:  '#E8F9ED',
+  redBg:    '#FFF0EF',
+  amberBg:  '#FFF5E6',
+};
+
+// Count color based on pitch count
+function countColor(n, max = 50) {
+  if (n >= max) return C.red;
+  if (n >= max * 0.72) return C.red;
+  if (n >= max * 0.56) return C.amber;
+  return C.text;
+}
+
+// ── Shared primitives ──────────────────────────────────────────
+function BigBtn({ children, color = C.blue, textColor = '#fff', onClick, style = {}, small = false }) {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <div
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => { setPressed(false); onClick && onClick(); }}
+      onMouseLeave={() => setPressed(false)}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => { setPressed(false); onClick && onClick(); }}
+      style={{
+        width: '100%',
+        height: small ? 54 : 68,
+        background: color,
+        borderRadius: 16,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer',
+        fontFamily: '-apple-system, system-ui',
+        fontSize: small ? 17 : 22,
+        fontWeight: 700,
+        color: textColor,
+        letterSpacing: -0.3,
+        transform: pressed ? 'scale(0.97)' : 'scale(1)',
+        transition: 'transform 0.1s, opacity 0.1s',
+        opacity: pressed ? 0.85 : 1,
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        ...style,
+      }}
+    >{children}</div>
+  );
+}
+
+function SmallBtn({ children, onClick, danger = false, style = {} }) {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <div
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => { setPressed(false); onClick && onClick(); }}
+      onMouseLeave={() => setPressed(false)}
+      style={{
+        padding: '8px 16px', borderRadius: 10, cursor: 'pointer',
+        background: pressed ? (danger ? C.redBg : '#E5E5EA') : (danger ? 'transparent' : 'transparent'),
+        fontFamily: '-apple-system, system-ui',
+        fontSize: 15, fontWeight: 500,
+        color: danger ? C.red : C.blue,
+        userSelect: 'none', WebkitUserSelect: 'none',
+        transition: 'background 0.1s',
+        ...style,
+      }}
+    >{children}</div>
+  );
+}
+
+function Chip({ children, color = C.blue, bg = C.blueBg }) {
+  return (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      padding: '4px 10px', borderRadius: 20,
+      background: bg, color: color,
+      fontSize: 12, fontWeight: 600,
+      fontFamily: '-apple-system, system-ui',
+      letterSpacing: 0.1,
+    }}>{children}</div>
+  );
+}
+
+function Alert({ type, children }) {
+  const styles = {
+    warn:   { bg: C.amberBg, color: '#7D4A00', dot: C.amber },
+    danger: { bg: C.redBg,   color: '#C0272D', dot: C.red },
+    info:   { bg: C.blueBg,  color: '#0050CC', dot: C.blue },
+  };
+  const s = styles[type] || styles.info;
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: 8,
+      padding: '10px 13px', borderRadius: 12,
+      background: s.bg, marginBottom: 8,
+    }}>
+      <div style={{ width: 7, height: 7, borderRadius: 4, background: s.dot, flexShrink: 0, marginTop: 5 }} />
+      <div style={{ fontSize: 13, fontWeight: 500, color: s.color, lineHeight: 1.45, fontFamily: '-apple-system, system-ui' }}>{children}</div>
+    </div>
+  );
+}
+
+// ── Scoreboard header ──────────────────────────────────────────
+function Scoreboard({ homeTeam, awayTeam, homeScore, awayScore, inning, isTop, onMenu, onEndHalf, onAdjHome, onAdjAway }) {
+  return (
+    <div style={{
+      background: C.dark,
+      paddingTop: 58, // below status bar
+      paddingBottom: 16,
+      paddingLeft: 20, paddingRight: 20,
+    }}>
+      {/* Inning row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{
+            background: isTop ? 'rgba(26,107,255,0.25)' : 'rgba(255,149,0,0.22)',
+            border: `1px solid ${isTop ? 'rgba(26,107,255,0.5)' : 'rgba(255,149,0,0.45)'}`,
+            borderRadius: 8, padding: '4px 10px',
+            fontFamily: '-apple-system, system-ui',
+            fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
+            color: isTop ? '#6FA8FF' : '#FFB340',
+            textTransform: 'uppercase',
+          }}>{isTop ? '▲' : '▼'} {isTop ? 'TOP' : 'BOT'} {inning}</div>
+          <div style={{ fontSize: 13, color: C.label, fontFamily: '-apple-system, system-ui' }}>
+            {isTop ? `${homeTeam} fielding` : `${awayTeam} fielding`}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <div
+            onClick={onEndHalf}
+            style={{
+              padding: '6px 12px', borderRadius: 10,
+              background: 'rgba(255,255,255,0.1)',
+              color: 'rgba(255,255,255,0.75)', fontSize: 13, fontWeight: 600,
+              cursor: 'pointer', fontFamily: '-apple-system, system-ui',
+            }}
+          >End half ›</div>
+          <div onClick={onMenu} style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+              <path d="M0 1h18M0 7h18M0 13h18" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Score */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 0 }}>
+        <ScoreTeam name={awayTeam} score={awayScore} side="away" onAdj={onAdjAway} />
+        <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontSize: 28, fontWeight: 200, fontFamily: '-apple-system, system-ui', padding: '0 12px' }}>—</div>
+        <ScoreTeam name={homeTeam} score={homeScore} side="home" onAdj={onAdjHome} />
+      </div>
+    </div>
+  );
+}
+
+function ScoreTeam({ name, score, side, onAdj }) {
+  return (
+    <div style={{ textAlign: side === 'away' ? 'left' : 'right', display: 'flex', flexDirection: 'column', alignItems: side === 'away' ? 'flex-start' : 'flex-end' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: C.label, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6, fontFamily: '-apple-system, system-ui' }}>{name}</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexDirection: side === 'away' ? 'row' : 'row-reverse' }}>
+        <AdjBtn onPress={() => onAdj(1)}>+</AdjBtn>
+        <div style={{ fontSize: 48, fontWeight: 800, color: '#fff', lineHeight: 1, fontFamily: '-apple-system, system-ui', letterSpacing: -2, minWidth: 44, textAlign: 'center' }}>{score}</div>
+        <AdjBtn onPress={() => onAdj(-1)}>−</AdjBtn>
+      </div>
+    </div>
+  );
+}
+
+function AdjBtn({ children, onPress }) {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <div
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => { setPressed(false); onPress(); }}
+      onMouseLeave={() => setPressed(false)}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => { setPressed(false); onPress(); }}
+      style={{
+        width: 32, height: 32, borderRadius: 10,
+        background: pressed ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.12)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', userSelect: 'none', WebkitUserSelect: 'none',
+        fontSize: 20, fontWeight: 300, color: 'rgba(255,255,255,0.85)',
+        fontFamily: '-apple-system, system-ui',
+        transition: 'background 0.1s',
+        flexShrink: 0,
+      }}
+    >{children}</div>
+  );
+}
+
+// ── Game screen ────────────────────────────────────────────────
+function GameScreen({ pitches = 34, batterPitches = 4, navigate, actionsRef, buttonMapping = {} }) {
+  const [count, setCount] = useState(pitches);
+  const [batter, setBatter] = useState(batterPitches);
+  const [homeScore, setHomeScore] = useState(3);
+  const [awayScore, setAwayScore] = useState(2);
+  const [undoStack, setUndoStack] = useState([]);
+  const [popped, setPopped] = useState(false);
+  const [showPitcherPicker, setShowPitcherPicker] = useState(false);
+  const [showMappingModal, setShowMappingModal] = useState(false);
+  const [localMapping, setLocalMapping] = useState(buttonMapping);
+  const MAX = 50;
+
+  const adjScore = (side, d) => {
+    if (side === 'home') setHomeScore(s => Math.max(0, s + d));
+    else setAwayScore(s => Math.max(0, s + d));
+    setUndoStack(u => [...u, { type: 'score', side, d }]);
+  };
+
+  const addPitch = useCallback(() => {
+    setCount(c => c + 1);
+    setBatter(b => b + 1);
+    setUndoStack(u => [...u, { type: 'pitch' }]);
+    setPopped(true);
+    setTimeout(() => setPopped(false), 280);
+  }, []);
+
+  const nextBatter = useCallback(() => {
+    setBatter(0);
+    setUndoStack(u => [...u, { type: 'batter' }]);
+  }, []);
+
+  const undo = useCallback(() => {
+    setUndoStack(u => {
+      if (!u.length) return u;
+      const last = u[u.length - 1];
+      if (last.type === 'pitch') { setCount(c => Math.max(0, c - 1)); setBatter(b => Math.max(0, b - 1)); }
+      if (last.type === 'score') {
+        if (last.side === 'home') setHomeScore(s => Math.max(0, s - last.d));
+        else setAwayScore(s => Math.max(0, s - last.d));
+      }
+      return u.slice(0, -1);
+    });
+  }, []);
+
+  // Expose actions to parent for keyboard/physical button handling
+  useEffect(() => {
+    if (actionsRef) actionsRef.current = { addPitch, nextBatter, undo };
+  }, [actionsRef, addPitch, nextBatter, undo]);
+
+  const cc = countColor(count, MAX);
+  const restLabel = count <= 20 ? null : count <= 35 ? '1 day rest required' : '2 days rest required';
+  const restColor = count <= 20 ? C.green : count <= 35 ? C.amber : C.red;
+  const showWarn = count >= 42 && count < MAX;
+  const showMax  = count >= MAX;
+  const batWarn  = batter >= 6;
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', background: C.bg, overflow: 'hidden' }}>
+      <Scoreboard
+        homeTeam="Mustangs" awayTeam="Royals"
+        homeScore={homeScore} awayScore={awayScore}
+        inning={4} isTop={true}
+        onAdjHome={d => adjScore('home', d)}
+        onAdjAway={d => adjScore('away', d)}
+        onEndHalf={() => {}}
+        onMenu={() => setShowMappingModal(true)}
+      />
+
+      {/* Action area */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 20px' }}>
+
+        {/* Pitcher row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: C.text2, textTransform: 'uppercase', letterSpacing: 0.7, fontFamily: '-apple-system, system-ui' }}>Pitcher</div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: C.text, fontFamily: '-apple-system, system-ui', letterSpacing: -0.3, marginTop: 2 }}>
+              J. Martinez <span style={{ color: C.text3, fontWeight: 500 }}>#14</span>
+            </div>
+          </div>
+          <SmallBtn onClick={() => setShowPitcherPicker(!showPitcherPicker)}>
+            {showPitcherPicker ? 'Done' : 'Change'}
+          </SmallBtn>
+        </div>
+
+        {/* Pitcher picker dropdown */}
+        {showPitcherPicker && (
+          <div style={{ background: C.card, borderRadius: 14, marginBottom: 14, overflow: 'hidden', border: `1px solid ${C.sep}` }}>
+            {[{ name: 'J. Martinez', num: '#14', pitches: count }, { name: 'T. Williams', num: '#7', pitches: 12 }].map((p, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '12px 14px', borderBottom: i === 0 ? `1px solid ${C.sep}` : 'none', cursor: 'pointer' }}>
+                <div style={{ width: 8, height: 8, borderRadius: 4, background: i === 0 ? C.blue : 'transparent', border: `2px solid ${i === 0 ? C.blue : C.sep}`, marginRight: 12, flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: C.text, fontFamily: '-apple-system, system-ui' }}>{p.name} <span style={{ color: C.text3 }}>{p.num}</span></div>
+                  <div style={{ fontSize: 12, color: C.text2, fontFamily: '-apple-system, system-ui' }}>{p.pitches} pitches</div>
+                </div>
+                {i === 0 && <Chip color={C.blue} bg={C.blueBg}>Active</Chip>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Hero pitch count */}
+        <div style={{
+          background: C.card, borderRadius: 20, padding: '18px 16px 16px',
+          marginBottom: 12, textAlign: 'center',
+          boxShadow: '0 1px 0 rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          {/* At-bat strip */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: C.text2, fontFamily: '-apple-system, system-ui', textTransform: 'uppercase', letterSpacing: 0.5 }}>This at-bat</div>
+            <div style={{
+              fontSize: 20, fontWeight: 800, fontFamily: '-apple-system, system-ui',
+              color: batWarn ? C.amber : C.text, letterSpacing: -0.5,
+            }}>{batter}</div>
+          </div>
+          <div style={{ width: '100%', height: 1, background: C.sep, marginBottom: 16 }} />
+
+          {/* Big number */}
+          <div style={{
+            fontSize: 88, fontWeight: 900, color: cc,
+            fontFamily: '-apple-system, system-ui', lineHeight: 1,
+            letterSpacing: -4,
+            transform: popped ? 'scale(1.12)' : 'scale(1)',
+            transition: 'transform 0.22s cubic-bezier(.36,1.6,.5,1), color 0.3s',
+          }}>{count}</div>
+          <div style={{ fontSize: 13, color: C.text2, fontFamily: '-apple-system, system-ui', marginTop: 4 }}>of {MAX} max pitches</div>
+          {restLabel && (
+            <div style={{ fontSize: 13, fontWeight: 700, color: restColor, fontFamily: '-apple-system, system-ui', marginTop: 6 }}>{restLabel}</div>
+          )}
+
+          {/* Pitch history dots */}
+          <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap', justifyContent: 'center', marginTop: 14 }}>
+            {Array.from({ length: count }).map((_, i) => (
+              <div key={i} style={{
+                width: 6, height: 6, borderRadius: 3,
+                background: i < count - batter ? 'rgba(0,0,0,0.12)' : cc,
+                opacity: i < count - batter ? 1 : 0.7,
+              }} />
+            ))}
+          </div>
+        </div>
+
+        {/* Alerts */}
+        {batWarn && !showWarn && !showMax && <Alert type="warn">At-bat pitch count is {batter} — verify or press Next Batter.</Alert>}
+        {showWarn && <Alert type="warn">{count} pitches — approaching {MAX}-pitch limit. {MAX - count} remain.</Alert>}
+        {showMax && <Alert type="danger">{count} pitches — {count - MAX} over limit. Notify coach.</Alert>}
+
+        {/* Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+          <BigBtn color={C.blue} onClick={addPitch}>+ Pitch</BigBtn>
+          <BigBtn color={C.green} small onClick={nextBatter}>
+            Next batter
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" style={{ marginLeft: 6 }}>
+              <polyline points="4,1 9,6 4,11" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </BigBtn>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <SmallBtn onClick={undo} style={{ opacity: undoStack.length ? 1 : 0.35 }}>
+              <span style={{ fontSize: 14, marginRight: 4 }}>↩</span> Undo
+            </SmallBtn>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ height: 1, background: C.sep, marginBottom: 16 }} />
+
+        {/* Catcher section */}
+        <CatcherSection pitcherPitches={count} />
+
+        {/* Physical button hint bar */}
+        {(buttonMapping.volUp || buttonMapping.volDown || buttonMapping.action) && (
+          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap', padding: '10px 0 4px' }}>
+            {[
+              { key: 'action', label: 'Action' },
+              { key: 'volUp',  label: 'Vol +' },
+              { key: 'volDown',label: 'Vol −' },
+            ].map(({ key, label }) => {
+              const m = buttonMapping[key];
+              if (!m || m === 'none') return null;
+              const info = BTN_ACTIONS[m];
+              return (
+                <div key={key} style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  background: `${info.color}18`, border: `1px solid ${info.color}40`,
+                  borderRadius: 20, padding: '4px 10px',
+                }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: C.text2, fontFamily: '-apple-system, system-ui' }}>{label}</div>
+                  <div style={{ width: 3, height: 3, borderRadius: 2, background: info.color }} />
+                  <div style={{ fontSize: 11, fontWeight: 700, color: info.color, fontFamily: '-apple-system, system-ui' }}>{info.label}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Button mapping modal */}
+      {showMappingModal && (
+        <ButtonMappingModal
+          mapping={localMapping}
+          onChange={setLocalMapping}
+          onClose={() => setShowMappingModal(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+const C_INN_MAX = 4;
+const PITCH_C_LIM = 41;
+
+function CatcherSection({ pitcherPitches }) {
+  const [catcherOpen, setCatcherOpen] = useState(false);
+  const catcherInnings = 3; // mock: caught 3 innings so far
+  const activeCatcher = { name: 'R. Davis', num: '#2' };
+  const catchers = [
+    { name: 'R. Davis', num: '#2', innings: 3 },
+    { name: 'M. Flores', num: '#9', innings: 0 },
+  ];
+
+  const inningsLeft = C_INN_MAX - catcherInnings;
+  const catcherWarn  = catcherInnings === C_INN_MAX - 1;
+  const catcherMaxed = catcherInnings >= C_INN_MAX;
+
+  // Pitcher-can't-catch rule
+  const pitcherCantCatch = pitcherPitches >= PITCH_C_LIM;
+
+  return (
+    <div style={{ marginBottom: 8 }}>
+      {/* Header row */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, color: C.text2, textTransform: 'uppercase', letterSpacing: 0.7, fontFamily: '-apple-system, system-ui' }}>Catcher</div>
+          <div style={{ fontSize: 17, fontWeight: 700, color: C.text, fontFamily: '-apple-system, system-ui', letterSpacing: -0.3, marginTop: 2 }}>
+            {activeCatcher.name} <span style={{ color: C.text3, fontWeight: 500 }}>{activeCatcher.num}</span>
+          </div>
+        </div>
+        <SmallBtn onClick={() => setCatcherOpen(o => !o)}>
+          {catcherOpen ? 'Done' : 'Change'}
+        </SmallBtn>
+      </div>
+
+      {/* Catcher picker */}
+      {catcherOpen && (
+        <div style={{ background: C.card, borderRadius: 14, marginBottom: 12, overflow: 'hidden', border: `1px solid ${C.sep}` }}>
+          {catchers.map((c, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '12px 14px', borderBottom: i < catchers.length - 1 ? `1px solid ${C.sep}` : 'none', cursor: 'pointer' }}>
+              <div style={{ width: 8, height: 8, borderRadius: 4, background: i === 0 ? C.blue : 'transparent', border: `2px solid ${i === 0 ? C.blue : C.sep}`, marginRight: 12, flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: C.text, fontFamily: '-apple-system, system-ui' }}>{c.name} <span style={{ color: C.text3 }}>{c.num}</span></div>
+                <div style={{ fontSize: 12, color: C.text2, fontFamily: '-apple-system, system-ui' }}>{c.innings} inning{c.innings !== 1 ? 's' : ''} caught</div>
+              </div>
+              {i === 0 && <Chip color={C.blue} bg={C.blueBg}>Active</Chip>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Catcher status card */}
+      <div style={{
+        background: catcherMaxed ? C.redBg : C.card,
+        borderRadius: 14, padding: '12px 14px',
+        border: `1px solid ${catcherMaxed ? C.red + '40' : catcherWarn ? C.amber + '50' : C.sep}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <div>
+          <div style={{ fontSize: 12, color: catcherMaxed ? C.red : C.text2, fontWeight: 500, fontFamily: '-apple-system, system-ui' }}>
+            {catcherMaxed ? `Inning limit reached` : `${inningsLeft} inning${inningsLeft !== 1 ? 's' : ''} remaining`}
+          </div>
+          {/* Inning pip track */}
+          <div style={{ display: 'flex', gap: 5, marginTop: 7 }}>
+            {Array.from({ length: C_INN_MAX }).map((_, i) => (
+              <div key={i} style={{
+                width: 28, height: 6, borderRadius: 3,
+                background: i < catcherInnings
+                  ? (catcherMaxed ? C.red : catcherWarn ? C.amber : C.blue)
+                  : 'rgba(0,0,0,0.1)',
+                transition: 'background 0.3s',
+              }} />
+            ))}
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: 28, fontWeight: 800, color: catcherMaxed ? C.red : catcherWarn ? C.amber : C.text, fontFamily: '-apple-system, system-ui', letterSpacing: -1 }}>{catcherInnings}</div>
+          <div style={{ fontSize: 11, color: C.text2, fontFamily: '-apple-system, system-ui', fontWeight: 600 }}>of {C_INN_MAX} inn.</div>
+        </div>
+      </div>
+
+      {/* Pitcher-can't-catch warning */}
+      {pitcherCantCatch && (
+        <div style={{ marginTop: 8 }}>
+          <Alert type="warn">Active pitcher threw {pitcherPitches}+ pitches — ineligible to catch remainder of day.</Alert>
+        </div>
+      )}
+
+      {catcherWarn && !catcherMaxed && (
+        <div style={{ marginTop: 8 }}>
+          <Alert type="warn">{activeCatcher.name} is in their last allowed inning ({C_INN_MAX - catcherInnings} remaining).</Alert>
+        </div>
+      )}
+      {catcherMaxed && (
+        <div style={{ marginTop: 8 }}>
+          <Alert type="danger">{activeCatcher.name} has reached the {C_INN_MAX}-inning catcher limit. Change catcher.</Alert>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── History screen ─────────────────────────────────────────────
+function HistoryScreen({ navigate }) {
+  const games = [
+    { id: 1, live: true,  home: 'Mustangs', away: 'Royals',  hs: 3, as: 2, date: 'Today',   rest: [{ name: 'J. Martinez', days: 2, pitches: 47 }] },
+    { id: 2, live: false, home: 'Eagles',   away: 'Tigers',  hs: 5, as: 4, date: 'Apr 16',  rest: [{ name: 'C. Johnson', days: 1, pitches: 34 }, { name: 'K. Lee', days: 2, pitches: 48 }] },
+    { id: 3, live: false, home: 'Mustangs', away: 'Eagles',  hs: 2, as: 6, date: 'Apr 12',  rest: [] },
+  ];
+
+  return (
+    <div style={{ background: C.bg, height: '100%', overflowY: 'auto' }}>
+      {/* Header */}
+      <div style={{ background: C.bg, paddingTop: 58, paddingBottom: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', padding: '10px 20px 12px' }}>
+          <div style={{ fontSize: 34, fontWeight: 800, color: C.text, fontFamily: '-apple-system, system-ui', letterSpacing: -0.5 }}>Games</div>
+          <div onClick={() => navigate('setup')} style={{
+            background: C.blue, color: '#fff', borderRadius: 12, padding: '9px 16px',
+            fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: '-apple-system, system-ui',
+          }}>+ New Game</div>
+        </div>
+        <div style={{ height: 1, background: C.sep, margin: '0 20px' }} />
+      </div>
+
+      {/* Game cards */}
+      <div style={{ padding: '12px 16px 100px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {games.map(g => (
+          <div key={g.id} style={{
+            background: C.card, borderRadius: 18,
+            boxShadow: '0 1px 0 rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.06)',
+            overflow: 'hidden',
+          }}>
+            {/* Card header */}
+            <div style={{ padding: '14px 16px 10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: C.text, fontFamily: '-apple-system, system-ui' }}>{g.away} vs {g.home}</span>
+                  {g.live && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: '#FF3B3015', borderRadius: 6, padding: '2px 7px' }}>
+                      <div style={{ width: 6, height: 6, borderRadius: 3, background: C.red }} />
+                      <span style={{ fontSize: 11, fontWeight: 700, color: C.red, fontFamily: '-apple-system, system-ui' }}>LIVE</span>
+                    </div>
+                  )}
+                </div>
+                <span style={{ fontSize: 13, color: C.text2, fontFamily: '-apple-system, system-ui' }}>{g.date}</span>
+              </div>
+              {/* Score pill */}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: C.bg, borderRadius: 10, padding: '6px 14px' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: C.text2, textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: '-apple-system, system-ui' }}>{g.away}</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: C.text, fontFamily: '-apple-system, system-ui', lineHeight: 1.2 }}>{g.as}</div>
+                </div>
+                <div style={{ fontSize: 16, color: C.text3, fontFamily: '-apple-system, system-ui' }}>—</div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: C.text2, textTransform: 'uppercase', letterSpacing: 0.5, fontFamily: '-apple-system, system-ui' }}>{g.home}</div>
+                  <div style={{ fontSize: 22, fontWeight: 800, color: C.text, fontFamily: '-apple-system, system-ui', lineHeight: 1.2 }}>{g.hs}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Rest days */}
+            {g.rest.length > 0 && (
+              <div style={{ borderTop: `1px solid ${C.sep}`, padding: '10px 16px' }}>
+                <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: C.text2, marginBottom: 7, fontFamily: '-apple-system, system-ui' }}>Rest required</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                  {g.rest.map((r, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ fontSize: 14, fontWeight: 500, color: C.text, fontFamily: '-apple-system, system-ui' }}>{r.name} <span style={{ color: C.text2, fontWeight: 400, fontSize: 13 }}>· {r.pitches} pitches</span></div>
+                      <div style={{
+                        padding: '3px 10px', borderRadius: 8,
+                        background: r.days >= 2 ? C.redBg : C.amberBg,
+                        color: r.days >= 2 ? C.red : C.amber,
+                        fontSize: 12, fontWeight: 700, fontFamily: '-apple-system, system-ui',
+                      }}>{r.days}d rest</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Actions */}
+            <div style={{ borderTop: `1px solid ${C.sep}`, padding: '10px 12px', display: 'flex', gap: 8 }}>
+              {g.live
+                ? <div onClick={() => navigate('game')} style={{ flex: 1, background: C.blue, color: '#fff', borderRadius: 10, padding: '8px 0', textAlign: 'center', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: '-apple-system, system-ui' }}>Resume</div>
+                : <div style={{ flex: 1, background: C.bg, color: C.text, borderRadius: 10, padding: '8px 0', textAlign: 'center', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: '-apple-system, system-ui' }}>View stats</div>
+              }
+              <div style={{ flex: 1, background: C.bg, color: C.text, borderRadius: 10, padding: '8px 0', textAlign: 'center', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: '-apple-system, system-ui' }}>Summary</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Setup screen ───────────────────────────────────────────────
+function SetupScreen({ navigate }) {
+  return (
+    <div style={{ background: C.bg, height: '100%', overflowY: 'auto', paddingBottom: 40 }}>
+      {/* Nav */}
+      <div style={{ paddingTop: 58, padding: '58px 16px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <SmallBtn onClick={() => navigate('history')}>‹ Games</SmallBtn>
+          <div style={{ fontSize: 17, fontWeight: 700, color: C.text, fontFamily: '-apple-system, system-ui' }}>New Game</div>
+          <div style={{ width: 70 }} />
+        </div>
+      </div>
+
+      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        {/* Config card */}
+        <FormCard>
+          <FormRow label="Configuration" value="Default Minors 7-10" action="Change" last />
+        </FormCard>
+
+        {/* Game info */}
+        <div>
+          <SectionHeader>Game Info</SectionHeader>
+          <FormCard>
+            <FormRow label="Date" value="April 19, 2026" />
+            <FormRow label="Time" value="10:00 AM" />
+            <FormRow label="Field" value="Field 3" />
+            <FormRow label="Home Team" placeholder="Home team name" />
+            <FormRow label="Away Team" placeholder="Away team name" last />
+          </FormCard>
+        </div>
+
+        {/* Home team */}
+        <div>
+          <SectionHeader>Home Team</SectionHeader>
+          <FormCard>
+            <FormRow label="Pitcher" placeholder="Name  #" />
+            <FormRow label="Catcher" placeholder="Name  #" last />
+          </FormCard>
+        </div>
+
+        {/* Away team */}
+        <div>
+          <SectionHeader>Away Team</SectionHeader>
+          <FormCard>
+            <FormRow label="Pitcher" placeholder="Name  #" />
+            <FormRow label="Catcher" placeholder="Name  #" last />
+          </FormCard>
+        </div>
+
+        <div onClick={() => navigate('game')} style={{
+          background: C.blue, borderRadius: 16, height: 56,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 17, fontWeight: 700, color: '#fff', cursor: 'pointer',
+          fontFamily: '-apple-system, system-ui',
+        }}>Start Game</div>
+      </div>
+    </div>
+  );
+}
+
+function SectionHeader({ children }) {
+  return (
+    <div style={{ fontSize: 13, fontWeight: 600, color: C.text2, textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8, padding: '0 4px', fontFamily: '-apple-system, system-ui' }}>
+      {children}
+    </div>
+  );
+}
+
+function FormCard({ children }) {
+  return (
+    <div style={{ background: C.card, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 0 rgba(0,0,0,0.04)' }}>
+      {children}
+    </div>
+  );
+}
+
+function FormRow({ label, value, placeholder, action, last }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', minHeight: 52, padding: '0 16px', borderBottom: last ? 'none' : `1px solid ${C.sep}` }}>
+      <div style={{ flex: '0 0 100px', fontSize: 16, fontWeight: 500, color: C.text, fontFamily: '-apple-system, system-ui', letterSpacing: -0.3 }}>{label}</div>
+      <div style={{ flex: 1, fontSize: 16, color: value ? C.text : C.text3, fontFamily: '-apple-system, system-ui', letterSpacing: -0.3 }}>{value || placeholder}</div>
+      {action && <div style={{ fontSize: 15, color: C.blue, fontWeight: 500, fontFamily: '-apple-system, system-ui', cursor: 'pointer' }}>{action}</div>}
+      {!action && <svg width="8" height="13" viewBox="0 0 8 13"><path d="M1 1l6 5.5-6 5.5" stroke="rgba(60,60,67,0.3)" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+    </div>
+  );
+}
+
+// ── Summary screen ─────────────────────────────────────────────
+function SummaryScreen({ navigate }) {
+  return (
+    <div style={{ background: C.bg, height: '100%', overflowY: 'auto', paddingBottom: 60 }}>
+      <div style={{ paddingTop: 58, padding: '58px 16px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <SmallBtn onClick={() => navigate('game')}>‹ Game</SmallBtn>
+          <div style={{ fontSize: 17, fontWeight: 700, color: C.text, fontFamily: '-apple-system, system-ui' }}>Summary</div>
+          <div style={{ width: 70 }} />
+        </div>
+      </div>
+
+      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Final score */}
+        <div style={{ background: C.dark, borderRadius: 18, padding: '20px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: C.label, textTransform: 'uppercase', letterSpacing: 0.8, fontFamily: '-apple-system, system-ui' }}>Final</div>
+            <div style={{ fontSize: 13, color: C.label, fontFamily: '-apple-system, system-ui' }}>Apr 19 · 10:00 AM · Field 3</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', marginTop: 12 }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.label, textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, fontFamily: '-apple-system, system-ui' }}>Royals</div>
+              <div style={{ fontSize: 48, fontWeight: 800, color: '#fff', letterSpacing: -2, fontFamily: '-apple-system, system-ui' }}>2</div>
+            </div>
+            <div style={{ fontSize: 24, color: 'rgba(255,255,255,0.25)', fontFamily: '-apple-system, system-ui', padding: '0 12px', alignSelf: 'flex-end', paddingBottom: 8 }}>—</div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: C.label, textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 4, fontFamily: '-apple-system, system-ui' }}>Mustangs</div>
+              <div style={{ fontSize: 48, fontWeight: 800, color: '#fff', letterSpacing: -2, fontFamily: '-apple-system, system-ui' }}>3</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pitchers */}
+        {['Mustangs', 'Royals'].map((team, ti) => (
+          <div key={ti}>
+            <SectionHeader>{team} — Pitchers</SectionHeader>
+            <FormCard>
+              {[
+                { name: 'J. Martinez #14', pitches: 47, inn: 4, rest: '2 days', rc: C.red },
+                ...(ti === 0 ? [] : [{ name: 'D. Lopez #3', pitches: 18, inn: 2, rest: 'No rest', rc: C.green }])
+              ].map((p, i, arr) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', padding: '13px 16px', borderBottom: i < arr.length - 1 ? `1px solid ${C.sep}` : 'none' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: C.text, fontFamily: '-apple-system, system-ui' }}>{p.name}</div>
+                    <div style={{ fontSize: 13, color: C.text2, fontFamily: '-apple-system, system-ui', marginTop: 2 }}>{p.inn} innings · last batter: 4</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: C.text, fontFamily: '-apple-system, system-ui', letterSpacing: -0.5 }}>{p.pitches}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: p.rc, fontFamily: '-apple-system, system-ui', marginTop: 1 }}>{p.rest}</div>
+                  </div>
+                </div>
+              ))}
+            </FormCard>
+          </div>
+        ))}
+
+        {/* Umpire */}
+        <div>
+          <SectionHeader>Umpire Notes</SectionHeader>
+          <FormCard>
+            <FormRow label="Plate ump." placeholder="Name" />
+            <FormRow label="Issues?" value="None" last />
+          </FormCard>
+        </div>
+
+        <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ flex: 1, background: C.blue, borderRadius: 14, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: '-apple-system, system-ui' }}>Generate</div>
+          <div style={{ flex: 1, background: C.green, borderRadius: 14, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#fff', cursor: 'pointer', fontFamily: '-apple-system, system-ui' }}>End &amp; Save</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Screen nav tabs ────────────────────────────────────────────
+function ScreenTabs({ active, onChange }) {
+  const tabs = [
+    { id: 'history', label: 'History' },
+    { id: 'game',    label: 'Game' },
+    { id: 'setup',   label: 'Setup' },
+    { id: 'summary', label: 'Summary' },
+  ];
+  return (
+    <div style={{ display: 'flex', gap: 6, background: 'rgba(0,0,0,0.12)', borderRadius: 12, padding: 4 }}>
+      {tabs.map(t => (
+        <div key={t.id} onClick={() => onChange(t.id)} style={{
+          padding: '7px 16px', borderRadius: 9, cursor: 'pointer',
+          background: active === t.id ? '#fff' : 'transparent',
+          fontSize: 13, fontWeight: 600, color: active === t.id ? C.text : 'rgba(0,0,0,0.5)',
+          fontFamily: '-apple-system, system-ui',
+          boxShadow: active === t.id ? '0 1px 3px rgba(0,0,0,0.12)' : 'none',
+          transition: 'all 0.15s',
+        }}>{t.label}</div>
+      ))}
+    </div>
+  );
+}
+
+// ── Physical button action map ─────────────────────────────────
+const BTN_ACTIONS = {
+  pitch:      { label: '+ Pitch',     color: C.blue  },
+  nextBatter: { label: 'Next Batter', color: C.green },
+  undo:       { label: '↩ Undo',      color: '#8E8E93' },
+  none:       { label: 'Off',         color: '#48484A' },
+};
+
+// Single hardware-button indicator (tab + floating label)
+function PhysicalButtonTab({ top, height, btnLabel, mapping, active }) {
+  const info = BTN_ACTIONS[mapping] || BTN_ACTIONS.none;
+  const isOn = mapping !== 'none';
+  return (
+    <React.Fragment>
+      {/* Hardware ridge */}
+      <div style={{
+        position: 'absolute', top, left: -14, width: 14, height,
+        borderRadius: '4px 0 0 4px',
+        background: active ? info.color : isOn ? '#555' : '#3A3A3C',
+        boxShadow: active ? `0 0 18px ${info.color}aa` : 'none',
+        transition: 'background 0.1s, box-shadow 0.18s',
+        zIndex: 10,
+      }} />
+      {/* Label pill */}
+      <div style={{
+        position: 'absolute',
+        top: top + height / 2,
+        left: -136,
+        transform: 'translateY(-50%)',
+        background: active ? info.color : 'rgba(40,40,44,0.88)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: 10,
+        padding: '5px 10px',
+        width: 114,
+        textAlign: 'right',
+        border: `1px solid ${active ? 'transparent' : 'rgba(255,255,255,0.07)'}`,
+        transition: 'background 0.15s',
+        zIndex: 10,
+      }}>
+        <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: 0.6, fontFamily: '-apple-system, system-ui', marginBottom: 1 }}>{btnLabel}</div>
+        <div style={{ fontSize: 12, fontWeight: 700, color: '#fff', fontFamily: '-apple-system, system-ui' }}>{isOn ? info.label : '—'}</div>
+      </div>
+    </React.Fragment>
+  );
+}
+
+// Button mapping config modal (rendered inside the phone)
+function ButtonMappingModal({ mapping, onChange, onClose }) {
+  const btns = [
+    { key: 'action', label: 'Action Button', sub: 'Top-left physical key (iPhone 15 Pro+)' },
+    { key: 'volUp',  label: 'Volume Up',     sub: 'Left side, upper button' },
+    { key: 'volDown',label: 'Volume Down',   sub: 'Left side, lower button' },
+  ];
+  const options = ['pitch', 'nextBatter', 'undo', 'none'];
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)',
+      display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+      zIndex: 200, borderRadius: 48,
+    }} onClick={onClose}>
+      <div style={{
+        background: '#1C1C1E', borderRadius: '24px 24px 0 0',
+        padding: '20px 20px 40px', width: '100%',
+      }} onClick={e => e.stopPropagation()}>
+        {/* Handle */}
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.2)', margin: '0 auto 18px' }} />
+        <div style={{ fontSize: 17, fontWeight: 700, color: '#fff', fontFamily: '-apple-system, system-ui', marginBottom: 4 }}>Physical Button Mapping</div>
+        <div style={{ fontSize: 13, color: 'rgba(235,235,245,0.6)', fontFamily: '-apple-system, system-ui', marginBottom: 18, lineHeight: 1.4 }}>
+          Assign hardware buttons to scorer actions. Use Vol+ to tap pitch counts without looking at the screen.
+        </div>
+        {btns.map(({ key, label, sub }) => (
+          <div key={key} style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(235,235,245,0.6)', textTransform: 'uppercase', letterSpacing: 0.6, fontFamily: '-apple-system, system-ui', marginBottom: 2 }}>{label}</div>
+            <div style={{ fontSize: 11, color: 'rgba(235,235,245,0.35)', fontFamily: '-apple-system, system-ui', marginBottom: 8 }}>{sub}</div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {options.map(opt => {
+                const sel = mapping[key] === opt;
+                const info = BTN_ACTIONS[opt];
+                return (
+                  <div key={opt} onClick={() => onChange({ ...mapping, [key]: opt })} style={{
+                    flex: 1, textAlign: 'center',
+                    padding: '8px 4px',
+                    borderRadius: 10,
+                    background: sel ? info.color : 'rgba(255,255,255,0.08)',
+                    border: `1px solid ${sel ? 'transparent' : 'rgba(255,255,255,0.1)'}`,
+                    cursor: 'pointer',
+                    transition: 'background 0.15s',
+                  }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: sel ? '#fff' : 'rgba(235,235,245,0.6)', fontFamily: '-apple-system, system-ui' }}>{info.label}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+        <div onClick={onClose} style={{
+          marginTop: 8, width: '100%', height: 50, borderRadius: 14,
+          background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', fontSize: 16, fontWeight: 600, color: '#fff', fontFamily: '-apple-system, system-ui',
+        }}>Done</div>
+      </div>
+    </div>
+  );
+}
+
+// ── Root app ───────────────────────────────────────────────────
+const { useRef } = React;
+
+function App() {
+  const [screen, setScreen] = useState('game');
+  const [buttonMapping, setButtonMapping] = useState({ volUp: 'pitch', volDown: 'undo', action: 'nextBatter' });
+  const [activeButton, setActiveButton] = useState(null);
+  const gameActionsRef = useRef({});
+
+  // Flash active button indicator briefly
+  const flashBtn = (key) => {
+    setActiveButton(key);
+    setTimeout(() => setActiveButton(null), 300);
+  };
+
+  // Keyboard simulation: ↑ = Vol+, ↓ = Vol−, Space = Action
+  useEffect(() => {
+    const onKey = (e) => {
+      if (screen !== 'game') return;
+      const actions = gameActionsRef.current;
+      if (e.key === 'ArrowUp' || e.key === 'v') {
+        e.preventDefault();
+        flashBtn('volUp');
+        const fn = buttonMapping.volUp;
+        if (fn === 'pitch' && actions.addPitch) actions.addPitch();
+        else if (fn === 'nextBatter' && actions.nextBatter) actions.nextBatter();
+        else if (fn === 'undo' && actions.undo) actions.undo();
+      } else if (e.key === 'ArrowDown' || e.key === 'b') {
+        e.preventDefault();
+        flashBtn('volDown');
+        const fn = buttonMapping.volDown;
+        if (fn === 'pitch' && actions.addPitch) actions.addPitch();
+        else if (fn === 'nextBatter' && actions.nextBatter) actions.nextBatter();
+        else if (fn === 'undo' && actions.undo) actions.undo();
+      } else if (e.key === ' ' || e.key === 'Enter') {
+        if (e.target.tagName !== 'INPUT') {
+          e.preventDefault();
+          flashBtn('action');
+          const fn = buttonMapping.action;
+          if (fn === 'pitch' && actions.addPitch) actions.addPitch();
+          else if (fn === 'nextBatter' && actions.nextBatter) actions.nextBatter();
+          else if (fn === 'undo' && actions.undo) actions.undo();
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [screen, buttonMapping]);
+
+  // Tweak controls
+  useEffect(() => {
+    const screenSel = document.getElementById('tw-screen');
+    if (screenSel) {
+      screenSel.value = screen;
+      screenSel.onchange = (e) => setScreen(e.target.value);
+    }
+  }, [screen]);
+
+  // Tweaks panel toggle
+  useEffect(() => {
+    const listener = (e) => {
+      if (e.data?.type === '__activate_edit_mode') document.getElementById('tweaks-panel').style.display = 'block';
+      if (e.data?.type === '__deactivate_edit_mode') document.getElementById('tweaks-panel').style.display = 'none';
+    };
+    window.addEventListener('message', listener);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', listener);
+  }, []);
+
+  const isDark = screen === 'game';
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: 'rgba(0,0,0,0.4)', textTransform: 'uppercase', letterSpacing: 1, fontFamily: '-apple-system, system-ui' }}>
+        Simple Pitch Counter — Redesign
+      </div>
+
+      {/* Device + physical button overlays */}
+      <div style={{ position: 'relative', width: 390, height: 844 }}>
+        <IOSDevice width={390} height={844} dark={isDark}>
+          {screen === 'game'    && <GameScreen navigate={setScreen} actionsRef={gameActionsRef} buttonMapping={buttonMapping} onShowMapping={() => {/* handled inside */}} />}
+          {screen === 'history' && <HistoryScreen navigate={setScreen} />}
+          {screen === 'setup'   && <SetupScreen navigate={setScreen} />}
+          {screen === 'summary' && <SummaryScreen navigate={setScreen} />}
+        </IOSDevice>
+
+        {/* Physical button overlays — only on game screen */}
+        {screen === 'game' && (
+          <React.Fragment>
+            <PhysicalButtonTab top={124} height={32} btnLabel="Action" mapping={buttonMapping.action} active={activeButton === 'action'} />
+            <PhysicalButtonTab top={182} height={44} btnLabel="Vol +"  mapping={buttonMapping.volUp}   active={activeButton === 'volUp'} />
+            <PhysicalButtonTab top={242} height={44} btnLabel="Vol −"  mapping={buttonMapping.volDown} active={activeButton === 'volDown'} />
+          </React.Fragment>
+        )}
+      </div>
+
+      <ScreenTabs active={screen} onChange={setScreen} />
+
+      {screen === 'game'
+        ? <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', fontFamily: '-apple-system, system-ui', textAlign: 'center', lineHeight: 1.6 }}>
+            Keyboard sim: <kbd style={{ background: '#ddd', borderRadius: 4, padding: '1px 6px' }}>↑</kbd> Vol+  ·  <kbd style={{ background: '#ddd', borderRadius: 4, padding: '1px 6px' }}>↓</kbd> Vol−  ·  <kbd style={{ background: '#ddd', borderRadius: 4, padding: '1px 6px' }}>Space</kbd> Action
+            <div style={{ marginTop: 4, color: 'rgba(0,0,0,0.3)' }}>Configure via ≡ menu → Button Mapping</div>
+          </div>
+        : <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.35)', fontFamily: '-apple-system, system-ui' }}>Tap the tabs above to explore screens</div>
+      }
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

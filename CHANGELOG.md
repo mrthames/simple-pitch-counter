@@ -4,6 +4,40 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-04-19] V2 Redesign — Claude Design rebuild
+
+**Files:** `index.html`, `ViewController.swift`
+
+Complete UI/UX redesign built via Claude Design. V1 files archived to `app/V1/`.
+
+### Visual overhaul
+- **Dark scoreboard header** — persistent dark-themed header with large score display, inning pill (Top/Bot with color coding), and out-tracking dots for Advanced mode
+- **iOS-native design language** — updated color palette using iOS system colors (`#1A6BFF` blue, `#34C759` green, `#FF3B30` red, `#FF9500` amber), SF-style rounded cards, and `#F2F2F7` system background
+- **Status bar** — switched to light content (white text) to match the dark header
+- **Hamburger menu** — replaced inline game controls with a dropdown menu (Quick stats, Game summary, Button mapping, Close, End game)
+
+### New features
+- **Advanced mode** — per-pitch type tracking with color-coded tap buttons for Ball (B), Called K (K̲), Swing K (K), Foul (F), and Ball in Play (⊙). Balls/strikes count and at-bat pitch sequence displayed with colored chips. Automatic walk/strikeout detection with result flash animations
+- **Simple mode** — large hero pitch count with pitch dots visualization, at-bat counter, and single "+ Pitch" button
+- **Game mode selection** — setup screen lets you choose Simple or Advanced before starting a game
+- **Ball in play modal** — dark bottom sheet prompts Safe/Out after BIP; auto-detects third out and triggers side retired
+- **Result flash overlays** — animated full-screen overlays for Strikeout, Walk, Out, Safe, and Side Retired events
+- **Pitcher stats sheet** — dark bottom sheet with K/BB/BIP summary boxes and per-pitch-type breakdown bars with counts and percentages
+- **Physical button mapping** — configurable mapping of iPhone volume buttons and Action Button (iPhone 15 Pro+) to pitch, undo, or next batter actions. Mapping persists in localStorage
+- **Volume button capture** — `ViewController.swift` now uses AVAudioSession KVO to detect volume changes and dispatches them to JS via `window.onPhysicalButton()`. Hidden `MPVolumeView` suppresses system HUD. Includes debounce and auto-reset to 0.5
+- **Button mapping UI** — in-game modal to configure physical button assignments with live preview hints on the game screen
+- **Swipe-to-delete** — history cards support swipe-left gesture to reveal a delete button
+- **Mode badges** — history cards show Simple/Advanced mode badge and LIVE indicator for active games
+- **Pitch type breakdown in summaries** — game export includes per-pitcher pitch type counts and K/BB/BIP totals for Advanced mode games
+- **View transitions** — uses `document.startViewTransition` API when available for smooth screen changes
+
+### Architecture changes
+- **ViewController.swift** — added `AVFoundation` and `MediaPlayer` imports; volume button observation via KVO; `MPVolumeView` extension for slider access; status bar style changed to `.lightContent`
+- **Game state** — added `mode`, `balls`, `strikes`, `outs`, `atBatLog` fields; pitcher objects now include `pitchTypes`, `ks`, `bbs`, `bips` tracking
+- **Button mapping state** — stored separately in `spc_btnmap` localStorage key
+
+---
+
 ## [2026-03-21] Bug Fix — History card missing over-limit pitchers
 
 **File:** `index.html`
