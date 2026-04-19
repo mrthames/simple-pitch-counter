@@ -1,0 +1,15 @@
+{
+  "name": "simple-pitch-counter",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Pitch counter app for youth baseball — test suite",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:ui": "npx playwright test --ui"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "serve": "^14.2.6"
+  }
+}

@@ -1001,7 +1001,7 @@ function endHalfInning(){
   if(ci!==null&&fRoster().catchers[ci]){const c=fRoster().catchers[ci];while(c.innings.length<g.inning)c.innings.push(false);c.innings[g.inning-1]=true;}
   if(!g.isTop)g.inning++;
   g.isTop=!g.isTop;
-  g.balls=0;g.strikes=0;g.atBatLog=[];
+  g.balls=0;g.strikes=0;g.outs=0;g.atBatLog=[];
   g.pSelectOpen=false;g.cSelectOpen=false;
   haptic('success');saveState();renderGame();window.scrollTo(0,0);
 }
