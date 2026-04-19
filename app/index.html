@@ -473,6 +473,7 @@ textarea{resize:vertical;min-height:56px}
           <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="var(--t2)" stroke-width="1.8" stroke-linecap="round"/></svg>
           <div class="hbg-menu" id="history-hbg-menu">
             <button class="hbg-item" onclick="closeHistoryMenu();showScreen('config')">Configuration</button>
+            <button class="hbg-item" onclick="closeHistoryMenu();showButtonMappingModal()">Button mapping</button>
             <button class="hbg-item" onclick="closeHistoryMenu();exportAllGames()">Export all games</button>
             <button class="hbg-item" onclick="closeHistoryMenu();importAllGames()">Import games</button>
           </div>
@@ -907,7 +908,7 @@ function showConfigPickerForSetup(){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
   ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
   let rows=state.configs.map(cfg=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--sep);cursor:pointer" onclick="selectSetupConfig('${cfg.id}')"><div><div style="font-size:14px;font-weight:600">${cfg.name}${cfg.isDefault?'<span class="default-badge">Default</span>':''}</div><div style="font-size:12px;color:var(--t2)">Max ${cfg.pitchMax} pitches · ${cfg.catcherInnMax} catcher inn.${cfg.mercyRuns?' · '+cfg.mercyRuns+'-run mercy':''}</div></div>${cfg.id===state.activeConfigId?'<span style="background:var(--blue-bg);color:var(--blue);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">Selected</span>':''}</div>`).join('');
-  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()">✕</button><div class="modal-title">Select Configuration</div>${rows}</div>`;
+  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title">Select Configuration</div>${rows}</div>`;
   document.body.appendChild(ov);
 }
 function selectSetupConfig(id){
@@ -1498,10 +1499,15 @@ document.addEventListener('click',e=>{
 // ── Data export / import ──
 function exportAllGames(){
   const data=JSON.stringify({games:state.games||[],configs:state.configs||[]},null,2);
-  const blob=new Blob([data],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='simple-pitch-counter-backup.json';
-  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  if(navigator.share){
+    const file=new File([data],'simple-pitch-counter-backup.json',{type:'application/json'});
+    navigator.share({files:[file]}).catch(()=>{});
+  }else{
+    const blob=new Blob([data],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='simple-pitch-counter-backup.json';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  }
 }
 function importAllGames(){
   const inp=document.createElement('input');inp.type='file';inp.accept='.json';
@@ -1595,7 +1601,7 @@ function showModal(title,sub,actions,dismissable=false){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
   if(dismissable)ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
   const btns=actions.map(a=>`<div class="modal-btn ${a.cls||''}" onclick="${a.fn}">${a.label}</div>`).join('');
-  const x=dismissable?`<button class="modal-close-x" onclick="closeModal()">✕</button>`:'';
+  const x=dismissable?`<button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>`:'';
   ov.innerHTML=`<div class="modal-box">${x}<div class="modal-title">${title}</div><div class="modal-sub">${sub}</div><div class="modal-actions">${btns}</div></div>`;
   document.body.appendChild(ov);
 }
@@ -1772,7 +1778,16 @@ function collectSummaryData(){
   const puR=document.querySelector('input[name="pu-iss"]:checked');if(puR)g.umpPlateIssue=puR.value;
   const buR=document.querySelector('input[name="bu-iss"]:checked');if(buR)g.umpBaseIssue=buR.value;
 }
-function generateExport(){collectSummaryData();showScreen('export');document.getElementById('export-box').textContent=buildSummaryText();}
+function generateExport(){
+  collectSummaryData();
+  const txt=buildSummaryText();
+  closeModal();
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
+  ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
+  ov.innerHTML=`<div class="modal-box" style="max-width:420px"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title" style="margin-bottom:8px">Game Summary</div><div class="export-box" id="export-box">${txt}</div><div style="display:flex;gap:8px"><div class="modal-btn primary" onclick="copyExportModal(this)">Copy</div><div class="modal-btn" onclick="emailExportModal()">Email ↗</div></div></div>`;
+  document.body.appendChild(ov);
+  window._exportTxt=txt;
+}
 function buildSummaryText(){
   const g=state.currentGame||state._expGame;if(!g)return'';
   const ri=(p)=>{const cfg=state.configs.find(c=>c.id===g.configId);const thr=(cfg?.thresholds||DEFAULT_THRESHOLDS).slice().sort((a,b)=>a.pitches-b.pitches);for(const t of thr){if(p<=t.pitches)return t.days===0?'No rest':'${t.days}d rest';}return'2d rest';};
@@ -1786,31 +1801,21 @@ function buildSummaryText(){
     if(!cs.length)return`${tn} catchers: None\n`;
     return cs.map(c=>`${tn}: ${c.name}${c.num?' #'+c.num:''} — ${c.innings.filter(Boolean).length} innings caught`).join('\n');
   };
-  let txt=`Game Summary\n${'─'.repeat(30)}\n${g.homeTeam} vs ${g.awayTeam}\n${g.date}${g.time?' · '+g.time:''}${g.field?' · '+g.field:''}\nFinal: ${g.homeTeam} ${g.homeScore} – ${g.awayTeam} ${g.awayScore}\n\nPitchers\n${'─'.repeat(30)}\n${pitcherLines('home')}\n${pitcherLines('away')}\nCatchers\n${'─'.repeat(30)}\n${catcherLines('home')}\n${catcherLines('away')}`;
-  if(g.hrHome||g.hrAway)txt+=`\nHome Runs\n${'─'.repeat(30)}\n${g.homeTeam}: ${g.hrHome||'None'}\n${g.awayTeam}: ${g.hrAway||'None'}`;
-  txt+=`\nUmpires\n${'─'.repeat(30)}\nPlate: ${g.umpPlateName||'—'} (Issues: ${g.umpPlateIssue||'No'})\nBase: ${g.umpBaseName||'—'} (Issues: ${g.umpBaseIssue||'No'})`;
-  if(g.mode==='advanced'){
-    txt+=`\n\nPitch Type Breakdown\n${'─'.repeat(30)}`;
-    ['home','away'].forEach(side=>{
-      g[side].pitchers.filter(p=>p.pitches>0).forEach(p=>{
-        const pt=p.pitchTypes||{};const total=p.pitches||1;
-        txt+=`\n${p.name}: ${['B','CS','SS','F','BIP'].map(k=>`${PT_TYPES[k].label}:${pt[k]||0}`).join(' ')} | K:${p.ks||0} BB:${p.bbs||0} BIP:${p.bips||0}`;
-      });
-    });
-  }
+  let txt=`Game Summary\n${'─'.repeat(30)}\n${g.homeTeam} vs ${g.awayTeam}\n${g.date}${g.time?' · '+g.time:''}${g.field?' · '+g.field:''}\nFinal: ${g.homeTeam} ${g.homeScore} – ${g.awayTeam} ${g.awayScore}\n\nPitchers\n${'─'.repeat(30)}\n${pitcherLines('home')}\n${pitcherLines('away')}\n\nCatchers\n${'─'.repeat(30)}\n${catcherLines('home')}\n${catcherLines('away')}`;
+  if(g.hrHome||g.hrAway)txt+=`\n\nHome Runs\n${'─'.repeat(30)}\n${g.homeTeam}: ${g.hrHome||'None'}\n${g.awayTeam}: ${g.hrAway||'None'}`;
+  txt+=`\n\nUmpires\n${'─'.repeat(30)}\nPlate: ${g.umpPlateName||'—'} (Issues: ${g.umpPlateIssue||'No'})\nBase: ${g.umpBaseName||'—'} (Issues: ${g.umpBaseIssue||'No'})`;
   return txt;
 }
-function copyExport(btn){
-  const txt=document.getElementById('export-box').textContent;
+function copyExportModal(btn){
+  const txt=window._exportTxt||window._histExportTxt||'';
   if(navigator.clipboard?.writeText){navigator.clipboard.writeText(txt).then(()=>{const o=btn.textContent;btn.textContent='Copied!';setTimeout(()=>btn.textContent=o,2000);});}
   else{const ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);const o=btn.textContent;btn.textContent='Copied!';setTimeout(()=>btn.textContent=o,2000);}
 }
-function emailExport(){
-  collectSummaryData();
+function emailExportModal(){
   const g=state.currentGame||state._expGame;
-  const s=encodeURIComponent(`Pitch Count — ${g.homeTeam} vs ${g.awayTeam} — ${g.date}`);
-  const b=encodeURIComponent(buildSummaryText());
-  const a=document.createElement('a');a.href=`mailto:?subject=${s}&body=${b}`;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>document.body.removeChild(a),500);
+  const txt=window._exportTxt||window._histExportTxt||'';
+  const s=encodeURIComponent(`Pitch Count — ${g?.homeTeam||''} vs ${g?.awayTeam||''} — ${g?.date||''}`);
+  const a=document.createElement('a');a.href=`mailto:?subject=${s}&body=${encodeURIComponent(txt)}`;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>document.body.removeChild(a),500);
 }
 function openSavedStats(gi){
   const g=state.games[gi];state._expGame=g;
@@ -1872,11 +1877,9 @@ function openExportForGame(gi){
   const txt=buildSummaryText();
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
   ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
-  ov.innerHTML=`<div class="modal-box" style="max-width:420px"><button class="modal-close-x" onclick="closeModal()">✕</button><div class="modal-title" style="margin-bottom:8px">Game Summary</div><div class="export-box" id="hist-export-box">${txt}</div><div style="display:flex;gap:8px"><div class="modal-btn primary" onclick="copyHistExport(this)">Copy</div><div class="modal-btn" onclick="emailHistExport()">Email ↗</div></div></div>`;
+  ov.innerHTML=`<div class="modal-box" style="max-width:420px"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title" style="margin-bottom:8px">Game Summary</div><div class="export-box" id="hist-export-box">${txt}</div><div style="display:flex;gap:8px"><div class="modal-btn primary" onclick="copyExportModal(this)">Copy</div><div class="modal-btn" onclick="emailExportModal()">Email ↗</div></div></div>`;
   document.body.appendChild(ov);window._histExportTxt=txt;
 }
-function copyHistExport(btn){if(navigator.clipboard?.writeText){navigator.clipboard.writeText(window._histExportTxt||'').then(()=>{const o=btn.textContent;btn.textContent='Copied!';setTimeout(()=>btn.textContent=o,2000);});}else{const ta=document.createElement('textarea');ta.value=window._histExportTxt||'';ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);}}
-function emailHistExport(){const g=state._expGame;const s=encodeURIComponent(`Pitch Count — ${g?.homeTeam||''} vs ${g?.awayTeam||''} — ${g?.date||''}`);const a=document.createElement('a');a.href=`mailto:?subject=${s}&body=${encodeURIComponent(window._histExportTxt||'')}`;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>document.body.removeChild(a),500);}
 
 // ── Config ──
 function renderConfigScreen(){
@@ -1905,7 +1908,7 @@ function showConfigForm(id){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
   ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
   const thrRows=thr.map((t,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:7px;align-items:end;margin-bottom:8px"><div><div class="lbl">Threshold ${i+1} (pitches)</div><input type="number" id="thr-p-${i}" value="${t.pitches}" min="1" max="200"></div><div><div class="lbl">Days rest</div><input type="number" id="thr-d-${i}" value="${t.days}" min="0" max="10"></div><div class="trash-btn" onclick="this.closest('div[style]').remove()"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 3V2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1M2 3h11M13 3l-.867 9.356A2 2 0 0 1 10.14 14H4.86a2 2 0 0 1-1.993-1.644L2 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div></div>`).join('');
-  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()">✕</button><div class="modal-title">${existing?'Edit':'New'} Configuration</div><div style="margin-bottom:10px"><div class="lbl">Name</div><input type="text" id="cfg-name" value="${existing?existing.name:''}" placeholder="e.g. Minors 7-10"></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Max pitches</div><input type="number" id="cfg-pitch" value="${existing?existing.pitchMax:50}" min="1" max="200"></div><div><div class="lbl">Catcher inn. max</div><input type="number" id="cfg-catch" value="${existing?existing.catcherInnMax:4}" min="1" max="9"></div></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Mercy runs / half inning</div><input type="number" id="cfg-mercy" value="${existing?existing.mercyRuns||0:5}" min="0" max="99" placeholder="0 = off"></div><div></div></div><div class="lbl" style="margin-bottom:8px">Rest thresholds</div><div id="thr-rows">${thrRows}</div><div class="btn-sm" onclick="addThrRow()" style="margin-bottom:14px;display:inline-flex">+ Add threshold</div><div class="modal-actions"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="saveConfigForm('${id||''}')">Save</div></div></div>`;
+  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title">${existing?'Edit':'New'} Configuration</div><div style="margin-bottom:10px"><div class="lbl">Name</div><input type="text" id="cfg-name" value="${existing?existing.name:''}" placeholder="e.g. Minors 7-10"></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Max pitches</div><input type="number" id="cfg-pitch" value="${existing?existing.pitchMax:50}" min="1" max="200"></div><div><div class="lbl">Catcher inn. max</div><input type="number" id="cfg-catch" value="${existing?existing.catcherInnMax:4}" min="1" max="9"></div></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Mercy runs / half inning</div><input type="number" id="cfg-mercy" value="${existing?existing.mercyRuns||0:5}" min="0" max="99" placeholder="0 = off"></div><div></div></div><div class="lbl" style="margin-bottom:8px">Rest thresholds</div><div id="thr-rows">${thrRows}</div><div class="btn-sm" onclick="addThrRow()" style="margin-bottom:14px;display:inline-flex">+ Add threshold</div><div class="modal-actions"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="saveConfigForm('${id||''}')">Save</div></div></div>`;
   document.body.appendChild(ov);
 }
 function addThrRow(){
