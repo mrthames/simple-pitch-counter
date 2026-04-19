@@ -211,9 +211,9 @@
   /* Scale inner content to look like a real phone screen */
   .phone-inner {
     flex: 1;
-    transform: scale(0.52);
+    transform: scale(0.48);
     transform-origin: top left;
-    width: 192.3%;
+    width: 208.3%;
     display: flex;
     flex-direction: column;
   }
@@ -284,6 +284,16 @@
   .pc-alert-dot { width: 7px; height: 7px; border-radius: 4px; flex-shrink: 0; }
   .pc-alert.warn { background: #FFF5E6; color: #7D4A00; }
   .pc-alert.warn .pc-alert-dot { background: #FF9500; }
+  /* Menu icon */
+  .pc-menu-btn { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,.1); display: flex; align-items: center; justify-content: center; }
+  .pc-header-actions { display: flex; align-items: center; gap: 6px; }
+  /* Stats link */
+  .pc-stats-link { font-size: 12px; font-weight: 600; color: #1A6BFF; }
+  /* Button hints */
+  .pc-btn-hints { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; padding: 8px 0 4px; }
+  .pc-btn-hint { display: flex; align-items: center; gap: 4px; border-radius: 20px; padding: 3px 8px; font-size: 10px; font-weight: 700; }
+  .pc-btn-hint-lbl { color: rgba(60,60,67,.5); }
+  .pc-btn-hint-dot { width: 3px; height: 3px; border-radius: 2px; }
   /* Catcher section */
   .pc-catcher-section { margin-top: 12px; border-top: 1px solid rgba(60,60,67,.12); padding-top: 10px; }
   .pc-catcher-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
@@ -542,7 +552,10 @@
                 <div class="pc-out-dot"></div>
               </div>
             </div>
-            <div class="pc-end-btn">End half ›</div>
+            <div class="pc-header-actions">
+              <div class="pc-end-btn">End half ›</div>
+              <div class="pc-menu-btn"><svg width="16" height="12" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+            </div>
           </div>
           <div class="pc-sb">
             <div class="pc-sb-team away">
@@ -577,6 +590,7 @@
             </div>
             <div class="pc-change-btn">Change</div>
           </div>
+          <div class="pc-stats-link">Stats ›</div>
           <!-- Count card -->
           <div class="pc-count-card">
             <div class="pc-count-row">
@@ -644,6 +658,12 @@
                 <div class="pc-catcher-of">of 4 inn.</div>
               </div>
             </div>
+          </div>
+          <!-- Physical button hints -->
+          <div class="pc-btn-hints">
+            <div class="pc-btn-hint" style="background:rgba(52,199,89,.09);border:1px solid rgba(52,199,89,.25)"><span class="pc-btn-hint-lbl">Action</span><div class="pc-btn-hint-dot" style="background:#34C759"></div><span style="color:#34C759">Next Batter</span></div>
+            <div class="pc-btn-hint" style="background:rgba(26,107,255,.09);border:1px solid rgba(26,107,255,.25)"><span class="pc-btn-hint-lbl">Vol +</span><div class="pc-btn-hint-dot" style="background:#1A6BFF"></div><span style="color:#1A6BFF">+ Pitch</span></div>
+            <div class="pc-btn-hint" style="background:rgba(142,142,147,.09);border:1px solid rgba(142,142,147,.25)"><span class="pc-btn-hint-lbl">Vol −</span><div class="pc-btn-hint-dot" style="background:#8E8E93"></div><span style="color:#8E8E93">↩ Undo</span></div>
           </div>
         </div>
         </div><!-- end phone-inner -->
