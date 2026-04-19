@@ -24,16 +24,16 @@ You can also trigger a deploy manually from GitHub → Actions → "Deploy Websi
 
 ### Local SCP fallback
 
-If the GitHub Action fails (e.g., NAS not reachable externally), deploy from any machine on the local network:
+If the GitHub Action fails (e.g., NAS not reachable externally), deploy from any machine on the local network using the NAS local IP:
 
 ```bash
-scp -O -P 2222 -i ~/.ssh/id_ed25519 website/index.html justin@192.168.1.234:/volume1/Websites/simplepitchcounter.com/
-scp -O -P 2222 -i ~/.ssh/id_ed25519 website/privacy.html justin@192.168.1.234:/volume1/Websites/simplepitchcounter.com/
-scp -O -P 2222 -i ~/.ssh/id_ed25519 website/contact.html justin@192.168.1.234:/volume1/Websites/simplepitchcounter.com/
-scp -O -P 2222 -i ~/.ssh/id_ed25519 website/feedback.html justin@192.168.1.234:/volume1/Websites/simplepitchcounter.com/
+scp -O -P $NAS_SSH_PORT -i ~/.ssh/id_ed25519 website/index.html $NAS_USER@$NAS_LOCAL_IP:/volume1/Websites/simplepitchcounter.com/
+scp -O -P $NAS_SSH_PORT -i ~/.ssh/id_ed25519 website/privacy.html $NAS_USER@$NAS_LOCAL_IP:/volume1/Websites/simplepitchcounter.com/
+scp -O -P $NAS_SSH_PORT -i ~/.ssh/id_ed25519 website/contact.html $NAS_USER@$NAS_LOCAL_IP:/volume1/Websites/simplepitchcounter.com/
+scp -O -P $NAS_SSH_PORT -i ~/.ssh/id_ed25519 website/feedback.html $NAS_USER@$NAS_LOCAL_IP:/volume1/Websites/simplepitchcounter.com/
 ```
 
-Connection details: `justin@192.168.1.234:2222` with `~/.ssh/id_ed25519`.
+Connection details (NAS user, local IP, and SSH port) are stored as GitHub Actions secrets — not committed to the repo.
 
 ### Setup (one-time, already completed)
 
