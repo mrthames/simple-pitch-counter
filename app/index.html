@@ -275,8 +275,8 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 }
 .stats-sheet{
   background:var(--dark);border-radius:24px 24px 0 0;
-  padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 40px);
-  width:100%;max-width:430px;max-height:80vh;overflow-y:auto;
+  padding:20px 20px 40px;
+  width:100%;max-width:430px;max-height:85vh;overflow-y:auto;
 }
 .stats-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.2);margin:0 auto 18px}
 .stats-summary-row{display:flex;gap:8px;margin-bottom:18px}
@@ -1604,7 +1604,7 @@ function closeModal(){const m=document.getElementById('active-modal');if(m)m.rem
 function confirmEndGame(){
   showModal('End game?','This will close the game and save it to history. Generate the summary first to send the required report.',[
     {label:'Cancel',fn:'closeModal()'},
-    {label:'Go to summary',fn:'closeModal();showScreen("summary")',cls:'primary'},
+    {label:'Go to summary',fn:"closeModal();showScreen('summary')",cls:'primary'},
     {label:'End now',fn:'closeModal();endGame()',cls:'red'},
   ]);
 }
@@ -1814,16 +1814,58 @@ function emailExport(){
 }
 function openSavedStats(gi){
   const g=state.games[gi];state._expGame=g;
-  // Show summary modal
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
-  ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
-  const rows=['home','away'].map(side=>{
-    const tn=g[side+'Team'];const ps=g[side].pitchers.filter(p=>p.pitches>0);
-    if(!ps.length)return`<div style="font-size:13px;color:var(--t2);margin-bottom:8px">${tn}: No pitchers recorded.</div>`;
-    return`<div class="lbl" style="margin-bottom:6px">${tn}</div>${ps.map(p=>{const ri=restInfo(p.pitches);const rc=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';return`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--sep)"><div><div style="font-size:14px;font-weight:600">${p.name}${p.num?' #'+p.num:''}</div><div style="font-size:12px;color:var(--t2)">${p.innings?.filter(Boolean).length||0} inn</div></div><div style="text-align:right"><div style="font-size:22px;font-weight:800">${p.pitches}</div><div style="font-size:12px;font-weight:600;color:${rc}">${ri?ri.label:'No rest'}</div></div></div>`;}).join('')}`;
-  }).join('');
-  ov.innerHTML=`<div class="modal-box" style="max-width:400px"><button class="modal-close-x" onclick="closeModal()">✕</button><div class="modal-title">${g.awayTeam} vs ${g.homeTeam}</div><div style="font-size:13px;color:var(--t2);margin-bottom:14px">${g.date}${g.field?' · '+g.field:''}</div>${rows}<div class="modal-btn primary" onclick="closeModal();openExportForGame(${state.games.indexOf(g)})" style="margin-top:12px;text-align:center">Generate Summary</div></div>`;
+  const existing=document.getElementById('saved-stats-overlay');if(existing)existing.remove();
+  const ov=document.createElement('div');ov.className='stats-sheet-overlay';ov.id='saved-stats-overlay';
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  const types=['B','CS','SS','F','BIP'];
+  let pidCounter=0;
+  const mkPitcherRow=(p,team)=>{
+    const ri=restInfo(p.pitches);
+    const restColor=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
+    const restText=ri?ri.label:'No rest needed';
+    const s=pitcherDerivedStats(p);
+    const pid='sv-detail-'+(pidCounter++);
+    let barsHtml='';
+    if(g.mode==='advanced'){
+      const total=p.pitches||0;const denom=total||1;
+      barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin:12px 0 10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
+    }
+    const exportLine=`${p.name}${p.num?' #'+p.num:''} — ${p.pitches} pitches, ${s.ip} IP, ${s.bf} BF, K:${s.ks} BB:${s.bbs} K/BB:${s.kbb}${ri?' — '+ri.label:''}`;
+    const detailHtml=`<div id="${pid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
+      ${statLineHtml(p)}
+      ${barsHtml}
+      <div onclick="sharePitcherLine('${exportLine.replace(/'/g,"\\'")}')" style="margin-top:10px;width:100%;height:40px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">Share pitcher stats ↗</div>
+    </div>`;
+    return`<div style="background:rgba(255,255,255,.06);border-radius:14px;padding:14px;margin-bottom:8px">
+      <div onclick="const d=document.getElementById('${pid}');if(d)d.style.display=d.style.display==='none'?'block':'none'" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#fff">${p.name}${p.num?' <span style="color:rgba(235,235,245,.4)">#'+p.num+'</span>':''}</div>
+          <div style="font-size:12px;color:rgba(235,235,245,.5);margin-top:2px">${team} · ${s.ip} IP · ${s.bf} BF</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:22px;font-weight:800;color:#fff">${p.pitches}</div>
+          <div style="font-size:11px;font-weight:600;color:${restColor}">${restText}</div>
+        </div>
+      </div>
+      ${detailHtml}
+    </div>`;
+  };
+  const homePitchers=(g.home?.pitchers||[]).filter(p=>p.pitches>0).map(p=>mkPitcherRow(p,g.homeTeam));
+  const awayPitchers=(g.away?.pitchers||[]).filter(p=>p.pitches>0).map(p=>mkPitcherRow(p,g.awayTeam));
+  ov.innerHTML=`<div class="stats-sheet">
+    <div class="stats-handle"></div>
+    <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${g.awayTeam} vs ${g.homeTeam}</div>
+    <div style="font-size:13px;color:var(--dark-label);margin-bottom:16px">${g.date}${g.field?' · '+g.field:''}</div>
+    ${homePitchers.join('')}
+    ${awayPitchers.join('')}
+    ${!homePitchers.length&&!awayPitchers.length?'<div style="font-size:13px;color:rgba(235,235,245,.5);text-align:center;padding:20px 0">No pitcher data recorded.</div>':''}
+    <div onclick="document.getElementById('saved-stats-overlay').remove()" style="margin-top:12px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
+  </div>`;
   document.body.appendChild(ov);
+}
+function sharePitcherLine(line){
+  if(navigator.share){navigator.share({text:line}).catch(()=>{});}
+  else if(navigator.clipboard?.writeText){navigator.clipboard.writeText(line).then(()=>alert('Copied to clipboard'));}
 }
 function openExportForGame(gi){
   const g=state.games[gi];state._expGame=g;

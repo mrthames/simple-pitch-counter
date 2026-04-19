@@ -59,8 +59,8 @@ test.describe('History and configuration', () => {
     await page.click('.modal-btn.red');
 
     await page.locator('.hist-card').first().locator('text=View stats').click();
-    await expect(page.locator('.modal-overlay')).toBeVisible();
-    await expect(page.locator('.modal-title')).toContainText('Lions vs Tigers');
+    await expect(page.locator('.stats-sheet-overlay')).toBeVisible();
+    await expect(page.locator('.stats-sheet')).toContainText('Lions vs Tigers');
   });
 
   test('close game without ending saves as live game', async ({ page }) => {
