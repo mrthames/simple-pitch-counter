@@ -1,139 +1,153 @@
-# Deployment Guide
+# Development & Deployment Pipeline
 
-Two deployment targets, two pipelines.
-
----
-
-## Website → Synology NAS (automated)
-
-Website files deploy automatically when changes to `website/` are pushed to `main`.
-
-### How it works
-
-A GitHub Action (`.github/workflows/deploy-website.yml`) runs on every push that touches `website/**`:
-
-1. Checks out the repo
-2. Connects to the NAS via SSH using a deploy key
-3. Transfers `website/` files to `/volume1/Websites/simplepitchcounter.com/` via SSH+tar (Synology doesn't support rsync/scp over SSH by default)
-4. `contact.php` and `feedback.php` are not tracked in git, so they're never overwritten (credentials — managed separately on the NAS)
-5. Verifies the deployment by listing the remote directory
-
-### Manual trigger
-
-You can also trigger a deploy manually from GitHub → Actions → "Deploy Website to NAS" → Run workflow.
-
-### Local SCP fallback
-
-If the GitHub Action fails (e.g., NAS not reachable externally), deploy from any machine on the local network using the NAS local IP:
-
-```bash
-scp -O -P $NAS_SSH_PORT -i ~/.ssh/<ssh-key> website/index.html $NAS_USER@$NAS_LOCAL_IP:/volume1/Websites/simplepitchcounter.com/
-scp -O -P $NAS_SSH_PORT -i ~/.ssh/<ssh-key> website/privacy.html $NAS_USER@$NAS_LOCAL_IP:/volume1/Websites/simplepitchcounter.com/
-scp -O -P $NAS_SSH_PORT -i ~/.ssh/<ssh-key> website/contact.html $NAS_USER@$NAS_LOCAL_IP:/volume1/Websites/simplepitchcounter.com/
-scp -O -P $NAS_SSH_PORT -i ~/.ssh/<ssh-key> website/feedback.html $NAS_USER@$NAS_LOCAL_IP:/volume1/Websites/simplepitchcounter.com/
-```
-
-Connection details (NAS user, local IP, and SSH port) are stored as GitHub Actions secrets — not committed to the repo.
-
-### Setup (one-time, already completed)
-
-1. Generated an ED25519 SSH key pair (`~/.ssh/spc_deploy` on the Mac)
-2. Added the public key to `~/.ssh/authorized_keys` on the NAS
-3. Enabled `PubkeyAuthentication` in `/etc/ssh/sshd_config` on the NAS
-4. Set correct permissions: `~` = 755, `~/.ssh` = 700, `authorized_keys` = 600
-5. Added four GitHub Actions secrets (values stored in GitHub, not in this repo):
-   - `NAS_SSH_KEY` — the private deploy key
-   - `NAS_HOST` — the NAS hostname
-   - `NAS_USER` — the SSH username
-   - `NAS_SSH_PORT` — the SSH port (2222)
-
-### Important: NAS-only files
-
-The following files contain credentials and are **not tracked in git**. They live only on the NAS at `/volume1/Websites/simplepitchcounter.com/` and are never overwritten by automated deploys:
-
-| File | Purpose | Credentials |
-|------|---------|-------------|
-| `contact.php` | Contact form mailer | AWS WorkMail SMTP password |
-| `feedback.php` | Feedback form → GitHub Issues | GitHub fine-grained PAT (issues: write) |
-| `phpmailer/` | PHPMailer library (required by contact.php) | — |
-
-To update credentials: edit the file locally (gitignored) and deploy manually:
-```bash
-scp -O -i ~/.ssh/spc_deploy -P $NAS_SSH_PORT website/contact.php website/feedback.php $NAS_USER@$NAS_HOST:/volume1/Websites/simplepitchcounter.com/
-```
-*(Connection details are stored as GitHub Actions secrets — see Setup below.)*
+This project follows a structured development pipeline for all changes — from feature branches through QA to production deployment.
 
 ---
 
-## iOS App → App Store (semi-automated)
+## Development Workflow
 
-The iOS build requires Xcode on the Mac. A deploy script handles the build-to-upload pipeline.
+### Branching Strategy
 
-### Quick deploy
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production-ready code. All deploys come from here. |
+| `feature/*` | New features (e.g., `feature/advanced-mode-stats`) |
+| `fix/*` | Bug fixes (e.g., `fix/outs-reset-bug`) |
+| `docs/*` | Documentation-only changes |
 
-From your Mac, in the repo directory:
+### Change Process
 
-```bash
-cd ~/Projects/Sub-Projects/simple-pitch-counter
-./scripts/deploy-ios.sh
+```
+1. Create feature branch from main
+2. Make changes, commit with descriptive messages
+3. Push branch, open Pull Request
+4. E2E tests run automatically (GitHub Actions)
+5. Review PR, verify tests pass
+6. Merge to main
+7. Deploy (see below)
 ```
 
-The script will:
-1. `git pull` the latest code
-2. Clean the previous build
-3. Build and archive the Xcode project
-4. Export the IPA
-5. Attempt to upload to App Store Connect
+### Commit Messages
 
-### Manual deploy (via Xcode)
+Follow conventional style:
+- `Add <feature>` — new functionality
+- `Fix <bug>` — bug fix
+- `Update <thing>` — enhancement to existing feature
+- `Remove <thing>` — removal
 
-If the script fails or you prefer the GUI:
+---
 
-1. `git pull` in Terminal
-2. Open `app/Little League Pitch Counter.xcodeproj`
-3. Product → Archive
-4. Window → Organizer → select the archive → Distribute App
-5. Follow the App Store Connect prompts
+## Quality Assurance
 
-### Before each App Store release
+### Automated E2E Tests
 
-1. Bump the version/build number in Xcode (target → General → Identity)
+69 Playwright tests run on every push and PR to `main` via GitHub Actions (`test.yml`).
+
+**Test suites:**
+
+| File | Tests | Coverage |
+|------|-------|----------|
+| `core-game-flow.spec.ts` | 13 | History, setup, pitching, innings, scoring, persistence |
+| `advanced-mode.spec.ts` | 16 | Pitch types, B/S/F counting, walks, strikeouts, BIP, auto-outs |
+| `thresholds-alerts.spec.ts` | 9 | Rest labels, limit alerts, catcher innings, at-bat warnings |
+| `pitcher-catcher.spec.ts` | 10 | Mid-game changes, count preservation, stats, half-inning switching |
+| `summary-export.spec.ts` | 10 | Summary screen, export text, umpire data, pitch breakdowns |
+| `history-config.spec.ts` | 11 | History cards, persistence, setup screen, mode toggle |
+
+**Run locally:**
+```bash
+npm test                 # Headless (CI mode)
+npm run test:headed      # With browser visible
+npm run test:ui          # Interactive Playwright UI
+```
+
+### Pre-Merge Checklist
+
+- [ ] All E2E tests pass
+- [ ] Manual testing on device for UI changes
+- [ ] No regressions in existing features
+- [ ] CHANGELOG.md updated (for user-facing changes)
+
+---
+
+## Versioning
+
+### Marketing Version (`CFBundleShortVersionString`)
+
+Set manually in Xcode project (`MARKETING_VERSION`). Current: **2.0**
+
+Bump schedule:
+- **Patch** (2.0 → 2.1): bug fixes, small improvements
+- **Minor** (2.1 → 2.2): new features
+- **Major** (2.x → 3.0): defined by product owner
+
+### Build Number (`CFBundleVersion`)
+
+**Automated.** Set at build time by an Xcode build phase script:
+
+```bash
+git rev-list --count HEAD
+```
+
+Every git commit increments the build number. No manual action needed.
+
+---
+
+## iOS Deployment (TestFlight / App Store)
+
+### Deploy Steps
+
+1. Merge feature branch to `main`
+2. On Mac: **Xcode → Integrate → Pull** (or `git pull` in Terminal)
+3. **Xcode → Product → Archive**
+   - Build number auto-set from git commit count
+   - No encryption compliance prompt (`ITSAppUsesNonExemptEncryption = false`)
+4. **Xcode → Window → Organizer → Distribute App**
+5. Build appears in TestFlight within minutes
+
+### Before App Store Release
+
+1. Update `MARKETING_VERSION` if needed
 2. Update `CHANGELOG.md`
-3. Run through the [Responsible AI Checklist](../ai/responsible-ai-checklist.md)
-4. Test on a real device
-5. Create a GitHub Release tag: `git tag v1.x.x && git push --tags`
+3. Test on a real device
+4. Create GitHub Release: `gh release create v2.x.x --notes "..."`
 
 ---
 
-## Full Release Workflow
+## Website Deployment (simplepitchcounter.com)
 
-When shipping a new version:
+Hosted on Synology NAS. Deploy via local SCP from Mac (NAS is on local network only — not reachable from GitHub Actions).
 
+### Deploy Steps
+
+```bash
+scp -O -P 2222 website/index.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
+scp -O -P 2222 website/privacy.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
+scp -O -P 2222 website/contact.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
 ```
-1. Finish code changes on main
-2. Test on device
-3. Update CHANGELOG.md
-4. Push to main
-   → Website deploys automatically (if website/ changed)
-5. On Mac: git pull
-6. Run ./scripts/deploy-ios.sh (or archive via Xcode)
-7. Submit for App Store review in App Store Connect
-8. Create GitHub Release: gh release create v1.x.x --notes "..."
-9. Update sprint review docs
-```
+
+### NAS-Only Files (Not in Git)
+
+| File | Purpose |
+|------|---------|
+| `contact.php` | Contact form mailer (AWS WorkMail SMTP credentials) |
+| `feedback.php` | Feedback form → GitHub Issues (GitHub PAT) |
+| `phpmailer/` | PHPMailer library |
 
 ---
 
 ## Troubleshooting
 
+### E2E tests fail locally
+- Ensure `npm ci` has been run
+- Ensure Playwright browsers are installed: `npx playwright install chromium`
+
+### Xcode build fails with "multiple commands produce"
+- Non-app files (V1/, design HTMLs) must be excluded via `PBXFileSystemSynchronizedBuildFileExceptionSet` in the Xcode project
+
 ### Website deploy fails
+- Verify SSH: `ssh -p 2222 <user>@<nas-ip>`
+- Check NAS SSH is enabled: DSM → Control Panel → Terminal & SNMP
 
-- **SSH connection refused:** Check that SSH port forwarding is active and SSH is enabled in DSM → Control Panel → Terminal & SNMP
-- **Permission denied:** Verify the deploy key is in `~/.ssh/authorized_keys` on the NAS and file permissions are correct (home=755, .ssh=700, authorized_keys=600)
-- **Transfer fails:** The workflow uses SSH+tar. Verify the NAS user has write access to the web root directory.
-
-### iOS build fails
-
-- **Signing error:** Open the project in Xcode, go to Signing & Capabilities, and ensure automatic signing is enabled with your Apple Developer account
-- **Missing ExportOptions.plist:** Archive once manually in Xcode (Product → Archive → Distribute → Export) to generate the plist, then copy it to `scripts/ExportOptions.plist`
-- **altool upload fails:** Use Xcode Organizer or Transporter.app as a fallback
+### iOS signing error
+- Xcode → Signing & Capabilities → ensure automatic signing with Apple Developer account
