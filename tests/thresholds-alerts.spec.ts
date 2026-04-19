@@ -114,8 +114,8 @@ test.describe('Thresholds and alerts', () => {
     }
     await expect(page.locator('#adv-alerts')).toContainText('mercy');
 
-    // End half manually
-    await page.click('.end-half-btn');
+    // Mercy modal should appear — end half through it
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
     await page.click('.modal-btn.amber');
 
     // Mercy alert should be gone in new half
