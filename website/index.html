@@ -173,7 +173,7 @@
   }
   .btn-ghost-cta:hover { border-color: rgba(247,244,237,0.6); color: var(--cream); }
 
-  /* App mockup */
+  /* App mockup — V2 dark header design */
   .hero-visual {
     display: flex; justify-content: center; align-items: center;
     position: relative; z-index: 1;
@@ -188,14 +188,14 @@
     position: relative;
   }
   .phone-screen {
-    background: #f7f4ed;
+    background: #F2F2F7;
     border-radius: 26px;
     overflow: hidden;
     aspect-ratio: 9/19;
     position: relative;
   }
   .phone-notch {
-    background: var(--navy-mid);
+    background: #1C1C1E;
     height: 24px;
     display: flex; align-items: center; justify-content: center;
   }
@@ -204,45 +204,73 @@
     background: rgba(255,255,255,0.1);
     border-radius: 10px;
   }
-  .phone-content { padding: 14px 12px; }
-  .pc-inning {
-    background: #ffffff;
-    border: 1.5px solid rgba(0,0,0,0.28);
-    border-radius: 8px;
-    padding: 8px 10px;
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 8px;
+  /* Dark scoreboard header */
+  .pc-dark-header {
+    background: #1C1C1E;
+    padding: 0 10px 10px;
   }
-  .pc-inning-text { font-size: 10px; font-weight: 700; color: #111; }
-  .pc-inning-sub { font-size: 8px; color: #4a4945; }
-  .pc-scoreboard {
-    display: grid; grid-template-columns: 1fr auto 1fr;
-    background: #f5f4ef; border: 1px solid rgba(0,0,0,0.22);
-    border-radius: 10px; padding: 6px 6px; margin-bottom: 8px;
-    align-items: center; gap: 0;
+  .pc-inn-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; padding-top: 4px;
   }
-  .pc-sb-team { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .pc-sb-name { font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #706f68; }
-  .pc-sb-score-row { display: flex; align-items: center; gap: 3px; }
-  .pc-sb-num { font-size: 16px; font-weight: 700; color: #111; min-width: 14px; text-align: center; }
-  .pc-sb-btn { width: 16px; height: 16px; border: 1px solid rgba(0,0,0,0.22); border-radius: 3px; background: #fff; font-size: 10px; font-weight: 500; color: #111; display: flex; align-items: center; justify-content: center; line-height: 1; }
-  .pc-sb-divider { font-size: 12px; color: #706f68; padding: 0 2px; text-align: center; }
-  .pc-card { background: #fff; border: 1.5px solid rgba(0,0,0,0.28); border-radius: 10px; padding: 10px 10px 8px; margin-bottom: 8px; }
-  .pc-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .pc-card-label { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #888; }
-  .pc-card-btn { font-size: 7px; font-weight: 600; color: #1e5fa0; background: #f0f7ff; border: 1px solid #b5d4f4; border-radius: 4px; padding: 2px 6px; }
-  .pc-batter { background: #ebebe5; border-radius: 6px; padding: 6px 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .pc-batter-label { font-size: 7px; font-weight: 600; color: #4a4945; }
-  .pc-batter-num { font-size: 14px; font-weight: 800; color: #111; }
-  .pc-pitch-num { text-align: center; padding: 4px 0 2px; }
-  .pc-pitcher-name { font-size: 9px; color: #4a4945; margin-bottom: 2px; }
-  .pc-pitch-big { font-size: 48px; font-weight: 700; color: #ba7517; line-height: 1; letter-spacing: -2px; }
-  .pc-pitch-sub { font-size: 7px; color: #706f68; }
-  .pc-pitch-rest { font-size: 8px; font-weight: 600; color: #ba7517; margin-top: 2px; }
-  .pc-action-row { display: flex; gap: 5px; margin-bottom: 5px; }
-  .pc-btn-pitch { background: #1e5fa0; color: #fff; border: 1.5px solid #2a6db5; border-radius: 8px; padding: 8px; text-align: center; font-size: 10px; font-weight: 700; flex: 1; }
-  .pc-btn-undo { background: #dddcd6; color: #000; border: 1.5px solid rgba(0,0,0,0.32); border-radius: 6px; padding: 6px 8px; font-size: 7px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
-  .pc-btn-next { background: #0a5c41; color: #fff; border: 1.5px solid #0d6e4e; border-radius: 8px; padding: 7px; text-align: center; font-size: 9px; font-weight: 700; width: 100%; }
+  .pc-inn-pill {
+    padding: 2px 7px; border-radius: 5px;
+    font-size: 7px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase;
+    background: rgba(26,107,255,.25); border: 1px solid rgba(26,107,255,.5); color: #6FA8FF;
+  }
+  .pc-inn-pill.bot { background: rgba(255,149,0,.22); border-color: rgba(255,149,0,.45); color: #FFB340; }
+  .pc-outs { display: flex; gap: 3px; align-items: center; }
+  .pc-out-dot { width: 6px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.35); }
+  .pc-out-dot.filled { background: #FF9500; border-color: #FF9500; }
+  .pc-end-btn { font-size: 7px; font-weight: 600; color: rgba(255,255,255,.7); background: rgba(255,255,255,.1); border-radius: 5px; padding: 3px 7px; }
+  .pc-sb { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
+  .pc-sb-team { display: flex; flex-direction: column; }
+  .pc-sb-team.away { align-items: flex-start; }
+  .pc-sb-team.home { align-items: flex-end; }
+  .pc-sb-name { font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: rgba(235,235,245,.6); margin-bottom: 2px; }
+  .pc-sb-score-row { display: flex; align-items: center; gap: 4px; }
+  .pc-sb-num { font-size: 22px; font-weight: 800; color: #fff; min-width: 18px; text-align: center; letter-spacing: -1px; }
+  .pc-sb-adj { width: 16px; height: 16px; border-radius: 5px; background: rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; font-size: 11px; color: rgba(255,255,255,.8); }
+  .pc-sb-divider { font-size: 14px; color: rgba(255,255,255,.2); padding: 0 5px; align-self: flex-end; padding-bottom: 2px; }
+  /* Light action area */
+  .pc-action-area { padding: 8px 10px; }
+  .pc-section-lbl { font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: rgba(60,60,67,.6); margin-bottom: 3px; }
+  .pc-pitcher-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .pc-pitcher-name { font-size: 10px; font-weight: 700; color: #000; letter-spacing: -.2px; }
+  .pc-pitcher-num { color: rgba(60,60,67,.35); font-weight: 500; }
+  .pc-pitch-badge { display: flex; align-items: center; gap: 3px; background: #F2F2F7; border-radius: 6px; padding: 2px 6px; border: 1px solid rgba(60,60,67,.12); }
+  .pc-pitch-badge-num { font-size: 10px; font-weight: 800; color: #FF9500; }
+  .pc-pitch-badge-lbl { font-size: 6px; font-weight: 600; color: rgba(60,60,67,.6); }
+  .pc-change-btn { font-size: 7px; font-weight: 600; color: #1A6BFF; }
+  /* Count card */
+  .pc-count-card { background: #fff; border-radius: 10px; padding: 8px 10px 6px; margin-bottom: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .pc-count-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 6px; }
+  .pc-count-col { text-align: center; }
+  .pc-count-num { font-size: 28px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+  .pc-count-lbl { font-size: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: rgba(60,60,67,.6); margin-top: 1px; }
+  .pc-count-dot { font-size: 14px; color: rgba(60,60,67,.35); padding: 0 4px; }
+  .pc-seq { display: flex; gap: 2px; flex-wrap: wrap; border-top: 1px solid rgba(60,60,67,.12); padding-top: 5px; }
+  .pc-seq-chip { min-width: 14px; height: 13px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 800; padding: 0 3px; }
+  /* Pitch buttons */
+  .pc-pitch-grid { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
+  .pc-pitch-row { display: flex; gap: 4px; }
+  .pc-pitch-btn { flex: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; border: 1px solid transparent; }
+  .pc-pitch-btn.row1 { height: 34px; }
+  .pc-pitch-btn.row2 { height: 30px; }
+  .pc-pt-glyph { font-size: 14px; font-weight: 900; line-height: 1; }
+  .pc-pt-name { font-size: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; }
+  .pc-pt-B { background: #EBF1FF; border-color: rgba(26,107,255,.35); color: #1A6BFF; }
+  .pc-pt-CS { background: #FFF0EF; border-color: rgba(255,59,48,.35); color: #FF3B30; }
+  .pc-pt-SS { background: #fce8e8; border-color: rgba(192,39,45,.35); color: #C0272D; }
+  .pc-pt-F { background: #FFF5E6; border-color: rgba(255,149,0,.35); color: #FF9500; }
+  .pc-pt-BIP { background: #E8F9ED; border-color: rgba(52,199,89,.35); color: #34C759; }
+  /* Undo/next row */
+  .pc-adv-secondary { display: flex; justify-content: space-between; font-size: 7px; font-weight: 500; color: #1A6BFF; margin-bottom: 6px; }
+  /* Rest alert */
+  .pc-alert { padding: 5px 7px; border-radius: 6px; font-size: 6px; font-weight: 500; display: flex; align-items: center; gap: 4px; line-height: 1.4; }
+  .pc-alert-dot { width: 4px; height: 4px; border-radius: 2px; flex-shrink: 0; }
+  .pc-alert.warn { background: #FFF5E6; color: #7D4A00; }
+  .pc-alert.warn .pc-alert-dot { background: #FF9500; }
 
   /* ── FEATURES ── */
   .features {
@@ -267,7 +295,7 @@
   }
   .features-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 24px;
   }
   .feature-card {
@@ -430,6 +458,7 @@
     .hero-visual { order: -1; }
     .phone-frame { width: 180px; }
     .features-grid { grid-template-columns: 1fr 1fr; }
+    .pc-pitch-grid .pc-pt-name { display: none; }
     .steps { grid-template-columns: 1fr 1fr; }
     .steps::before { display: none; }
   }
@@ -465,7 +494,7 @@
   <div class="hero-text">
     <div class="hero-eyebrow">iOS App · Free</div>
     <h1>Track every pitch. <em>Every game.</em></h1>
-    <p class="hero-sub">Simple Pitch Counter keeps accurate pitch counts and catcher innings for baseball and softball coaches — built for the dugout, not a desk.</p>
+    <p class="hero-sub">Track pitch counts and every pitch type in real time. Simple mode for quick counting, Advanced mode for full ball-strike-out tracking — built for the dugout, not a desk.</p>
     <div class="cta-group">
       <a href="#download" class="btn-primary-cta">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v10M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -478,50 +507,94 @@
     <div class="phone-frame">
       <div class="phone-screen">
         <div class="phone-notch"><div class="phone-notch-pill"></div></div>
-        <div class="phone-content">
-          <div class="pc-inning">
-            <div><div class="pc-inning-text">Top of Inning 3</div><div class="pc-inning-sub">Home fielding · Away batting</div></div>
-            <div style="background:#f0f7ff;border:1px solid #b5d4f4;border-radius:5px;padding:4px 7px;font-size:8px;font-weight:700;color:#185fa5">End half →</div>
-          </div>
-          <div class="pc-scoreboard">
-            <div class="pc-sb-team">
-              <div class="pc-sb-name">Home</div>
-              <div class="pc-sb-score-row">
-                <div class="pc-sb-btn">−</div>
-                <div class="pc-sb-num">4</div>
-                <div class="pc-sb-btn">+</div>
+        <!-- Dark scoreboard header -->
+        <div class="pc-dark-header">
+          <div class="pc-inn-bar">
+            <div style="display:flex;align-items:center;gap:5px">
+              <div class="pc-inn-pill">▲ TOP 3</div>
+              <div class="pc-outs">
+                <div class="pc-out-dot filled"></div>
+                <div class="pc-out-dot"></div>
+                <div class="pc-out-dot"></div>
               </div>
             </div>
-            <div class="pc-sb-divider">–</div>
-            <div class="pc-sb-team">
+            <div class="pc-end-btn">End half ›</div>
+          </div>
+          <div class="pc-sb">
+            <div class="pc-sb-team away">
               <div class="pc-sb-name">Away</div>
               <div class="pc-sb-score-row">
-                <div class="pc-sb-btn">−</div>
+                <div class="pc-sb-adj">+</div>
                 <div class="pc-sb-num">2</div>
-                <div class="pc-sb-btn">+</div>
+                <div class="pc-sb-adj">−</div>
+              </div>
+            </div>
+            <div class="pc-sb-divider">—</div>
+            <div class="pc-sb-team home">
+              <div class="pc-sb-name">Home</div>
+              <div class="pc-sb-score-row">
+                <div class="pc-sb-adj">−</div>
+                <div class="pc-sb-num">4</div>
+                <div class="pc-sb-adj">+</div>
               </div>
             </div>
           </div>
-          <div class="pc-card">
-            <div class="pc-card-header">
-              <div class="pc-card-label">Pitcher</div>
-              <div class="pc-card-btn">Change pitcher</div>
+        </div>
+        <!-- Light action area -->
+        <div class="pc-action-area">
+          <div class="pc-section-lbl">Pitcher</div>
+          <div class="pc-pitcher-row">
+            <div style="display:flex;align-items:center;gap:5px">
+              <div class="pc-pitcher-name">Jake M. <span class="pc-pitcher-num">#12</span></div>
+              <div class="pc-pitch-badge">
+                <div class="pc-pitch-badge-num">37</div>
+                <div class="pc-pitch-badge-lbl">pitches</div>
+              </div>
             </div>
-            <div class="pc-batter">
-              <div><div class="pc-batter-label">Pitches this at-bat</div></div>
-              <div class="pc-batter-num">3</div>
+            <div class="pc-change-btn">Change</div>
+          </div>
+          <!-- Count card -->
+          <div class="pc-count-card">
+            <div class="pc-count-row">
+              <div class="pc-count-col">
+                <div class="pc-count-num" style="color:#1A6BFF">3</div>
+                <div class="pc-count-lbl">Balls</div>
+              </div>
+              <div class="pc-count-dot">·</div>
+              <div class="pc-count-col">
+                <div class="pc-count-num" style="color:#FF3B30">2</div>
+                <div class="pc-count-lbl">Strikes</div>
+              </div>
             </div>
-            <div class="pc-pitch-num">
-              <div class="pc-pitcher-name">Jake M. #12</div>
-              <div class="pc-pitch-big">28</div>
-              <div class="pc-pitch-sub">of 50 max pitches</div>
-              <div class="pc-pitch-rest">1 day rest required</div>
+            <div class="pc-seq">
+              <div class="pc-seq-chip" style="background:#EBF1FF;color:#1A6BFF">B</div>
+              <div class="pc-seq-chip" style="background:#FFF0EF;color:#FF3B30">K̲</div>
+              <div class="pc-seq-chip" style="background:#FFF5E6;color:#FF9500">F</div>
+              <div class="pc-seq-chip" style="background:#EBF1FF;color:#1A6BFF">B</div>
+              <div class="pc-seq-chip" style="background:#fce8e8;color:#C0272D">K</div>
+              <div class="pc-seq-chip" style="background:#EBF1FF;color:#1A6BFF">B</div>
+              <div class="pc-seq-chip" style="background:#FFF5E6;color:#FF9500">F</div>
             </div>
-            <div class="pc-action-row">
-              <button class="pc-btn-pitch">+ Pitch</button>
-              <button class="pc-btn-undo">Undo</button>
+          </div>
+          <!-- Pitch buttons -->
+          <div class="pc-pitch-grid">
+            <div class="pc-pitch-row">
+              <div class="pc-pitch-btn pc-pt-B row1"><span class="pc-pt-glyph">B</span><span class="pc-pt-name">Ball</span></div>
+              <div class="pc-pitch-btn pc-pt-CS row1"><span class="pc-pt-glyph">K̲</span><span class="pc-pt-name">Called K</span></div>
+              <div class="pc-pitch-btn pc-pt-SS row1"><span class="pc-pt-glyph">K</span><span class="pc-pt-name">Swing K</span></div>
             </div>
-            <button class="pc-btn-next">Next batter →</button>
+            <div class="pc-pitch-row">
+              <div class="pc-pitch-btn pc-pt-F row2"><span class="pc-pt-glyph">F</span><span class="pc-pt-name">Foul</span></div>
+              <div class="pc-pitch-btn pc-pt-BIP row2"><span class="pc-pt-glyph">⊙</span><span class="pc-pt-name">In Play</span></div>
+            </div>
+          </div>
+          <div class="pc-adv-secondary">
+            <span>↩ Undo</span>
+            <span>Next batter ›</span>
+          </div>
+          <div class="pc-alert warn">
+            <div class="pc-alert-dot"></div>
+            <span>37 pitches — approaching 50-pitch limit. 13 remain.</span>
           </div>
         </div>
       </div>
@@ -536,8 +609,13 @@
   <div class="features-grid">
     <div class="feature-card">
       <div class="feature-icon"><i class="ph-bold ph-target"></i></div>
-      <div class="feature-title">Pitch count tracking</div>
-      <p class="feature-desc">Track every pitch in real time with a single tap. Configurable limits and rest-day thresholds alert you before a pitcher hits mandatory rest requirements.</p>
+      <div class="feature-title">Two tracking modes</div>
+      <p class="feature-desc">Simple mode for quick tap-to-count, or Advanced mode that tracks every pitch type — balls, called strikes, swinging strikes, fouls, and balls in play — with automatic ball-strike counts and out tracking.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ph-bold ph-chart-bar"></i></div>
+      <div class="feature-title">Live pitcher stats</div>
+      <p class="feature-desc">See strikeouts, walks, and balls in play in real time. Advanced mode gives you a full pitch type breakdown with percentages — right from the game screen.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><i class="ph-bold ph-hand"></i></div>
@@ -545,9 +623,9 @@
       <p class="feature-desc">Automatically tracks innings behind the plate and flags when a catcher approaches limits. Pitcher-catcher eligibility conflicts are highlighted immediately.</p>
     </div>
     <div class="feature-card">
-      <div class="feature-icon"><i class="ph-bold ph-clock-counter-clockwise"></i></div>
-      <div class="feature-title">Game history</div>
-      <p class="feature-desc">Every game is saved automatically. Review past pitcher counts, rest requirements, and scores at a glance — even when offline.</p>
+      <div class="feature-icon"><i class="ph-bold ph-device-mobile"></i></div>
+      <div class="feature-title">Physical button support</div>
+      <p class="feature-desc">Map your iPhone's volume buttons or Action Button to add pitches, undo, or advance batters. Keep your eyes on the game, not the screen.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><i class="ph-bold ph-sliders-horizontal"></i></div>
@@ -557,7 +635,12 @@
     <div class="feature-card">
       <div class="feature-icon"><i class="ph-bold ph-paper-plane-right"></i></div>
       <div class="feature-title">Game summaries</div>
-      <p class="feature-desc">Generate and email a formatted game summary with pitcher data, umpire notes, and final scores — ready to send to your league administrator.</p>
+      <p class="feature-desc">Generate and email a formatted game summary with pitcher data, pitch type breakdowns, umpire notes, and final scores — ready to send to your league administrator.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="ph-bold ph-clock-counter-clockwise"></i></div>
+      <div class="feature-title">Game history</div>
+      <p class="feature-desc">Every game is saved automatically. Review past pitcher counts, rest requirements, and scores at a glance. Swipe to delete old games.</p>
     </div>
     <div class="feature-card">
       <div class="feature-icon"><i class="ph-bold ph-wifi-slash"></i></div>
@@ -580,12 +663,12 @@
     <div class="step">
       <div class="step-num">2</div>
       <div class="step-title">Start a game</div>
-      <p class="step-desc">Enter team names, field, date, and your opening pitcher and catcher for each team. Takes under a minute.</p>
+      <p class="step-desc">Choose Simple or Advanced mode, enter team names, field, date, and your opening pitcher and catcher for each team. Takes under a minute.</p>
     </div>
     <div class="step">
       <div class="step-num">3</div>
       <div class="step-title">Tap to track</div>
-      <p class="step-desc">Hit + Pitch for each throw, Next Batter when the at-bat ends, End Half Inning when sides change. Undo if you miscount.</p>
+      <p class="step-desc">In Simple mode, tap + Pitch. In Advanced mode, tap the pitch type — balls, strikes, outs, and innings advance automatically. Use volume buttons for hands-free tracking.</p>
     </div>
     <div class="step">
       <div class="step-num">4</div>
