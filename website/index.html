@@ -179,7 +179,7 @@
     position: relative; z-index: 1;
   }
   .phone-frame {
-    width: 280px;
+    width: 340px;
     background: var(--navy-mid);
     border: 2px solid rgba(255,255,255,0.12);
     border-radius: 44px;
@@ -197,7 +197,7 @@
     flex-direction: column;
   }
   .phone-notch {
-    background: #1C1C1E;
+    background: #0b1c3a;
     height: 28px;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
@@ -211,15 +211,15 @@
   /* Scale inner content to look like a real phone screen */
   .phone-inner {
     flex: 1;
-    transform: scale(0.44);
+    transform: scale(0.8);
     transform-origin: top left;
-    width: 227.3%;
+    width: 125%;
     display: flex;
     flex-direction: column;
   }
   /* Dark scoreboard header */
   .pc-dark-header {
-    background: #1C1C1E;
+    background: #0b1c3a;
     padding: 6px 18px 16px;
   }
   .pc-inn-bar {
@@ -492,7 +492,7 @@
     .hero-sub { margin: 0 auto 40px; }
     .cta-group { justify-content: center; }
     .hero-visual { order: -1; }
-    .phone-frame { width: 240px; }
+    .phone-frame { width: 300px; }
     .features-grid { grid-template-columns: 1fr 1fr; }
     .steps { grid-template-columns: 1fr 1fr; }
     .steps::before { display: none; }
@@ -608,28 +608,27 @@
             </div>
             <div class="pc-seq">
               <div class="pc-seq-chip" style="background:#EBF1FF;color:#1A6BFF">B</div>
-              <div class="pc-seq-chip" style="background:#FFF0EF;color:#FF3B30"><span style="display:inline-block;transform:scaleX(-1)">K</span></div>
-              <div class="pc-seq-chip" style="background:#FFF5E6;color:#FF9500">F</div>
-              <div class="pc-seq-chip" style="background:#EBF1FF;color:#1A6BFF">B</div>
-              <div class="pc-seq-chip" style="background:#fce8e8;color:#C0272D">K</div>
+              <div class="pc-seq-chip" style="background:#FFF0EF;color:#FF3B30"><svg width="10" height="10" viewBox="0 0 128 128" fill="currentColor" style="vertical-align:-1px"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z" transform="scale(-1,1) translate(-128,0)"/></svg></div>
               <div class="pc-seq-chip" style="background:#EBF1FF;color:#1A6BFF">B</div>
               <div class="pc-seq-chip" style="background:#FFF5E6;color:#FF9500">F</div>
+              <div class="pc-seq-chip" style="background:#FFF5E6;color:#FF9500">F</div>
+              <div class="pc-seq-chip" style="background:#EBF1FF;color:#1A6BFF">B</div>
             </div>
           </div>
           <!-- Pitch buttons -->
           <div class="pc-pitch-grid">
             <div class="pc-pitch-row">
               <div class="pc-pitch-btn pc-pt-B row1"><span class="pc-pt-glyph">B</span><span class="pc-pt-name">Ball</span></div>
-              <div class="pc-pitch-btn pc-pt-CS row1"><span class="pc-pt-glyph mirror">K</span><span class="pc-pt-name">Called K</span></div>
-              <div class="pc-pitch-btn pc-pt-SS row1"><span class="pc-pt-glyph">K</span><span class="pc-pt-name">Swing K</span></div>
+              <div class="pc-pitch-btn pc-pt-CS row1"><span class="pc-pt-glyph"><svg width="22" height="22" viewBox="0 0 128 128" fill="currentColor"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z" transform="scale(-1,1) translate(-128,0)"/></svg></span><span class="pc-pt-name">Called K</span></div>
+              <div class="pc-pitch-btn pc-pt-SS row1"><span class="pc-pt-glyph"><svg width="22" height="22" viewBox="0 0 128 128" fill="currentColor"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z"/></svg></span><span class="pc-pt-name">Swing K</span></div>
             </div>
             <div class="pc-pitch-row">
               <div class="pc-pitch-btn pc-pt-F row2"><span class="pc-pt-glyph">F</span><span class="pc-pt-name">Foul</span></div>
-              <div class="pc-pitch-btn pc-pt-BIP row2"><span class="pc-pt-glyph bat-svg"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3.5 20.5l1.5-1.5m0 0l7-7m-7 7l-1-1m8-6l5.5-5.5c.8-.8 2.2-.8 2.8 0l.2.2c.6.6.6 1.6-.2 2.4L15 14.5m-3-3l-4.5 4.5M12 11.5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pc-pt-name">In Play</span></div>
+              <div class="pc-pitch-btn pc-pt-BIP row2"><span class="pc-pt-glyph bat-svg"><svg width="24" height="24" viewBox="0 0 496.926 496.926" fill="currentColor"><path d="M227.831,233.153c-17.891,32.025-36.395,65.14-44.667,77.982c-6.072,9.438-28.018,41.875-98.063,142.75c-5.737-1.33-11.915,1.004-15.673,6.473c-2.228,3.242-3.05,7.145-2.333,11.008c0.717,3.854,2.907,7.199,6.139,9.428l19.699,13.541c2.467,1.691,5.345,2.592,8.329,2.592h0.01c4.838,0,9.362-2.383,12.431-6.848c3.471-5.049,3.347-11.59,0.115-16.467c13.091-19.258,83.299-122.496,98.13-142.711c9.018-12.316,33.287-41.424,56.744-69.566c19.298-23.151,37.514-45.021,46.244-56.314c19.106-24.729,50.213-66.909,50.624-67.454l58.379-84.943c11.839-17.222,3.979-30.208-2.036-34.817L400.052,2.792C399.583,2.505,395.299,0,389.188,0c-5.871,0-14.487,2.343-22.156,13.512L308.558,98.58c-0.277,0.44-28.506,44.6-44.753,71.298C256.375,182.061,242.51,206.875,227.831,233.153z"/></svg></span><span class="pc-pt-name">In Play</span></div>
             </div>
           </div>
           <div class="pc-adv-secondary">
-            <span>↩ Undo</span>
+            <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:3px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo</span>
             <span>Next batter ›</span>
           </div>
           <div class="pc-alert warn">
@@ -665,7 +664,7 @@
           <div class="pc-btn-hints">
             <div class="pc-btn-hint" style="background:rgba(52,199,89,.09);border:1px solid rgba(52,199,89,.25)"><span class="pc-btn-hint-lbl">Action</span><div class="pc-btn-hint-dot" style="background:#34C759"></div><span style="color:#34C759">Next Batter</span></div>
             <div class="pc-btn-hint" style="background:rgba(26,107,255,.09);border:1px solid rgba(26,107,255,.25)"><span class="pc-btn-hint-lbl">Vol +</span><div class="pc-btn-hint-dot" style="background:#1A6BFF"></div><span style="color:#1A6BFF">+ Pitch</span></div>
-            <div class="pc-btn-hint" style="background:rgba(142,142,147,.09);border:1px solid rgba(142,142,147,.25)"><span class="pc-btn-hint-lbl">Vol −</span><div class="pc-btn-hint-dot" style="background:#8E8E93"></div><span style="color:#8E8E93">↩ Undo</span></div>
+            <div class="pc-btn-hint" style="background:rgba(142,142,147,.09);border:1px solid rgba(142,142,147,.25)"><span class="pc-btn-hint-lbl">Vol −</span><div class="pc-btn-hint-dot" style="background:#8E8E93"></div><span style="color:#8E8E93"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:2px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo</span></div>
           </div>
         </div>
         </div><!-- end phone-inner -->
