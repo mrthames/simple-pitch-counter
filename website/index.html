@@ -218,19 +218,21 @@
   /* Button labels with connecting lines */
   .hw-label {
     position: absolute;
-    left: -165px;
+    left: -130px;
+    width: 90px;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: center;
     gap: 1px;
     white-space: nowrap;
+    transform: translateY(-50%);
   }
   .hw-label::after {
     content: '';
     position: absolute;
-    right: -15px;
+    right: -24px;
     top: 50%;
-    width: 14px;
+    width: 22px;
     border-top: 1px dashed rgba(255,255,255,0.3);
   }
   .hw-label-name {
@@ -244,9 +246,21 @@
     font-size: 12px;
     font-weight: 700;
   }
-  .hw-label-action { top: 94px; }
-  .hw-label-vol-up { top: 149px; }
-  .hw-label-vol-down { top: 204px; }
+  .hw-heading {
+    position: absolute;
+    left: -138px;
+    top: 61px;
+    width: 106px;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .hw-label-action { top: 114px; }
+  .hw-label-vol-up { top: 177px; }
+  .hw-label-vol-down { top: 232px; }
 
   .phone-notch {
     background: #0b1c3a;
@@ -544,8 +558,19 @@
     .hero-sub { margin: 0 auto 40px; }
     .cta-group { justify-content: center; }
     .hero-visual { order: -1; }
-    .phone-frame { width: 300px; }
-    .hw-label { display: none; }
+    .phone-frame { width: 260px; margin-left: 100px; }
+    .hw-heading { left: -108px; top: 52px; width: 86px; font-size: 8px; }
+    .hw-label { left: -104px; width: 76px; }
+    .hw-label::after { right: -18px; width: 16px; }
+    .hw-label-name { font-size: 8px; }
+    .hw-label-map { font-size: 10px; }
+    .hw-label-action { top: 88px; }
+    .hw-label-vol-up { top: 136px; }
+    .hw-label-vol-down { top: 179px; }
+    .hw-btn.hw-action { top: 77px; height: 22px; }
+    .hw-btn.hw-vol-up { top: 120px; height: 34px; }
+    .hw-btn.hw-vol-down { top: 163px; height: 34px; }
+    .phone-inner { transform: scale(0.61); width: 163.9%; }
     .features-grid { grid-template-columns: 1fr 1fr; }
     .steps { grid-template-columns: 1fr 1fr; }
     .steps::before { display: none; }
@@ -556,6 +581,19 @@
     .nav-links { display: none; }
     footer { flex-direction: column; text-align: center; }
     .footer-links { flex-wrap: wrap; justify-content: center; }
+    .phone-frame { width: 220px; margin-left: 90px; }
+    .phone-inner { transform: scale(0.52); width: 192.3%; }
+    .hw-heading { left: -94px; top: 44px; width: 76px; font-size: 7px; }
+    .hw-label { left: -90px; width: 68px; }
+    .hw-label::after { right: -16px; width: 14px; }
+    .hw-label-name { font-size: 7px; }
+    .hw-label-map { font-size: 9px; }
+    .hw-label-action { top: 74px; }
+    .hw-label-vol-up { top: 114px; }
+    .hw-label-vol-down { top: 150px; }
+    .hw-btn.hw-action { top: 65px; height: 18px; }
+    .hw-btn.hw-vol-up { top: 100px; height: 28px; }
+    .hw-btn.hw-vol-down { top: 136px; height: 28px; }
   }
 </style>
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
@@ -721,9 +759,10 @@
       <div class="hw-btn hw-vol-up"></div>
       <div class="hw-btn hw-vol-down"></div>
       <!-- Button labels -->
+      <div class="hw-heading">Custom Button Actions</div>
       <div class="hw-label hw-label-action"><span class="hw-label-name">Action</span><span class="hw-label-map" style="color:#FF9500">+ Out</span></div>
       <div class="hw-label hw-label-vol-up"><span class="hw-label-name">Vol +</span><span class="hw-label-map" style="color:#34C759">Next Batter</span></div>
-      <div class="hw-label hw-label-vol-down"><span class="hw-label-name">Vol −</span><span class="hw-label-map" style="color:#8E8E93">Undo</span></div>
+      <div class="hw-label hw-label-vol-down"><span class="hw-label-name">Vol −</span><span class="hw-label-map" style="color:#FFFFFF">Undo</span></div>
     </div>
   </div>
 </section>

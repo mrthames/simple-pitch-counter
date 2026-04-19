@@ -30,7 +30,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 /* ── Dark header (scoreboard) ── */
 .dark-header{
   background:var(--dark);
-  padding:calc(env(safe-area-inset-top,0px) + 12px) 18px 16px;
+  padding:calc(env(safe-area-inset-top,0px) + 20px) 18px 16px;
   position:relative;
 }
 .inn-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
@@ -47,11 +47,13 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
   padding:6px 12px;border-radius:10px;background:rgba(255,255,255,.1);
   color:rgba(255,255,255,.75);font-size:13px;font-weight:600;cursor:pointer;
 }
-.menu-btn{
-  width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.1);
+.menu-btn,.hist-menu-btn{
+  width:34px;height:34px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;cursor:pointer;
   position:relative;
 }
+.menu-btn{background:rgba(255,255,255,.1)}
+.hist-menu-btn{background:var(--sep)}
 .hbg-menu{
   display:none;position:absolute;right:0;top:42px;background:var(--card);
   border:0.5px solid var(--sep2);border-radius:var(--r-lg);min-width:160px;
@@ -305,7 +307,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 /* ── History screen ── */
 .history-header{
   background:var(--bg);
-  padding:calc(env(safe-area-inset-top,0px) + 10px) 20px 12px;
+  padding:calc(env(safe-area-inset-top,0px) + 20px) 20px 12px;
 }
 .history-title-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
 .history-title{font-size:34px;font-weight:800;letter-spacing:-.5px}
@@ -344,12 +346,12 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 /* ── Setup screen ── */
 .setup-nav{
   display:flex;align-items:center;justify-content:space-between;
-  padding:calc(env(safe-area-inset-top,0px)+12px) 16px 16px;
+  padding:calc(env(safe-area-inset-top,0px)+20px) 16px 16px;
   background:var(--bg);
 }
 .setup-nav-title{font-size:17px;font-weight:700}
 .setup-content{padding:0 16px;display:flex;flex-direction:column;gap:20px;
-  padding-bottom:calc(env(safe-area-inset-bottom,0px)+40px)}
+  padding-bottom:calc(env(safe-area-inset-bottom,0px)+60px)}
 .section-header-lbl{font-size:13px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding:0 4px}
 /* Mode cards */
 .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -383,7 +385,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 /* ── Summary & Export ── */
 .summary-nav{
   display:flex;align-items:center;justify-content:space-between;
-  padding:calc(env(safe-area-inset-top,0px)+12px) 16px 16px;
+  padding:calc(env(safe-area-inset-top,0px)+20px) 16px 16px;
 }
 .summary-nav-title{font-size:17px;font-weight:700}
 .summary-content{padding:0 16px;display:flex;flex-direction:column;gap:16px;
@@ -411,7 +413,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
   margin-bottom:10px;
 }
 /* Config screen */
-.config-nav{padding:calc(env(safe-area-inset-top,0px)+12px) 16px 8px;background:var(--bg)}
+.config-nav{padding:calc(env(safe-area-inset-top,0px)+20px) 16px 8px;background:var(--bg)}
 .config-item{display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--sep)}
 .config-item:last-child{border-bottom:none}
 .config-name{font-size:14px;font-weight:600}
@@ -464,7 +466,17 @@ textarea{resize:vertical;min-height:56px}
   <div class="history-header">
     <div class="history-title-row">
       <div class="history-title">Games</div>
-      <div class="new-game-btn" onclick="goSetup()">+ New Game</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="new-game-btn" onclick="goSetup()">+ New Game</div>
+        <div class="hist-menu-btn" onclick="toggleHistoryMenu()">
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="var(--t2)" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div class="hbg-menu" id="history-hbg-menu">
+            <button class="hbg-item" onclick="closeHistoryMenu();showScreen('config')">Configuration</button>
+            <button class="hbg-item" onclick="closeHistoryMenu();exportAllGames()">Export all games</button>
+            <button class="hbg-item" onclick="closeHistoryMenu();importAllGames()">Import games</button>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="history-sep"></div>
   </div>
@@ -1462,13 +1474,61 @@ function setBtnMapping(key,val){
   renderBtnHints();
 }
 
-// ── Game menu ──
+// ── Menus ──
 function toggleGameMenu(){document.getElementById('game-hbg-menu').classList.toggle('open');}
 function closeGameMenu(){document.getElementById('game-hbg-menu').classList.remove('open');}
+function toggleHistoryMenu(){document.getElementById('history-hbg-menu').classList.toggle('open');}
+function closeHistoryMenu(){document.getElementById('history-hbg-menu').classList.remove('open');}
 document.addEventListener('click',e=>{
-  const wrap=document.getElementById('game-hbg-menu')?.closest('.menu-btn');
-  if(wrap&&!wrap.contains(e.target))closeGameMenu();
+  const gm=document.getElementById('game-hbg-menu')?.closest('.menu-btn');
+  if(gm&&!gm.contains(e.target))closeGameMenu();
+  const hm=document.getElementById('history-hbg-menu')?.closest('.hist-menu-btn');
+  if(hm&&!hm.contains(e.target))closeHistoryMenu();
 });
+
+// ── Data export / import ──
+function exportAllGames(){
+  const data=JSON.stringify({games:state.games||[],configs:state.configs||[]},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='simple-pitch-counter-backup.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+function importAllGames(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{
+        const d=JSON.parse(ev.target.result);
+        const importedGames=d.games||[];
+        const importedConfigs=d.configs||[];
+        if(!importedGames.length&&!importedConfigs.length){showModal('Import failed','No valid data found in file.',[{label:'OK',fn:'closeModal()'}]);return;}
+        showModal('Import games',`Found ${importedGames.length} game(s) and ${importedConfigs.length} config(s). This will merge with your existing data.`,[
+          {label:'Cancel',fn:'closeModal()'},
+          {label:'Import',fn:`closeModal();doImport(${JSON.stringify(JSON.stringify(d))})`,cls:'amber'},
+        ]);
+      }catch(err){showModal('Import failed','Could not parse file. Make sure it is a valid backup file.',[{label:'OK',fn:'closeModal()'}]);}
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+function doImport(jsonStr){
+  const d=JSON.parse(jsonStr);
+  const existingIds=new Set((state.games||[]).map(g=>g.id||g.date));
+  (d.games||[]).forEach(g=>{
+    const gid=g.id||g.date;
+    if(!existingIds.has(gid)){state.games.push(g);existingIds.add(gid);}
+  });
+  const existingConfigNames=new Set((state.configs||[]).map(c=>c.name));
+  (d.configs||[]).forEach(c=>{
+    if(!existingConfigNames.has(c.name)){state.configs.push(c);existingConfigNames.add(c.name);}
+  });
+  saveState();renderHistory();
+  showModal('Import complete',`Games and configurations have been merged.`,[{label:'OK',fn:'closeModal()'}]);
+}
 function showStatsQuick(){
   closeGameMenu();
   const g=state.currentGame;if(!g)return;
