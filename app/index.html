@@ -1277,9 +1277,15 @@ function renderSimple(){
   const ri=restInfo(ap.pitches);
   const rl=document.getElementById('simple-rest-lbl');
   if(ri&&ri.days>0){rl.textContent=ri.label;rl.style.color=ri.days===1?'var(--amber)':'var(--red)';rl.style.display='block';}else rl.style.display='none';
-  // Dots
+  // Dots — alternate shade per batter
   const dots=document.getElementById('simple-pitch-dots');
-  dots.innerHTML=Array.from({length:ap.pitches}).map((_,i)=>`<div class="pitch-dot" style="background:${i<ap.pitches-ap.currentBatterPitches?'rgba(0,0,0,.12)':cc};opacity:.7"></div>`).join('');
+  const breaks=ap.batterBreaks||[];
+  const dotColors=[];
+  let batterIdx=0;
+  for(let b=0;b<breaks.length;b++){for(let j=0;j<breaks[b];j++)dotColors.push(b%2===0?'rgba(0,0,0,.18)':'rgba(0,0,0,.08)');batterIdx=b+1;}
+  const curShade=batterIdx%2===0?'rgba(0,0,0,.18)':'rgba(0,0,0,.08)';
+  for(let j=0;j<ap.currentBatterPitches;j++)dotColors.push(cc);
+  dots.innerHTML=dotColors.map((c,i)=>`<div class="pitch-dot" style="background:${c}"></div>`).join('');
   // Alerts
   const w=[];
   if(ap.currentBatterPitches>=BATTER_WARN&&ap.pitches<PITCH_MAX)w.push({t:'warn',m:`At-bat pitch count is ${ap.currentBatterPitches} — verify or press Next Batter.`});
