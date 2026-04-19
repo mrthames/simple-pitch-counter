@@ -129,13 +129,9 @@ Built and submitted via Xcode on macOS. The `app/index.html` is bundled into the
 
 ### Website
 
-Hosted on Synology NAS using Web Station. Deployed via SCP over the local network:
+Hosted on a self-hosted Synology NAS via Web Station. Deployed via SCP over the local network after any content or mockup changes.
 
-```bash
-scp -O -P 2222 -i ~/.ssh/<ssh-key> website/* <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
-```
-
-**Note:** `contact.php` contains SMTP credentials and is excluded from git via `.gitignore`.
+**Note:** `contact.php` contains SMTP credentials and is excluded from git via `.gitignore`. Connection details (host, port, SSH key) are kept outside the repo.
 
 ## Future plans
 

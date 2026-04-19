@@ -120,10 +120,12 @@ Hosted on Synology NAS. Deploy via local SCP from Mac (NAS is on local network o
 
 ### Deploy Steps
 
+Deploy website files via SCP to the NAS web root. Connection details (host, port, SSH key path) are kept outside the repo.
+
 ```bash
-scp -O -P 2222 website/index.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
-scp -O -P 2222 website/privacy.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
-scp -O -P 2222 website/contact.html <user>@<nas-ip>:/volume1/Websites/simplepitchcounter.com/
+scp -O -P <port> website/index.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/
+scp -O -P <port> website/privacy.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/
+scp -O -P <port> website/contact.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/
 ```
 
 ### NAS-Only Files (Not in Git)
@@ -146,8 +148,7 @@ scp -O -P 2222 website/contact.html <user>@<nas-ip>:/volume1/Websites/simplepitc
 - Non-app files (V1/, design HTMLs) must be excluded via `PBXFileSystemSynchronizedBuildFileExceptionSet` in the Xcode project
 
 ### Website deploy fails
-- Verify SSH: `ssh -p 2222 <user>@<nas-ip>`
-- Check NAS SSH is enabled: DSM → Control Panel → Terminal & SNMP
+- Verify SSH connectivity to the NAS (check DSM → Control Panel → Terminal & SNMP for SSH status)
 
 ### iOS signing error
 - Xcode → Signing & Capabilities → ensure automatic signing with Apple Developer account
