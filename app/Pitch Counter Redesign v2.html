@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Pitch Counter — v2</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#E8E8ED;font-family:-apple-system,system-ui,sans-serif}
+  body{display:flex;flex-direction:column;align-items:center;padding:40px 160px 80px;gap:24px}
+  kbd{background:#ddd;border-radius:4px;padding:1px 6px;font-family:inherit}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ── Tokens ────────────────────────────────────────────────────
+const C = {
+  dark:'#1C1C1E', dark2:'#2C2C2E', dark3:'#3A3A3C',
+  label:'rgba(235,235,245,0.6)',
+  bg:'#F2F2F7', card:'#FFFFFF', sep:'rgba(60,60,67,0.12)',
+  text:'#000000', text2:'rgba(60,60,67,0.6)', text3:'rgba(60,60,67,0.4)',
+  blue:'#1A6BFF', green:'#34C759', red:'#FF3B30', amber:'#FF9500', purple:'#AF52DE',
+  blueBg:'#EBF1FF', greenBg:'#E8F9ED', redBg:'#FFF0EF', amberBg:'#FFF5E6',
+};
+const FONT = '-apple-system, system-ui';
+const C_INN_MAX = 4;
+const PITCH_C_LIM = 41;
+
+// Pitch types
+const PT = {
+  B:   { label:'B',  glyph:'B',  name:'Ball',         color:C.blue,   bg:C.blueBg },
+  CS:  { label:'K̲',  glyph:'K̲',  name:'Called K',     color:C.red,    bg:C.redBg  },
+  SS:  { label:'K',  glyph:'K',  name:'Swinging K',   color:'#C0272D',bg:'#fce8e8' },
+  F:   { label:'F',  glyph:'F',  name:'Foul',         color:C.amber,  bg:C.amberBg},
+  BIP: { label:'●',  glyph:'⊙',  name:'In Play',      color:C.green,  bg:C.greenBg},
+};
+
+const BTN_ACTIONS = {
+  pitch:      { label:'+ Pitch',    color:C.blue  },
+  nextBatter: { label:'Next Batter',color:C.green },
+  undo:       { label:'↩ Undo',     color:'#8E8E93'},
+  none:       { label:'Off',        color:'#48484A'},
+};
+
+function countColor(n, max=50) {
+  if (n >= max) return C.red;
+  if (n >= max*0.72) return C.red;
+  if (n >= max*0.56) return C.amber;
+  return C.text;
+}
+
+// ── Primitives ────────────────────────────────────────────────
+function BigBtn({ children, color=C.blue, onClick, style={}, small=false }) {
+  const [p,setP]=useState(false);
+  return <div onMouseDown={()=>setP(true)} onMouseUp={()=>{setP(false);onClick&&onClick()}} onMouseLeave={()=>setP(false)} onTouchStart={()=>setP(true)} onTouchEnd={()=>{setP(false);onClick&&onClick()}} style={{ width:'100%', height:small?54:68, background:color, borderRadius:16, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontFamily:FONT, fontSize:small?17:22, fontWeight:700, color:'#fff', letterSpacing:-0.3, transform:p?'scale(0.97)':'scale(1)', transition:'transform 0.1s', opacity:p?0.85:1, userSelect:'none', ...style }}>{children}</div>;
+}
+
+function SmallBtn({ children, onClick, danger=false, style={} }) {
+  const [p,setP]=useState(false);
+  return <div onMouseDown={()=>setP(true)} onMouseUp={()=>{setP(false);onClick&&onClick()}} onMouseLeave={()=>setP(false)} style={{ padding:'8px 14px', borderRadius:10, cursor:'pointer', background:p?(danger?C.redBg:'#E5E5EA'):'transparent', fontFamily:FONT, fontSize:15, fontWeight:500, color:danger?C.red:C.blue, userSelect:'none', transition:'background 0.1s', ...style }}>{children}</div>;
+}
+
+function Alert({ type, children }) {
+  const s={warn:{bg:C.amberBg,color:'#7D4A00',dot:C.amber},danger:{bg:C.redBg,color:'#C0272D',dot:C.red},info:{bg:C.blueBg,color:'#0050CC',dot:C.blue}}[type]||{bg:C.blueBg,color:'#0050CC',dot:C.blue};
+  return <div style={{ display:'flex', alignItems:'flex-start', gap:8, padding:'10px 13px', borderRadius:12, background:s.bg, marginBottom:8 }}>
+    <div style={{ width:7,height:7,borderRadius:4,background:s.dot,flexShrink:0,marginTop:5 }}/>
+    <div style={{ fontSize:13, fontWeight:500, color:s.color, lineHeight:1.45, fontFamily:FONT }}>{children}</div>
+  </div>;
+}
+
+function AdjBtn({ children, onPress }) {
+  const [p,setP]=useState(false);
+  return <div onMouseDown={()=>setP(true)} onMouseUp={()=>{setP(false);onPress()}} onMouseLeave={()=>setP(false)} onTouchStart={()=>setP(true)} onTouchEnd={()=>{setP(false);onPress()}} style={{ width:32,height:32,borderRadius:10, background:p?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.12)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', userSelect:'none', fontSize:20, fontWeight:300, color:'rgba(255,255,255,0.85)', fontFamily:FONT, transition:'background 0.1s', flexShrink:0 }}>{children}</div>;
+}
+
+// ── Scoreboard ────────────────────────────────────────────────
+function OutsDots({ outs }) {
+  return <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+    {[0,1,2].map(i=><div key={i} style={{ width:10, height:10, borderRadius:5, background:i<outs?C.amber:'rgba(255,255,255,0.2)', border:'1.5px solid rgba(255,255,255,0.35)', transition:'background 0.2s' }}/>)}
+  </div>;
+}
+
+function ScoreTeam({ name, score, side, onAdj }) {
+  return <div style={{ textAlign:side==='away'?'left':'right', display:'flex', flexDirection:'column', alignItems:side==='away'?'flex-start':'flex-end' }}>
+    <div style={{ fontSize:11, fontWeight:700, color:C.label, textTransform:'uppercase', letterSpacing:0.8, marginBottom:4, fontFamily:FONT }}>{name}</div>
+    <div style={{ display:'flex', alignItems:'center', gap:7, flexDirection:side==='away'?'row':'row-reverse' }}>
+      <AdjBtn onPress={()=>onAdj(1)}>+</AdjBtn>
+      <div style={{ fontSize:44,fontWeight:800,color:'#fff',lineHeight:1,fontFamily:FONT,letterSpacing:-2,minWidth:40,textAlign:'center' }}>{score}</div>
+      <AdjBtn onPress={()=>onAdj(-1)}>−</AdjBtn>
+    </div>
+  </div>;
+}
+
+function Scoreboard({ homeTeam,awayTeam,homeScore,awayScore,inning,isTop,outs,onMenu,onEndHalf,onAdjHome,onAdjAway,mode }) {
+  return <div style={{ background:C.dark, paddingTop:58, paddingBottom:14, paddingLeft:18, paddingRight:18 }}>
+    {/* Top row: inning + outs + menu */}
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12 }}>
+      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+        <div style={{ background:isTop?'rgba(26,107,255,0.25)':'rgba(255,149,0,0.22)', border:`1px solid ${isTop?'rgba(26,107,255,0.5)':'rgba(255,149,0,0.45)'}`, borderRadius:8, padding:'4px 10px', fontFamily:FONT, fontSize:13, fontWeight:700, letterSpacing:0.5, color:isTop?'#6FA8FF':'#FFB340', textTransform:'uppercase' }}>{isTop?'▲':'▼'} {isTop?'TOP':'BOT'} {inning}</div>
+        {mode==='advanced' && <OutsDots outs={outs}/>}
+      </div>
+      <div style={{ display:'flex', gap:7, alignItems:'center' }}>
+        <div onClick={onEndHalf} style={{ padding:'6px 12px', borderRadius:10, background:'rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.75)', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:FONT }}>End half ›</div>
+        <div onClick={onMenu} style={{ width:34,height:34,borderRadius:10,background:'rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer' }}>
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="rgba(255,255,255,0.7)" strokeWidth="1.8" strokeLinecap="round"/></svg>
+        </div>
+      </div>
+    </div>
+    {/* Score */}
+    <div style={{ display:'grid', gridTemplateColumns:'1fr auto 1fr', alignItems:'center' }}>
+      <ScoreTeam name={awayTeam} score={awayScore} side="away" onAdj={onAdjAway}/>
+      <div style={{ textAlign:'center', color:'rgba(255,255,255,0.2)', fontSize:26, fontWeight:200, fontFamily:FONT, padding:'0 10px' }}>—</div>
+      <ScoreTeam name={homeTeam} score={homeScore} side="home" onAdj={onAdjHome}/>
+    </div>
+  </div>;
+}
+
+// ── Count display (advanced mode) ─────────────────────────────
+function CountDisplay({ balls, strikes, atBatLog }) {
+  const ballStr = balls >= 3 ? C.blue : C.text;
+  const strikeStr = strikes >= 2 ? C.red : C.text;
+  return <div style={{ background:C.card, borderRadius:18, padding:'14px 16px 12px', marginBottom:10, boxShadow:'0 1px 4px rgba(0,0,0,0.06)' }}>
+    {/* B · S big */}
+    <div style={{ display:'grid', gridTemplateColumns:'1fr auto 1fr', alignItems:'center', marginBottom:10 }}>
+      <div style={{ textAlign:'center' }}>
+        <div style={{ fontSize:52, fontWeight:900, color:balls>=3?C.blue:C.text, lineHeight:1, fontFamily:FONT, letterSpacing:-2, transition:'color 0.2s' }}>{balls}</div>
+        <div style={{ fontSize:10, fontWeight:700, color:C.text2, textTransform:'uppercase', letterSpacing:0.8, fontFamily:FONT, marginTop:3 }}>Balls</div>
+      </div>
+      <div style={{ fontSize:24, color:C.text3, fontFamily:FONT, padding:'0 8px', alignSelf:'flex-start', paddingTop:14 }}>·</div>
+      <div style={{ textAlign:'center' }}>
+        <div style={{ fontSize:52, fontWeight:900, color:strikes>=2?C.red:C.text, lineHeight:1, fontFamily:FONT, letterSpacing:-2, transition:'color 0.2s' }}>{strikes}</div>
+        <div style={{ fontSize:10, fontWeight:700, color:C.text2, textTransform:'uppercase', letterSpacing:0.8, fontFamily:FONT, marginTop:3 }}>Strikes</div>
+      </div>
+    </div>
+    {/* At-bat sequence */}
+    {atBatLog.length>0 && <div style={{ display:'flex', gap:4, flexWrap:'wrap', borderTop:`1px solid ${C.sep}`, paddingTop:9 }}>
+      {atBatLog.map((pt,i)=>{
+        const p=PT[pt]||PT.B;
+        return <div key={i} style={{ minWidth:24, height:22, borderRadius:6, background:p.bg, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:FONT, fontSize:11, fontWeight:800, color:p.color, padding:'0 5px' }}>{p.label}</div>;
+      })}
+    </div>}
+  </div>;
+}
+
+// ── Pitch type grid ───────────────────────────────────────────
+function PitchTypeGrid({ onPitch, disabled=false }) {
+  const row1 = ['B','CS','SS'];
+  const row2 = ['F','BIP'];
+  const PBtn = ({ ptKey }) => {
+    const p = PT[ptKey];
+    const [pressed, setPressed] = useState(false);
+    return <div
+      onMouseDown={()=>setPressed(true)}
+      onMouseUp={()=>{setPressed(false);if(!disabled)onPitch(ptKey)}}
+      onMouseLeave={()=>setPressed(false)}
+      onTouchStart={()=>setPressed(true)}
+      onTouchEnd={()=>{setPressed(false);if(!disabled)onPitch(ptKey)}}
+      style={{ flex:1, borderRadius:14, background:pressed?p.color:p.bg, border:`1.5px solid ${pressed?'transparent':p.color+'60'}`, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', cursor:disabled?'default':'pointer', height:ptKey==='BIP'||ptKey==='F'?54:62, gap:3, opacity:disabled?0.4:1, transition:'background 0.1s, opacity 0.2s', userSelect:'none' }}>
+      <div style={{ fontSize:ptKey==='BIP'?20:26, fontWeight:900, color:pressed?'#fff':p.color, fontFamily:FONT, lineHeight:1 }}>{p.glyph}</div>
+      <div style={{ fontSize:9, fontWeight:700, color:pressed?'rgba(255,255,255,0.8)':p.color, fontFamily:FONT, textTransform:'uppercase', letterSpacing:0.5 }}>{p.name}</div>
+    </div>;
+  };
+  return <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:10 }}>
+    <div style={{ display:'flex', gap:8 }}>{row1.map(k=><PBtn key={k} ptKey={k}/>)}</div>
+    <div style={{ display:'flex', gap:8 }}>{row2.map(k=><PBtn key={k} ptKey={k}/>)}</div>
+  </div>;
+}
+
+// ── Ball in Play modal ─────────────────────────────────────────
+function BIPModal({ outs, onSelect }) {
+  return <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.55)', display:'flex', alignItems:'flex-end', justifyContent:'center', zIndex:200, borderRadius:48 }}>
+    <div style={{ background:C.dark, borderRadius:'24px 24px 0 0', padding:'20px 20px 44px', width:'100%' }}>
+      <div style={{ width:36,height:4,borderRadius:2,background:'rgba(255,255,255,0.2)',margin:'0 auto 20px' }}/>
+      <div style={{ fontSize:18, fontWeight:700, color:'#fff', fontFamily:FONT, textAlign:'center', marginBottom:6 }}>Ball in Play</div>
+      <div style={{ fontSize:14, color:C.label, fontFamily:FONT, textAlign:'center', marginBottom:24 }}>{outs} out{outs!==1?'s':''} — batter reached or put out?</div>
+      <div style={{ display:'flex', gap:12 }}>
+        <div onClick={()=>onSelect(false)} style={{ flex:1, height:70, borderRadius:18, background:C.green, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', cursor:'pointer', gap:2 }}>
+          <div style={{ fontSize:24, fontWeight:900, color:'#fff', fontFamily:FONT }}>SAFE</div>
+          <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', fontFamily:FONT, fontWeight:600 }}>Reached base</div>
+        </div>
+        <div onClick={()=>onSelect(true)} style={{ flex:1, height:70, borderRadius:18, background:C.red, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', cursor:'pointer', gap:2 }}>
+          <div style={{ fontSize:24, fontWeight:900, color:'#fff', fontFamily:FONT }}>OUT</div>
+          <div style={{ fontSize:11, color:'rgba(255,255,255,0.7)', fontFamily:FONT, fontWeight:600 }}>{outs+1>=3?'3rd out — inning ends':'Out recorded'}</div>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ── Result flash overlay ───────────────────────────────────────
+function ResultFlash({ result }) {
+  if (!result) return null;
+  const map = {
+    K:    { label:'Strikeout',  sub:'K',   color:C.red   },
+    BB:   { label:'Walk',       sub:'BB',  color:C.blue  },
+    OUT:  { label:'Out!',       sub:'OUT', color:C.amber },
+    SAFE: { label:'Safe!',      sub:'',    color:C.green },
+    END:  { label:'Side Retired!',sub:'3 Outs',color:C.purple},
+  }[result]||{label:result,sub:'',color:C.blue};
+  return <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', zIndex:150, pointerEvents:'none', borderRadius:48 }}>
+    <div style={{ background:map.color, borderRadius:24, padding:'20px 36px', textAlign:'center', boxShadow:`0 8px 40px ${map.color}80` }}>
+      <div style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,0.8)', textTransform:'uppercase', letterSpacing:0.8, fontFamily:FONT, marginBottom:4 }}>{map.sub}</div>
+      <div style={{ fontSize:32, fontWeight:900, color:'#fff', fontFamily:FONT, letterSpacing:-0.5 }}>{map.label}</div>
+    </div>
+  </div>;
+}
+
+// ── Pitcher stats modal ────────────────────────────────────────
+function PitcherStatsModal({ stats, pitcherName, total, onClose }) {
+  const types = ['B','CS','SS','F','BIP'];
+  return <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'flex-end', justifyContent:'center', zIndex:300, borderRadius:48 }} onClick={onClose}>
+    <div style={{ background:'#1C1C1E', borderRadius:'24px 24px 0 0', padding:'20px 20px 48px', width:'100%' }} onClick={e=>e.stopPropagation()}>
+      <div style={{ width:36,height:4,borderRadius:2,background:'rgba(255,255,255,0.2)',margin:'0 auto 18px' }}/>
+      <div style={{ fontSize:17,fontWeight:700,color:'#fff',fontFamily:FONT,marginBottom:4 }}>{pitcherName}</div>
+      <div style={{ fontSize:13,color:C.label,fontFamily:FONT,marginBottom:18 }}>{total} total pitches</div>
+      {/* Summary row */}
+      <div style={{ display:'flex', gap:8, marginBottom:18 }}>
+        {[{l:'K',v:stats.ks,c:C.red},{l:'BB',v:stats.bbs,c:C.blue},{l:'BIP',v:stats.bips,c:C.green}].map(x=>(
+          <div key={x.l} style={{ flex:1, background:'rgba(255,255,255,0.07)', borderRadius:14, padding:'12px 8px', textAlign:'center' }}>
+            <div style={{ fontSize:26,fontWeight:800,color:x.c,fontFamily:FONT }}>{x.v}</div>
+            <div style={{ fontSize:11,fontWeight:700,color:'rgba(235,235,245,0.5)',fontFamily:FONT,marginTop:2 }}>{x.l}</div>
+          </div>
+        ))}
+      </div>
+      {/* Pitch type breakdown */}
+      <div style={{ fontSize:11,fontWeight:700,color:'rgba(235,235,245,0.45)',textTransform:'uppercase',letterSpacing:0.7,fontFamily:FONT,marginBottom:10 }}>Pitch Breakdown</div>
+      {types.map(k=>{
+        const p=PT[k]; const v=stats.pitchTypes[k]||0; const pct=total?Math.round(v/total*100):0;
+        return <div key={k} style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
+          <div style={{ width:32,height:28,borderRadius:8,background:p.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
+            <span style={{ fontSize:13,fontWeight:800,color:p.color,fontFamily:FONT }}>{p.label}</span>
+          </div>
+          <div style={{ flex:1 }}>
+            <div style={{ height:6, borderRadius:3, background:'rgba(255,255,255,0.1)', overflow:'hidden' }}>
+              <div style={{ height:'100%', width:`${pct}%`, background:p.color, borderRadius:3, transition:'width 0.4s' }}/>
+            </div>
+          </div>
+          <div style={{ fontSize:13,fontWeight:700,color:'#fff',fontFamily:FONT,minWidth:30,textAlign:'right' }}>{v}</div>
+          <div style={{ fontSize:11,color:'rgba(235,235,245,0.4)',fontFamily:FONT,minWidth:28,textAlign:'right' }}>{pct}%</div>
+        </div>;
+      })}
+      <div onClick={onClose} style={{ marginTop:16,width:'100%',height:50,borderRadius:14,background:'rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:16,fontWeight:600,color:'#fff',fontFamily:FONT }}>Close</div>
+    </div>
+  </div>;
+}
+
+// ── Catcher section ────────────────────────────────────────────
+function CatcherSection({ pitcherPitches }) {
+  const [open,setOpen]=useState(false);
+  const inn=3, max=C_INN_MAX;
+  const warn=inn===max-1, maxed=inn>=max, pcCant=pitcherPitches>=PITCH_C_LIM;
+  return <div style={{ marginBottom:8 }}>
+    <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10 }}>
+      <div>
+        <div style={{ fontSize:11,fontWeight:700,color:C.text2,textTransform:'uppercase',letterSpacing:0.7,fontFamily:FONT }}>Catcher</div>
+        <div style={{ fontSize:16,fontWeight:700,color:C.text,fontFamily:FONT,letterSpacing:-0.3,marginTop:2 }}>R. Davis <span style={{color:C.text3,fontWeight:500}}>#2</span></div>
+      </div>
+      <SmallBtn onClick={()=>setOpen(o=>!o)}>{open?'Done':'Change'}</SmallBtn>
+    </div>
+    {open && <div style={{ background:C.card,borderRadius:14,marginBottom:12,overflow:'hidden',border:`1px solid ${C.sep}` }}>
+      {[{name:'R. Davis',num:'#2',inn:3},{name:'M. Flores',num:'#9',inn:0}].map((c,i)=>(
+        <div key={i} style={{ display:'flex',alignItems:'center',padding:'12px 14px',borderBottom:i===0?`1px solid ${C.sep}`:'none',cursor:'pointer' }}>
+          <div style={{ width:8,height:8,borderRadius:4,background:i===0?C.blue:'transparent',border:`2px solid ${i===0?C.blue:C.sep}`,marginRight:12,flexShrink:0 }}/>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:15,fontWeight:600,color:C.text,fontFamily:FONT }}>{c.name} <span style={{color:C.text3}}>{c.num}</span></div>
+            <div style={{ fontSize:12,color:C.text2,fontFamily:FONT }}>{c.inn} inning{c.inn!==1?'s':''} caught</div>
+          </div>
+          {i===0&&<div style={{ display:'inline-flex',alignItems:'center',gap:4,padding:'4px 10px',borderRadius:20,background:C.blueBg,color:C.blue,fontSize:12,fontWeight:600,fontFamily:FONT }}>Active</div>}
+        </div>
+      ))}
+    </div>}
+    <div style={{ background:maxed?C.redBg:C.card,borderRadius:14,padding:'12px 14px',border:`1px solid ${maxed?C.red+'40':warn?C.amber+'50':C.sep}`,display:'flex',alignItems:'center',justifyContent:'space-between' }}>
+      <div>
+        <div style={{ fontSize:12,color:maxed?C.red:C.text2,fontWeight:500,fontFamily:FONT }}>{maxed?'Inning limit reached':`${max-inn} inning${max-inn!==1?'s':''} remaining`}</div>
+        <div style={{ display:'flex',gap:5,marginTop:7 }}>
+          {Array.from({length:max}).map((_,i)=><div key={i} style={{ width:28,height:6,borderRadius:3,background:i<inn?(maxed?C.red:warn?C.amber:C.blue):'rgba(0,0,0,0.1)',transition:'background 0.3s' }}/>)}
+        </div>
+      </div>
+      <div style={{ textAlign:'right' }}>
+        <div style={{ fontSize:28,fontWeight:800,color:maxed?C.red:warn?C.amber:C.text,fontFamily:FONT,letterSpacing:-1 }}>{inn}</div>
+        <div style={{ fontSize:11,color:C.text2,fontFamily:FONT,fontWeight:600 }}>of {max} inn.</div>
+      </div>
+    </div>
+    {pcCant&&<div style={{marginTop:8}}><Alert type="warn">Active pitcher threw {pitcherPitches}+ pitches — ineligible to catch remainder of day.</Alert></div>}
+    {warn&&!maxed&&<div style={{marginTop:8}}><Alert type="warn">R. Davis is in their last allowed inning.</Alert></div>}
+    {maxed&&<div style={{marginTop:8}}><Alert type="danger">R. Davis reached the {max}-inning limit. Change catcher.</Alert></div>}
+  </div>;
+}
+
+// ── Game Screen ───────────────────────────────────────────────
+function GameScreen({ navigate, actionsRef, buttonMapping={}, mode='advanced' }) {
+  const MAX=50;
+  // Core state
+  const [count,setCount]=useState(14);
+  const [batter,setBatter]=useState(0);
+  const [homeScore,setHomeScore]=useState(3);
+  const [awayScore,setAwayScore]=useState(2);
+  const [inning,setInning]=useState(4);
+  const [isTop,setIsTop]=useState(true);
+  const [popped,setPopped]=useState(false);
+  const [showPitcherPicker,setShowPitcherPicker]=useState(false);
+  const [showMappingModal,setShowMappingModal]=useState(false);
+  const [localMapping,setLocalMapping]=useState(buttonMapping);
+  // Advanced mode state
+  const [balls,setBalls]=useState(0);
+  const [strikes,setStrikes]=useState(0);
+  const [outs,setOuts]=useState(1);
+  const [atBatLog,setAtBatLog]=useState([]);
+  const [showBIPModal,setShowBIPModal]=useState(false);
+  const [resultFlash,setResultFlash]=useState(null);
+  const [showStats,setShowStats]=useState(false);
+  const [pitcherStats,setPitcherStats]=useState({ ks:2,bbs:1,bips:3,pitchTypes:{B:6,CS:2,SS:2,F:2,BIP:2} });
+  // Undo — snapshot-based
+  const [snapStack,setSnapStack]=useState([]);
+
+  const snap = () => ({
+    count,batter,homeScore,awayScore,inning,isTop,popped,
+    balls,strikes,outs,atBatLog:[...atBatLog],
+    pitcherStats:{...pitcherStats,pitchTypes:{...pitcherStats.pitchTypes}},
+  });
+
+  const restore = (s) => {
+    setCount(s.count); setBatter(s.batter);
+    setHomeScore(s.homeScore); setAwayScore(s.awayScore);
+    setInning(s.inning); setIsTop(s.isTop);
+    setBalls(s.balls); setStrikes(s.strikes); setOuts(s.outs);
+    setAtBatLog(s.atBatLog); setPitcherStats(s.pitcherStats);
+  };
+
+  const pushSnap = () => setSnapStack(s=>[...s, snap()]);
+
+  const flashResult = (res, cb) => {
+    setResultFlash(res);
+    setTimeout(()=>{ setResultFlash(null); cb&&cb(); }, 900);
+  };
+
+  const nextBatterAuto = useCallback((result, newOuts) => {
+    setBalls(0); setStrikes(0); setBatter(0); setAtBatLog([]);
+    if (result==='K'||result==='OUT') {
+      const no = typeof newOuts==='number' ? newOuts : outs+1;
+      if (no>=3) {
+        flashResult('END', ()=>{ setOuts(0); setIsTop(t=>!t); setInning(i=>isTop?i:i+1); });
+      } else {
+        setOuts(no);
+      }
+    }
+  }, [outs, isTop]);
+
+  const handleBIP = (isOut) => {
+    setShowBIPModal(false);
+    if (isOut) {
+      const newOuts=outs+1;
+      flashResult(newOuts>=3?'END':'OUT', ()=>nextBatterAuto('OUT', newOuts));
+    } else {
+      flashResult('SAFE', ()=>nextBatterAuto('SAFE'));
+    }
+  };
+
+  const throwPitch = (type) => {
+    pushSnap();
+    const newCount=count+1, newBatter=batter+1;
+    setCount(newCount); setBatter(newBatter);
+    setAtBatLog(l=>[...l,type]);
+    setPitcherStats(st=>({...st, pitchTypes:{...st.pitchTypes,[type]:(st.pitchTypes[type]||0)+1}}));
+    setPopped(true); setTimeout(()=>setPopped(false),280);
+
+    if (type==='B') {
+      if (balls>=3) { flashResult('BB',()=>nextBatterAuto('BB')); }
+      else setBalls(b=>b+1);
+    } else if (type==='CS'||type==='SS') {
+      if (strikes>=2) {
+        setPitcherStats(st=>({...st,ks:st.ks+1}));
+        flashResult('K',()=>nextBatterAuto('K'));
+      } else setStrikes(s=>s+1);
+    } else if (type==='F') {
+      if (strikes<2) setStrikes(s=>s+1);
+    } else if (type==='BIP') {
+      setPitcherStats(st=>({...st,bips:st.bips+1}));
+      setShowBIPModal(true);
+    }
+  };
+
+  const addPitch = useCallback(()=>{ if(mode==='simple'){ pushSnap(); setCount(c=>c+1); setBatter(b=>b+1); setPopped(true); setTimeout(()=>setPopped(false),280); } }, [mode]);
+  const doNextBatter = useCallback(()=>{ pushSnap(); nextBatterAuto('SAFE'); }, [nextBatterAuto]);
+  const undo = useCallback(()=>{
+    setSnapStack(s=>{
+      if(!s.length)return s;
+      const prev=s[s.length-1];
+      restore(prev);
+      return s.slice(0,-1);
+    });
+  },[]);
+
+  useEffect(()=>{ if(actionsRef) actionsRef.current={addPitch,nextBatter:doNextBatter,undo}; },[actionsRef,addPitch,doNextBatter,undo]);
+
+  const cc=countColor(count,MAX);
+  const ri=count<=20?null:count<=35?{days:1,label:'1 day rest required'}:{days:2,label:'2 days rest required'};
+  const restColor=!ri?C.green:ri.days===1?C.amber:C.red;
+  const showWarn=count>=42&&count<MAX, showMax=count>=MAX;
+  const batWarn=batter>=6;
+
+  return <div style={{ height:'100%',display:'flex',flexDirection:'column',background:C.bg,overflow:'hidden',position:'relative' }}>
+    <Scoreboard homeTeam="Mustangs" awayTeam="Royals" homeScore={homeScore} awayScore={awayScore}
+      inning={inning} isTop={isTop} outs={outs} mode={mode}
+      onAdjHome={d=>{pushSnap();setHomeScore(s=>Math.max(0,s+d));}}
+      onAdjAway={d=>{pushSnap();setAwayScore(s=>Math.max(0,s+d));}}
+      onEndHalf={()=>{pushSnap();setOuts(0);setBalls(0);setStrikes(0);setBatter(0);setAtBatLog([]);setIsTop(t=>!t);setInning(i=>isTop?i:i+1);}}
+      onMenu={()=>setShowMappingModal(true)}/>
+
+    <div style={{ flex:1,overflowY:'auto',padding:'12px 16px 20px' }}>
+      {/* Pitcher row */}
+      <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10 }}>
+        <div>
+          <div style={{ fontSize:11,fontWeight:700,color:C.text2,textTransform:'uppercase',letterSpacing:0.7,fontFamily:FONT }}>Pitcher</div>
+          <div style={{ display:'flex',alignItems:'center',gap:8,marginTop:2 }}>
+            <div style={{ fontSize:17,fontWeight:700,color:C.text,fontFamily:FONT,letterSpacing:-0.3 }}>J. Martinez <span style={{color:C.text3,fontWeight:500}}>#14</span></div>
+            {/* Pitch count badge */}
+            <div style={{ display:'flex',alignItems:'center',gap:5,background:C.bg,borderRadius:10,padding:'3px 9px',border:`1px solid ${C.sep}` }}>
+              <div style={{ fontSize:16,fontWeight:800,color:cc,fontFamily:FONT,transform:popped?'scale(1.2)':'scale(1)',transition:'transform 0.22s cubic-bezier(.36,1.6,.5,1),color 0.3s' }}>{count}</div>
+              <div style={{ fontSize:10,color:C.text2,fontFamily:FONT,fontWeight:600 }}>pitches</div>
+            </div>
+            <div onClick={()=>setShowStats(true)} style={{ fontSize:12,color:C.blue,fontWeight:600,fontFamily:FONT,cursor:'pointer',padding:'4px 0' }}>Stats ›</div>
+          </div>
+          {ri&&<div style={{ fontSize:12,fontWeight:600,color:restColor,fontFamily:FONT,marginTop:2 }}>{ri.label}</div>}
+        </div>
+        <SmallBtn onClick={()=>setShowPitcherPicker(o=>!o)}>{showPitcherPicker?'Done':'Change'}</SmallBtn>
+      </div>
+
+      {showPitcherPicker&&<div style={{ background:C.card,borderRadius:14,marginBottom:10,overflow:'hidden',border:`1px solid ${C.sep}` }}>
+        {[{name:'J. Martinez',num:'#14',pitches:count},{name:'T. Williams',num:'#7',pitches:12}].map((p,i)=>(
+          <div key={i} style={{ display:'flex',alignItems:'center',padding:'12px 14px',borderBottom:i===0?`1px solid ${C.sep}`:'none',cursor:'pointer' }}>
+            <div style={{ width:8,height:8,borderRadius:4,background:i===0?C.blue:'transparent',border:`2px solid ${i===0?C.blue:C.sep}`,marginRight:12,flexShrink:0 }}/>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:15,fontWeight:600,color:C.text,fontFamily:FONT }}>{p.name} <span style={{color:C.text3}}>{p.num}</span></div>
+              <div style={{ fontSize:12,color:C.text2,fontFamily:FONT }}>{p.pitches} pitches</div>
+            </div>
+            {i===0&&<div style={{ display:'inline-flex',padding:'4px 10px',borderRadius:20,background:C.blueBg,color:C.blue,fontSize:12,fontWeight:600,fontFamily:FONT }}>Active</div>}
+          </div>
+        ))}
+      </div>}
+
+      {/* Advanced mode: count + pitch grid */}
+      {mode==='advanced' && <>
+        <CountDisplay balls={balls} strikes={strikes} atBatLog={atBatLog}/>
+        {batWarn&&!showWarn&&!showMax&&<Alert type="warn">At-bat pitch count is {batter} — verify or manually advance batter.</Alert>}
+        {showWarn&&<Alert type="warn">{count} pitches — approaching {MAX}-pitch limit. {MAX-count} remain.</Alert>}
+        {showMax&&<Alert type="danger">{count} pitches — {count-MAX} over limit. Notify coach.</Alert>}
+        <PitchTypeGrid onPitch={throwPitch} disabled={!!resultFlash||showBIPModal}/>
+        <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4 }}>
+          <SmallBtn onClick={undo} style={{ opacity:snapStack.length?1:0.35 }}>↩ Undo</SmallBtn>
+          <SmallBtn onClick={doNextBatter}>Next batter (manual)</SmallBtn>
+        </div>
+      </>}
+
+      {/* Simple mode: classic big buttons */}
+      {mode==='simple' && <>
+        <div style={{ background:C.card,borderRadius:20,padding:'18px 16px 16px',marginBottom:12,textAlign:'center',boxShadow:'0 1px 0 rgba(0,0,0,0.05)' }}>
+          <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14 }}>
+            <div style={{ fontSize:12,fontWeight:600,color:C.text2,fontFamily:FONT,textTransform:'uppercase',letterSpacing:0.5 }}>This at-bat</div>
+            <div style={{ fontSize:20,fontWeight:800,fontFamily:FONT,color:batWarn?C.amber:C.text,letterSpacing:-0.5 }}>{batter}</div>
+          </div>
+          <div style={{ width:'100%',height:1,background:C.sep,marginBottom:14 }}/>
+          <div style={{ fontSize:88,fontWeight:900,color:cc,fontFamily:FONT,lineHeight:1,letterSpacing:-4,transform:popped?'scale(1.12)':'scale(1)',transition:'transform 0.22s cubic-bezier(.36,1.6,.5,1),color 0.3s' }}>{count}</div>
+          <div style={{ fontSize:13,color:C.text2,fontFamily:FONT,marginTop:4 }}>of {MAX} max pitches</div>
+          {ri&&<div style={{ fontSize:13,fontWeight:700,color:restColor,fontFamily:FONT,marginTop:6 }}>{ri.label}</div>}
+          <div style={{ display:'flex',gap:3,flexWrap:'wrap',justifyContent:'center',marginTop:14 }}>
+            {Array.from({length:count}).map((_,i)=><div key={i} style={{ width:6,height:6,borderRadius:3,background:i<count-batter?'rgba(0,0,0,0.12)':cc,opacity:0.7 }}/>)}
+          </div>
+        </div>
+        {batWarn&&<Alert type="warn">At-bat pitch count is {batter} — verify or press Next Batter.</Alert>}
+        {showWarn&&<Alert type="warn">{count} pitches — {MAX-count} remain.</Alert>}
+        {showMax&&<Alert type="danger">{count} pitches — {count-MAX} over limit.</Alert>}
+        <div style={{ display:'flex',flexDirection:'column',gap:10,marginBottom:10 }}>
+          <BigBtn color={C.blue} onClick={addPitch}>+ Pitch</BigBtn>
+          <BigBtn color={C.green} small onClick={doNextBatter}>Next batter ›</BigBtn>
+          <div style={{ display:'flex',justifyContent:'center' }}>
+            <SmallBtn onClick={undo} style={{ opacity:snapStack.length?1:0.35 }}>↩ Undo</SmallBtn>
+          </div>
+        </div>
+      </>}
+
+      <div style={{ height:1,background:C.sep,marginBottom:12 }}/>
+      <CatcherSection pitcherPitches={count}/>
+
+      {/* Physical button hint */}
+      {(buttonMapping.volUp||buttonMapping.volDown||buttonMapping.action)&&<div style={{ display:'flex',gap:6,justifyContent:'center',flexWrap:'wrap',padding:'8px 0 4px' }}>
+        {[{key:'action',label:'Action'},{key:'volUp',label:'Vol +'},{key:'volDown',label:'Vol −'}].map(({key,label})=>{
+          const m=buttonMapping[key]; if(!m||m==='none')return null;
+          const info=BTN_ACTIONS[m];
+          return <div key={key} style={{ display:'flex',alignItems:'center',gap:5,background:`${info.color}18`,border:`1px solid ${info.color}40`,borderRadius:20,padding:'4px 10px' }}>
+            <div style={{ fontSize:10,fontWeight:700,color:C.text2,fontFamily:FONT }}>{label}</div>
+            <div style={{ width:3,height:3,borderRadius:2,background:info.color }}/>
+            <div style={{ fontSize:11,fontWeight:700,color:info.color,fontFamily:FONT }}>{info.label}</div>
+          </div>;
+        })}
+      </div>}
+    </div>
+
+    {showBIPModal&&<BIPModal outs={outs} onSelect={handleBIP}/>}
+    <ResultFlash result={resultFlash}/>
+    {showStats&&<PitcherStatsModal stats={pitcherStats} pitcherName="J. Martinez #14" total={count} onClose={()=>setShowStats(false)}/>}
+    {showMappingModal&&<ButtonMappingModal mapping={localMapping} onChange={setLocalMapping} onClose={()=>setShowMappingModal(false)}/>}
+  </div>;
+}
+
+// ── Button Mapping Modal ──────────────────────────────────────
+function ButtonMappingModal({ mapping, onChange, onClose }) {
+  const btns=[{key:'action',label:'Action Button',sub:'Top-left (iPhone 15 Pro+)'},{key:'volUp',label:'Volume Up',sub:'Left side upper'},{key:'volDown',label:'Volume Down',sub:'Left side lower'}];
+  const options=['pitch','nextBatter','undo','none'];
+  return <div style={{ position:'absolute',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'flex-end',justifyContent:'center',zIndex:200,borderRadius:48 }} onClick={onClose}>
+    <div style={{ background:'#1C1C1E',borderRadius:'24px 24px 0 0',padding:'20px 20px 40px',width:'100%' }} onClick={e=>e.stopPropagation()}>
+      <div style={{ width:36,height:4,borderRadius:2,background:'rgba(255,255,255,0.2)',margin:'0 auto 18px' }}/>
+      <div style={{ fontSize:17,fontWeight:700,color:'#fff',fontFamily:FONT,marginBottom:4 }}>Physical Button Mapping</div>
+      <div style={{ fontSize:13,color:C.label,fontFamily:FONT,marginBottom:18,lineHeight:1.4 }}>Assign hardware buttons to scorer actions.</div>
+      {btns.map(({key,label,sub})=>(
+        <div key={key} style={{ marginBottom:16 }}>
+          <div style={{ fontSize:12,fontWeight:700,color:'rgba(235,235,245,0.6)',textTransform:'uppercase',letterSpacing:0.6,fontFamily:FONT,marginBottom:2 }}>{label}</div>
+          <div style={{ fontSize:11,color:'rgba(235,235,245,0.35)',fontFamily:FONT,marginBottom:8 }}>{sub}</div>
+          <div style={{ display:'flex',gap:6 }}>
+            {options.map(opt=>{
+              const sel=mapping[key]===opt, info=BTN_ACTIONS[opt];
+              return <div key={opt} onClick={()=>onChange({...mapping,[key]:opt})} style={{ flex:1,textAlign:'center',padding:'8px 4px',borderRadius:10,background:sel?info.color:'rgba(255,255,255,0.08)',border:`1px solid ${sel?'transparent':'rgba(255,255,255,0.1)'}`,cursor:'pointer',transition:'background 0.15s' }}>
+                <div style={{ fontSize:11,fontWeight:700,color:sel?'#fff':'rgba(235,235,245,0.6)',fontFamily:FONT }}>{info.label}</div>
+              </div>;
+            })}
+          </div>
+        </div>
+      ))}
+      <div onClick={onClose} style={{ marginTop:8,width:'100%',height:50,borderRadius:14,background:'rgba(255,255,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:16,fontWeight:600,color:'#fff',fontFamily:FONT }}>Done</div>
+    </div>
+  </div>;
+}
+
+// ── History Screen ─────────────────────────────────────────────
+function HistoryScreen({ navigate }) {
+  const games=[
+    {id:1,live:true, home:'Mustangs',away:'Royals', hs:3,as:2,date:'Today',  mode:'advanced',rest:[{name:'J. Martinez',days:2,pitches:47}]},
+    {id:2,live:false,home:'Eagles',  away:'Tigers', hs:5,as:4,date:'Apr 16', mode:'advanced',rest:[{name:'C. Johnson',days:1,pitches:34},{name:'K. Lee',days:2,pitches:48}]},
+    {id:3,live:false,home:'Mustangs',away:'Eagles', hs:2,as:6,date:'Apr 12', mode:'simple', rest:[]},
+  ];
+  return <div style={{ background:C.bg,height:'100%',overflowY:'auto' }}>
+    <div style={{ paddingTop:58 }}>
+      <div style={{ display:'flex',alignItems:'flex-end',justifyContent:'space-between',padding:'10px 20px 12px' }}>
+        <div style={{ fontSize:34,fontWeight:800,color:C.text,fontFamily:FONT,letterSpacing:-0.5 }}>Games</div>
+        <div onClick={()=>navigate('setup')} style={{ background:C.blue,color:'#fff',borderRadius:12,padding:'9px 16px',fontSize:15,fontWeight:700,cursor:'pointer',fontFamily:FONT }}>+ New Game</div>
+      </div>
+      <div style={{ height:1,background:C.sep,margin:'0 20px' }}/>
+    </div>
+    <div style={{ padding:'12px 16px 100px',display:'flex',flexDirection:'column',gap:10 }}>
+      {games.map(g=>(
+        <div key={g.id} style={{ background:C.card,borderRadius:18,boxShadow:'0 1px 0 rgba(0,0,0,0.05),0 2px 8px rgba(0,0,0,0.06)',overflow:'hidden' }}>
+          <div style={{ padding:'14px 16px 10px' }}>
+            <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8 }}>
+              <div style={{ display:'flex',alignItems:'center',gap:8 }}>
+                <span style={{ fontSize:15,fontWeight:700,color:C.text,fontFamily:FONT }}>{g.away} vs {g.home}</span>
+                {g.live&&<div style={{ display:'flex',alignItems:'center',gap:4,background:'#FF3B3015',borderRadius:6,padding:'2px 7px' }}><div style={{ width:6,height:6,borderRadius:3,background:C.red }}/><span style={{ fontSize:11,fontWeight:700,color:C.red,fontFamily:FONT }}>LIVE</span></div>}
+                <div style={{ fontSize:10,fontWeight:600,background:g.mode==='advanced'?C.blueBg:C.bg,color:g.mode==='advanced'?C.blue:C.text2,padding:'2px 7px',borderRadius:6,fontFamily:FONT,textTransform:'uppercase',letterSpacing:0.4 }}>{g.mode==='advanced'?'Advanced':'Simple'}</div>
+              </div>
+              <span style={{ fontSize:13,color:C.text2,fontFamily:FONT }}>{g.date}</span>
+            </div>
+            <div style={{ display:'inline-flex',alignItems:'center',gap:10,background:C.bg,borderRadius:10,padding:'6px 14px' }}>
+              <div style={{ textAlign:'center' }}><div style={{ fontSize:10,fontWeight:600,color:C.text2,textTransform:'uppercase',letterSpacing:0.5,fontFamily:FONT }}>{g.away}</div><div style={{ fontSize:22,fontWeight:800,color:C.text,fontFamily:FONT,lineHeight:1.2 }}>{g.as}</div></div>
+              <div style={{ fontSize:16,color:C.text3,fontFamily:FONT }}>—</div>
+              <div style={{ textAlign:'center' }}><div style={{ fontSize:10,fontWeight:600,color:C.text2,textTransform:'uppercase',letterSpacing:0.5,fontFamily:FONT }}>{g.home}</div><div style={{ fontSize:22,fontWeight:800,color:C.text,fontFamily:FONT,lineHeight:1.2 }}>{g.hs}</div></div>
+            </div>
+          </div>
+          {g.rest.length>0&&<div style={{ borderTop:`1px solid ${C.sep}`,padding:'10px 16px' }}>
+            <div style={{ fontSize:10,fontWeight:700,textTransform:'uppercase',letterSpacing:0.6,color:C.text2,marginBottom:7,fontFamily:FONT }}>Rest required</div>
+            {g.rest.map((r,i)=><div key={i} style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:i<g.rest.length-1?5:0 }}>
+              <div style={{ fontSize:14,fontWeight:500,color:C.text,fontFamily:FONT }}>{r.name} <span style={{ color:C.text2,fontWeight:400,fontSize:13 }}>· {r.pitches} pitches</span></div>
+              <div style={{ padding:'3px 10px',borderRadius:8,background:r.days>=2?C.redBg:C.amberBg,color:r.days>=2?C.red:C.amber,fontSize:12,fontWeight:700,fontFamily:FONT }}>{r.days}d rest</div>
+            </div>)}
+          </div>}
+          <div style={{ borderTop:`1px solid ${C.sep}`,padding:'10px 12px',display:'flex',gap:8 }}>
+            {g.live?<div onClick={()=>navigate('game')} style={{ flex:1,background:C.blue,color:'#fff',borderRadius:10,padding:'8px 0',textAlign:'center',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:FONT }}>Resume</div>:<div style={{ flex:1,background:C.bg,color:C.text,borderRadius:10,padding:'8px 0',textAlign:'center',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:FONT }}>View stats</div>}
+            <div style={{ flex:1,background:C.bg,color:C.text,borderRadius:10,padding:'8px 0',textAlign:'center',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:FONT }}>Summary</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>;
+}
+
+// ── Setup Screen ───────────────────────────────────────────────
+function SetupScreen({ navigate }) {
+  const [gameMode,setGameMode]=useState('advanced');
+  return <div style={{ background:C.bg,height:'100%',overflowY:'auto',paddingBottom:40 }}>
+    <div style={{ paddingTop:58,padding:'58px 16px 0' }}>
+      <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20 }}>
+        <SmallBtn onClick={()=>navigate('history')}>‹ Games</SmallBtn>
+        <div style={{ fontSize:17,fontWeight:700,color:C.text,fontFamily:FONT }}>New Game</div>
+        <div style={{ width:70 }}/>
+      </div>
+    </div>
+    <div style={{ padding:'0 16px',display:'flex',flexDirection:'column',gap:20 }}>
+      {/* Mode selector */}
+      <div>
+        <div style={{ fontSize:13,fontWeight:600,color:C.text2,textTransform:'uppercase',letterSpacing:0.6,marginBottom:10,padding:'0 4px',fontFamily:FONT }}>Tracking Mode</div>
+        <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:10 }}>
+          {[
+            {id:'simple', title:'Simple', sub:'Pitch count only', icon:'#'},
+            {id:'advanced',title:'Advanced',sub:'Track every pitch type',icon:'B·K·F'},
+          ].map(m=>{
+            const sel=gameMode===m.id;
+            return <div key={m.id} onClick={()=>setGameMode(m.id)} style={{ background:sel?C.blue:C.card, borderRadius:16, padding:'16px 14px', cursor:'pointer', border:`2px solid ${sel?C.blue:C.sep}`, transition:'all 0.15s' }}>
+              <div style={{ fontSize:22,fontWeight:900,color:sel?'rgba(255,255,255,0.85)':C.text3,fontFamily:FONT,marginBottom:6 }}>{m.icon}</div>
+              <div style={{ fontSize:15,fontWeight:700,color:sel?'#fff':C.text,fontFamily:FONT,marginBottom:3 }}>{m.title}</div>
+              <div style={{ fontSize:12,color:sel?'rgba(255,255,255,0.7)':C.text2,fontFamily:FONT,lineHeight:1.4 }}>{m.sub}</div>
+            </div>;
+          })}
+        </div>
+        {gameMode==='advanced'&&<div style={{ background:C.blueBg,borderRadius:12,padding:'10px 13px',marginTop:10,display:'flex',gap:8 }}>
+          <div style={{ fontSize:12,color:'#0050CC',fontFamily:FONT,lineHeight:1.5 }}><strong>Advanced mode</strong> tracks B, K̲, K, F, and balls in play. Outs and innings advance automatically.</div>
+        </div>}
+      </div>
+      {/* Game info */}
+      <div>
+        <div style={{ fontSize:13,fontWeight:600,color:C.text2,textTransform:'uppercase',letterSpacing:0.6,marginBottom:8,padding:'0 4px',fontFamily:FONT }}>Game Info</div>
+        <div style={{ background:C.card,borderRadius:14,overflow:'hidden',boxShadow:'0 1px 0 rgba(0,0,0,0.04)' }}>
+          {[{l:'Date',v:'April 19, 2026'},{l:'Time',v:'10:00 AM'},{l:'Field',v:'Field 3'},{l:'Home Team',v:'',ph:'Home team name'},{l:'Away Team',v:'',ph:'Away team name',last:true}].map((r,i,arr)=>(
+            <div key={i} style={{ display:'flex',alignItems:'center',minHeight:52,padding:'0 16px',borderBottom:r.last?'none':`1px solid ${C.sep}` }}>
+              <div style={{ flex:'0 0 110px',fontSize:16,fontWeight:500,color:C.text,fontFamily:FONT,letterSpacing:-0.3 }}>{r.l}</div>
+              <div style={{ flex:1,fontSize:16,color:r.v?C.text:C.text3,fontFamily:FONT,letterSpacing:-0.3 }}>{r.v||r.ph}</div>
+              <svg width="8" height="13" viewBox="0 0 8 13"><path d="M1 1l6 5.5-6 5.5" stroke="rgba(60,60,67,0.3)" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Roster */}
+      {['Home Team','Away Team'].map((team,ti)=>(
+        <div key={ti}>
+          <div style={{ fontSize:13,fontWeight:600,color:C.text2,textTransform:'uppercase',letterSpacing:0.6,marginBottom:8,padding:'0 4px',fontFamily:FONT }}>{team}</div>
+          <div style={{ background:C.card,borderRadius:14,overflow:'hidden' }}>
+            {[{l:'Pitcher',ph:'Name  #'},{l:'Catcher',ph:'Name  #',last:true}].map((r,i)=>(
+              <div key={i} style={{ display:'flex',alignItems:'center',minHeight:52,padding:'0 16px',borderBottom:r.last?'none':`1px solid ${C.sep}` }}>
+                <div style={{ flex:'0 0 80px',fontSize:16,fontWeight:500,color:C.text,fontFamily:FONT }}>{r.l}</div>
+                <div style={{ flex:1,fontSize:16,color:C.text3,fontFamily:FONT }}>{r.ph}</div>
+                <svg width="8" height="13" viewBox="0 0 8 13"><path d="M1 1l6 5.5-6 5.5" stroke="rgba(60,60,67,0.3)" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      <div onClick={()=>navigate('game')} style={{ background:C.blue,borderRadius:16,height:56,display:'flex',alignItems:'center',justifyContent:'center',fontSize:17,fontWeight:700,color:'#fff',cursor:'pointer',fontFamily:FONT }}>Start Game</div>
+    </div>
+  </div>;
+}
+
+// ── Summary Screen ─────────────────────────────────────────────
+function SummaryScreen({ navigate }) {
+  const [statsOpen,setStatsOpen]=useState(false);
+  const [statsPitcher,setStatsPitcher]=useState(null);
+  const mockStats={ks:5,bbs:2,bips:8,pitchTypes:{B:18,CS:6,SS:5,F:8,BIP:8}};
+  return <div style={{ background:C.bg,height:'100%',overflowY:'auto',paddingBottom:60,position:'relative' }}>
+    <div style={{ paddingTop:58,padding:'58px 16px 0' }}>
+      <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20 }}>
+        <SmallBtn onClick={()=>navigate('game')}>‹ Game</SmallBtn>
+        <div style={{ fontSize:17,fontWeight:700,color:C.text,fontFamily:FONT }}>Summary</div>
+        <div style={{ width:70 }}/>
+      </div>
+    </div>
+    <div style={{ padding:'0 16px',display:'flex',flexDirection:'column',gap:16 }}>
+      {/* Final score */}
+      <div style={{ background:C.dark,borderRadius:18,padding:'18px 20px' }}>
+        <div style={{ fontSize:11,fontWeight:700,color:C.label,textTransform:'uppercase',letterSpacing:0.8,fontFamily:FONT,marginBottom:12 }}>Final · Apr 19 · Field 3</div>
+        <div style={{ display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center' }}>
+          <div><div style={{ fontSize:11,fontWeight:700,color:C.label,textTransform:'uppercase',letterSpacing:0.6,marginBottom:4,fontFamily:FONT }}>Royals</div><div style={{ fontSize:44,fontWeight:800,color:'#fff',letterSpacing:-2,fontFamily:FONT }}>2</div></div>
+          <div style={{ fontSize:24,color:'rgba(255,255,255,0.2)',fontFamily:FONT,padding:'0 12px',alignSelf:'flex-end',paddingBottom:6 }}>—</div>
+          <div style={{ textAlign:'right' }}><div style={{ fontSize:11,fontWeight:700,color:C.label,textTransform:'uppercase',letterSpacing:0.6,marginBottom:4,fontFamily:FONT }}>Mustangs</div><div style={{ fontSize:44,fontWeight:800,color:'#fff',letterSpacing:-2,fontFamily:FONT }}>3</div></div>
+        </div>
+      </div>
+      {/* Pitchers — league report */}
+      {['Mustangs','Royals'].map((team,ti)=>(
+        <div key={ti}>
+          <div style={{ fontSize:13,fontWeight:600,color:C.text2,textTransform:'uppercase',letterSpacing:0.6,marginBottom:8,padding:'0 4px',fontFamily:FONT }}>{team} — Pitchers</div>
+          <div style={{ background:C.card,borderRadius:14,overflow:'hidden' }}>
+            {([ti===0?[{name:'J. Martinez #14',pitches:47,inn:4,rest:'2 days',rc:C.red}]:[{name:'D. Lopez #3',pitches:18,inn:2,rest:'No rest',rc:C.green}]])[0].map((p,i,arr)=>(
+              <div key={i} style={{ display:'flex',alignItems:'center',padding:'13px 16px',borderBottom:i<arr.length-1?`1px solid ${C.sep}`:'none' }}>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontSize:15,fontWeight:600,color:C.text,fontFamily:FONT }}>{p.name}</div>
+                  <div style={{ fontSize:13,color:C.text2,fontFamily:FONT,marginTop:2 }}>{p.inn} innings · last batter: 4</div>
+                </div>
+                <div style={{ textAlign:'right',marginRight:10 }}>
+                  <div style={{ fontSize:24,fontWeight:800,color:C.text,fontFamily:FONT,letterSpacing:-0.5 }}>{p.pitches}</div>
+                  <div style={{ fontSize:12,fontWeight:600,color:p.rc,fontFamily:FONT,marginTop:1 }}>{p.rest}</div>
+                </div>
+                {/* Advanced stats button */}
+                <div onClick={()=>{setStatsPitcher(p.name);setStatsOpen(true);}} style={{ padding:'7px 12px',borderRadius:10,background:C.blueBg,color:C.blue,fontSize:12,fontWeight:700,cursor:'pointer',fontFamily:FONT,flexShrink:0 }}>Stats</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      {/* Umpire */}
+      <div>
+        <div style={{ fontSize:13,fontWeight:600,color:C.text2,textTransform:'uppercase',letterSpacing:0.6,marginBottom:8,padding:'0 4px',fontFamily:FONT }}>Umpire Notes</div>
+        <div style={{ background:C.card,borderRadius:14,overflow:'hidden' }}>
+          {[{l:'Plate ump.',ph:'Name'},{l:'Issues?',v:'None',last:true}].map((r,i)=>(
+            <div key={i} style={{ display:'flex',alignItems:'center',minHeight:52,padding:'0 16px',borderBottom:r.last?'none':`1px solid ${C.sep}` }}>
+              <div style={{ flex:'0 0 100px',fontSize:16,fontWeight:500,color:C.text,fontFamily:FONT }}>{r.l}</div>
+              <div style={{ flex:1,fontSize:16,color:r.v?C.text:C.text3,fontFamily:FONT }}>{r.v||r.ph}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ display:'flex',gap:10 }}>
+        <div style={{ flex:1,background:C.blue,borderRadius:14,height:52,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,fontWeight:700,color:'#fff',cursor:'pointer',fontFamily:FONT }}>Generate Report</div>
+        <div style={{ flex:1,background:C.green,borderRadius:14,height:52,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,fontWeight:700,color:'#fff',cursor:'pointer',fontFamily:FONT }}>End &amp; Save</div>
+      </div>
+    </div>
+    {statsOpen&&<PitcherStatsModal stats={mockStats} pitcherName={statsPitcher} total={47} onClose={()=>setStatsOpen(false)}/>}
+  </div>;
+}
+
+// ── Physical button overlay ────────────────────────────────────
+function PhysicalButtonTab({ top, height, btnLabel, mapping, active }) {
+  const info=BTN_ACTIONS[mapping]||BTN_ACTIONS.none, isOn=mapping!=='none';
+  return <React.Fragment>
+    <div style={{ position:'absolute',top,left:-14,width:14,height,borderRadius:'4px 0 0 4px',background:active?info.color:isOn?'#555':'#3A3A3C',boxShadow:active?`0 0 18px ${info.color}aa`:'none',transition:'background 0.1s,box-shadow 0.18s',zIndex:10 }}/>
+    <div style={{ position:'absolute',top:top+height/2,left:-138,transform:'translateY(-50%)',background:active?info.color:'rgba(40,40,44,0.88)',backdropFilter:'blur(10px)',borderRadius:10,padding:'5px 10px',width:116,textAlign:'right',border:`1px solid ${active?'transparent':'rgba(255,255,255,0.07)'}`,transition:'background 0.15s',zIndex:10 }}>
+      <div style={{ fontSize:9,fontWeight:700,color:'rgba(255,255,255,0.45)',textTransform:'uppercase',letterSpacing:0.6,fontFamily:FONT,marginBottom:1 }}>{btnLabel}</div>
+      <div style={{ fontSize:12,fontWeight:700,color:'#fff',fontFamily:FONT }}>{isOn?info.label:'—'}</div>
+    </div>
+  </React.Fragment>;
+}
+
+// ── Screen tabs ────────────────────────────────────────────────
+function ScreenTabs({ active, onChange }) {
+  return <div style={{ display:'flex',gap:6,background:'rgba(0,0,0,0.12)',borderRadius:12,padding:4 }}>
+    {[{id:'history',l:'History'},{id:'game',l:'Game'},{id:'setup',l:'Setup'},{id:'summary',l:'Summary'}].map(t=>(
+      <div key={t.id} onClick={()=>onChange(t.id)} style={{ padding:'7px 16px',borderRadius:9,cursor:'pointer',background:active===t.id?'#fff':'transparent',fontSize:13,fontWeight:600,color:active===t.id?C.text:'rgba(0,0,0,0.5)',fontFamily:FONT,boxShadow:active===t.id?'0 1px 3px rgba(0,0,0,0.12)':'none',transition:'all 0.15s' }}>{t.l}</div>
+    ))}
+  </div>;
+}
+
+// ── App ────────────────────────────────────────────────────────
+function App() {
+  const [screen,setScreen]=useState('game');
+  const [gameMode,setGameMode]=useState('advanced');
+  const [buttonMapping,setButtonMapping]=useState({volUp:'pitch',volDown:'undo',action:'nextBatter'});
+  const [activeButton,setActiveButton]=useState(null);
+  const gameActionsRef=useRef({});
+
+  const flashBtn=(key)=>{ setActiveButton(key); setTimeout(()=>setActiveButton(null),300); };
+
+  useEffect(()=>{
+    const onKey=(e)=>{
+      if(screen!=='game')return;
+      const a=gameActionsRef.current;
+      const fire=(mapping)=>{ if(mapping==='pitch'&&a.addPitch)a.addPitch(); else if(mapping==='nextBatter'&&a.nextBatter)a.nextBatter(); else if(mapping==='undo'&&a.undo)a.undo(); };
+      if(e.key==='ArrowUp'||e.key==='v'){ e.preventDefault(); flashBtn('volUp'); fire(buttonMapping.volUp); }
+      else if(e.key==='ArrowDown'||e.key==='b'){ e.preventDefault(); flashBtn('volDown'); fire(buttonMapping.volDown); }
+      else if((e.key===' '||e.key==='Enter')&&e.target.tagName!=='INPUT'){ e.preventDefault(); flashBtn('action'); fire(buttonMapping.action); }
+    };
+    window.addEventListener('keydown',onKey);
+    return()=>window.removeEventListener('keydown',onKey);
+  },[screen,buttonMapping]);
+
+  useEffect(()=>{
+    const l=(e)=>{ if(e.data?.type==='__activate_edit_mode'){}; };
+    window.addEventListener('message',l);
+    window.parent.postMessage({type:'__edit_mode_available'},'*');
+    return()=>window.removeEventListener('message',l);
+  },[]);
+
+  const isDark=screen==='game';
+  const DEVICE_W=390, DEVICE_H=844;
+
+  return <div style={{ display:'flex',flexDirection:'column',alignItems:'center',gap:20 }}>
+    <div style={{ fontSize:13,fontWeight:600,color:'rgba(0,0,0,0.4)',textTransform:'uppercase',letterSpacing:1,fontFamily:FONT }}>Simple Pitch Counter — v2 · Advanced Mode</div>
+    <div style={{ position:'relative',width:DEVICE_W,height:DEVICE_H }}>
+      <IOSDevice width={DEVICE_W} height={DEVICE_H} dark={isDark}>
+        {screen==='game'    && <GameScreen navigate={setScreen} actionsRef={gameActionsRef} buttonMapping={buttonMapping} mode={gameMode}/>}
+        {screen==='history' && <HistoryScreen navigate={setScreen}/>}
+        {screen==='setup'   && <SetupScreen navigate={setScreen}/>}
+        {screen==='summary' && <SummaryScreen navigate={setScreen}/>}
+      </IOSDevice>
+      {screen==='game'&&<React.Fragment>
+        <PhysicalButtonTab top={124} height={32} btnLabel="Action" mapping={buttonMapping.action} active={activeButton==='action'}/>
+        <PhysicalButtonTab top={182} height={44} btnLabel="Vol +"  mapping={buttonMapping.volUp}   active={activeButton==='volUp'}/>
+        <PhysicalButtonTab top={242} height={44} btnLabel="Vol −"  mapping={buttonMapping.volDown} active={activeButton==='volDown'}/>
+      </React.Fragment>}
+    </div>
+    <ScreenTabs active={screen} onChange={setScreen}/>
+    <div style={{ fontSize:12,color:'rgba(0,0,0,0.38)',fontFamily:FONT,textAlign:'center',lineHeight:1.8 }}>
+      {screen==='game'
+        ? <><kbd>↑</kbd> Vol+  ·  <kbd>↓</kbd> Vol−  ·  <kbd>Space</kbd> Action  ·  ≡ menu → Button Mapping</>
+        : 'Tap tabs to explore · Game screen shows Advanced mode'}
+    </div>
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
