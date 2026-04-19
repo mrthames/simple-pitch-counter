@@ -12,6 +12,8 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 ### Key features
 
 - **Two tracking modes** — Simple mode (tap-to-count) for basic pitch counting, or Advanced mode with per-pitch type tracking (Ball, Called K, Swing K, Foul, Ball in Play)
+- **Out tracking in both modes** — out dots display in the header next to the inning pill; Simple mode has a dedicated `+ Out` button; 3 outs triggers an end-of-half confirmation modal
+- **Mercy rule auto-prompt** — when runs scored in a half inning reach the configured mercy limit, a modal prompts to end the half or continue playing; tracks runs from either team
 - **Advanced pitch tracking** — tracks balls, strikes, and outs automatically; records pitch-by-pitch sequences per at-bat with visual chips; auto-advances count on walks, strikeouts, and balls in play
 - **Ball in play outcomes** — when a ball is put in play, a bottom sheet prompts for Safe/Out with automatic out tracking and side-retired detection
 - **Live pitcher stats** — dark-themed bottom sheet showing K, BB, BIP totals and a full pitch type breakdown with percentage bars
@@ -25,6 +27,8 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 - **Swipe-to-delete history** — swipe game cards left to reveal delete action; history cards show mode badge (Simple/Advanced) and live game indicator
 - **Game history** — review past games, pitcher rest requirements, and stats
 - **Result flash animations** — full-screen animated overlays for strikeouts, walks, outs, safe calls, and side retired
+- **Data export/import** — export all game data as JSON (via Share Sheet on iOS) and import backups from the history menu
+- **Pitch dot visualization** — dots below the hero count alternate shading per batter to show at-bat boundaries at a glance
 - **Fully offline** — no account, no internet, no ads. All data stays on your device via localStorage
 
 ### Game summary output

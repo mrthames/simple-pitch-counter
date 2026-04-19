@@ -4,6 +4,37 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-04-19] Simple mode outs, mercy rule, UI refinements
+
+**Files:** `index.html`, `ViewController.swift`, `website/index.html`
+
+### Simple mode outs tracking
+- **Outs in header** — out dots now display next to the inning pill in the dark header for both Simple and Advanced modes, with fielding team label shown below
+- **+ Out button** — simple mode has an `+ Out` action alongside Undo and Next Batter, using link-style secondary buttons matching Advanced mode
+- **3-out end-of-half** — accumulating 3 outs in simple mode triggers the same end-of-half confirmation modal as Advanced mode
+
+### Mercy rule auto-prompt
+- **Mercy modal** — when runs scored in a half inning reach the configured mercy limit, a confirmation modal prompts to end the half or continue playing
+- **Either-team tracking** — mercy rule now tracks total runs by either team in the half inning (not just the batting team), preventing cases where scoring the fielding team didn't trigger the alert
+- **`halfInningRuns` initialized** — game object now explicitly initializes `halfInningRuns: 0` at game creation
+
+### UI fixes
+- **Score button layout** — both teams now show `− score +` (minus left, plus right) instead of the previous mirrored layout
+- **Pitch dot batter shading** — dots below the hero number alternate between darker and lighter gray per batter, making at-bat boundaries visible without separators; current batter's dots use the pitch count color
+- **Alert spacing** — simple mode alerts area reserves a fixed `min-height` to prevent layout shift when warnings appear
+- **Next batter button** — replaced broken big green button with link-style secondary buttons matching Advanced mode layout
+- **Alerts position** — moved from below the hero card to below the pitcher section, matching Advanced mode placement
+
+### Website updates
+- Score buttons standardized (minus left, plus right for both teams)
+- Fielding team label added below outs in mockup header
+- `+ Out` added to secondary button row in mockup
+
+### Test coverage
+- Added 13 new E2E tests covering simple mode outs, mercy modal interactions, outs in header, fielding label, and umpire field clearing (78 → 91 total tests)
+
+---
+
 ## [2026-04-19] V2 Redesign — Claude Design rebuild
 
 **Files:** `index.html`, `ViewController.swift`

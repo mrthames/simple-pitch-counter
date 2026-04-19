@@ -637,13 +637,16 @@
         <!-- Dark scoreboard header -->
         <div class="pc-dark-header">
           <div class="pc-inn-bar">
-            <div style="display:flex;align-items:center;gap:5px">
-              <div class="pc-inn-pill">▲ TOP 3</div>
-              <div class="pc-outs">
-                <div class="pc-out-dot filled"></div>
-                <div class="pc-out-dot"></div>
-                <div class="pc-out-dot"></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px">
+              <div style="display:flex;align-items:center;gap:5px">
+                <div class="pc-inn-pill">▲ TOP 3</div>
+                <div class="pc-outs">
+                  <div class="pc-out-dot filled"></div>
+                  <div class="pc-out-dot"></div>
+                  <div class="pc-out-dot"></div>
+                </div>
               </div>
+              <div style="font-size:10px;color:rgba(255,255,255,.5);padding-left:2px">Home fielding</div>
             </div>
             <div class="pc-header-actions">
               <div class="pc-end-btn">End half ›</div>
@@ -654,9 +657,9 @@
             <div class="pc-sb-team away">
               <div class="pc-sb-name">Away</div>
               <div class="pc-sb-score-row">
-                <div class="pc-sb-adj">+</div>
-                <div class="pc-sb-num">2</div>
                 <div class="pc-sb-adj">−</div>
+                <div class="pc-sb-num">2</div>
+                <div class="pc-sb-adj">+</div>
               </div>
             </div>
             <div class="pc-sb-divider">—</div>
@@ -720,6 +723,7 @@
           </div>
           <div class="pc-adv-secondary">
             <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:3px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo</span>
+            <span>+ Out</span>
             <span>Next batter ›</span>
           </div>
           <div class="pc-alert warn">
