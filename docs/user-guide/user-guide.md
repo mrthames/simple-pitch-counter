@@ -1,7 +1,7 @@
 # Simple Pitch Counter: User Guide
 
-**Version:** 1.x
-**Last updated:** 2026-03-26
+**Version:** 2.0
+**Last updated:** 2026-04-19
 
 ---
 
@@ -11,18 +11,13 @@ Simple Pitch Counter is designed for youth baseball and softball scorekeepers. I
 
 ### First Launch
 
-When you open the app for the first time, you'll see the **Game History** screen. Since no games have been played yet, it will prompt you to:
-
-1. Check your **Configuration** (tap the menu button in the top right)
-2. Start a **New Game**
-
-Before your first game, we recommend setting up a configuration that matches your league's rules.
+When you open the app for the first time, you'll see the **Game History** screen with a prompt to start a new game. Before your first game, we recommend setting up a configuration that matches your league's rules.
 
 ---
 
 ## Configuration
 
-Tap the **menu button** (three-line icon) on the history screen, then tap **Configuration**.
+Access configuration from the setup screen when creating a new game.
 
 ### Pitch & Catcher Presets
 
@@ -34,11 +29,11 @@ To create a new preset, tap **+ New configuration** and fill in:
 |-------|-------------|---------|
 | Name | A label for this config | "Majors 11-12" |
 | Max pitches | Maximum pitches allowed per game | 85 |
-| Catcher inn. max | Maximum innings a catcher can catch before being ineligible to pitch | 4 |
+| Catcher inn. max | Maximum innings a catcher can catch | 4 |
 
-### Pitcher Rest Thresholds
+### Rest Thresholds
 
-These define how many rest days a pitcher needs based on their pitch count. Add rows for each threshold your league requires:
+Define how many rest days a pitcher needs based on their pitch count:
 
 | Pitches | Days Rest | Meaning |
 |---------|-----------|---------|
@@ -46,215 +41,241 @@ These define how many rest days a pitcher needs based on their pitch count. Add 
 | 35 | 1 | 21-35 pitches: 1 day of rest |
 | 50 | 2 | 36-50 pitches: 2 days of rest |
 
-### Catcher Inning Thresholds
-
-Define when a catcher becomes ineligible to pitch:
-
-| Innings | Restriction |
-|---------|-------------|
-| 4 | Cannot pitch remainder of day |
-
 ### Field List
 
-You can save field names you use frequently (e.g., "Field 3", "Main Diamond"). These will appear as a dropdown when creating a new game, saving you from typing them each time.
-
-### Setting a Default
-
-Tap **Set default** next to any configuration to make it the automatically selected config for new games. You can still change the config on a per-game basis during game setup.
+Save frequently used field names (e.g., "Field 3", "Main Diamond"). These appear as options when creating a new game.
 
 ---
 
 ## Starting a New Game
 
-1. Tap **+ New game** from the history screen
-2. **Configuration** — confirm or change the league preset for this game
-3. **Game info** — set the date, game time, and field name
-4. **Teams** — enter home and away team names
-5. **Opening pitcher & catcher** — enter the starting pitcher and catcher for each team (at minimum, one pitcher is required)
-6. Tap **Start game**
+1. Tap **+ New Game** from the history screen
+2. **Tracking Mode** — choose Simple or Advanced (see below)
+3. **Configuration** — confirm or change the league preset
+4. **Game Info** — date, time, and field
+5. **Teams** — home and away team names
+6. **Pitchers & Catchers** — starting pitcher and catcher for each team (at minimum, one pitcher required)
+7. Tap **Start Game**
+
+### Tracking Modes
+
+| Mode | Best For | What It Tracks |
+|------|----------|----------------|
+| **Simple** | Quick counting | Total pitches per pitcher, at-bat count |
+| **Advanced** | Full game tracking | Ball, Called K, Swing K, Foul, Ball in Play — with automatic walk/strikeout detection and out tracking |
 
 ---
 
-## During a Game
+## During a Game — Simple Mode
 
-The game screen shows everything you need at a glance:
+### Scoreboard Header
 
-### Top Bar
-
-- **Inning indicator** — shows "Top of Inning 1", "Bottom of Inning 3", etc., along with which team is fielding/batting
-- **End half** button — advances to the next half inning
-- **Menu** button — access quick stats, game summary, close game, or end game
-
-### Scoreboard
-
-The scoreboard at the top shows both teams' scores. Tap **+** or **-** to adjust either team's score. Score changes can be undone.
+The dark header shows:
+- **Inning pill** — current half and inning (e.g., "TOP 3")
+- **Team scores** — tap +/− to adjust
+- **End half** button — advance to the next half inning
+- **Menu** (☰) — access quick stats, game summary, button mapping, close, or end game
 
 ### Pitch Counting
 
-The main area shows:
+- **+ Pitch** — tap for each pitch thrown
+- **Next batter ›** — tap when a batter's at-bat ends (resets at-bat counter, keeps total)
+- **Undo** — reverses the last action (up to 100 steps)
 
-- **Current batter pitch count** — how many pitches the active pitcher has thrown to the current batter
-- **Total pitch count** — the large number in the center showing the pitcher's total pitches
-- **Rest requirement** — color-coded text showing how many rest days the pitcher currently needs
-- **Max pitches remaining** — how many pitches until the league limit
+### Pitch Count Display
 
-#### Adding Pitches
+- Large center number shows total pitches for the active pitcher
+- "This at-bat" counter shows pitches to the current batter
+- Color changes as the pitcher approaches thresholds (green → amber → red)
 
-Tap the blue **+ Pitch** button each time a pitch is thrown. The count updates immediately with a visual pop animation and haptic feedback on your device.
+---
 
-#### Next Batter
+## During a Game — Advanced Mode
 
-When a batter's at-bat ends, tap the green **Next batter** button. This:
-- Records the pitches thrown to that batter
-- Resets the "pitches this at-bat" counter to 0
-- Does NOT change the total pitch count
+Advanced mode adds per-pitch type tracking with automatic game state management.
 
-#### Undo
+### Pitch Type Buttons
 
-Made a mistake? Tap **Undo** to reverse the last action. The undo history tracks up to 60 actions, including pitches, next batter, and score adjustments.
+| Button | Meaning | Effect |
+|--------|---------|--------|
+| **B** (blue) | Ball | Adds a ball. 4 balls = walk (auto-resets count) |
+| **K̲** (red) | Called Strike | Adds a strike. 3 strikes = strikeout |
+| **K** (dark red) | Swinging Strike | Adds a strike. 3 strikes = strikeout |
+| **F** (orange) | Foul | Adds a strike if under 2 strikes. At 2 strikes, adds a pitch but no strike |
+| **⊙** (green) | Ball in Play | Opens the BIP modal (see below) |
 
-#### Edit Pitch Count
+### Ball-Strike Count
 
-If you need to manually correct the pitch count (e.g., you lost track), tap the **Edit** button next to the large pitch count number. You can set both the total count and current batter count. Note: editing clears the undo history for that pitcher.
+Displayed as colored dots above the pitch buttons. Resets automatically on walks, strikeouts, and BIP results.
 
-### Alerts
+### At-Bat Sequence
 
-The app displays color-coded alerts as pitchers approach and cross thresholds:
+Colored chips show the sequence of pitches in the current at-bat (e.g., B, K̲, F, B, K).
 
-| Color | Meaning |
-|-------|---------|
-| Blue (info) | Approaching a threshold — be aware |
-| Yellow (warning) | At or near a rest-day threshold |
-| Red (danger) | Over the pitch limit or cannot catch today |
-| Dark red (critical) | Batter pitch count unusually high — verify count |
+### Ball in Play (BIP) Modal
+
+When you tap ⊙, a bottom sheet appears:
+- **Safe** — batter reached base. Count resets, no out added.
+- **Out** — batter is out. Count resets, out added.
+
+### Outs and Auto-Advance
+
+Three out dots appear in the header. When the third out is recorded (via strikeout or BIP out), the half inning ends automatically — outs reset and the inning advances.
+
+### Result Flashes
+
+Full-screen animated overlays briefly appear for:
+- **Strikeout** (K) — after 3 strikes
+- **Walk** (BB) — after 4 balls
+- **Out** / **Safe** — after BIP result
+- **Side Retired** — after 3 outs
+
+### Pitcher Stats
+
+Tap **Stats ›** next to the pitcher name to see a detailed breakdown:
+- K, BB, BIP totals
+- Per-pitch-type counts with percentage bars
+
+---
+
+## Pitcher Management
 
 ### Changing Pitchers
 
-1. Tap **Change pitcher** in the pitcher card
-2. Select an existing pitcher from the list, or add a new one using the form at the bottom
-3. The previous pitcher is marked as "Done" and their final batter count is recorded
+1. Tap **Change** next to the pitcher name
+2. Select an existing pitcher or add a new one
+3. The previous pitcher's stats are preserved — you can switch back anytime
+
+### Pitch Count Alerts
+
+| Alert | Meaning |
+|-------|---------|
+| Rest required (amber) | Pitcher has crossed a rest threshold |
+| Approaching limit (amber) | Within 5 pitches of the max |
+| Over limit (red) | Exceeded the maximum pitch count |
+| At-bat pitch count (blue) | 6+ pitches in a single at-bat — verify count |
+
+---
+
+## Catcher Management
+
+### Catcher Inning Tracking
+
+The catcher section shows:
+- Current inning count with visual pips
+- Innings remaining before reaching the limit
+- Warning at the last allowed inning
+- Alert when the limit is reached
+
+### Pitcher/Catcher Eligibility
+
+If the active pitcher has thrown 41+ pitches, the catcher section warns that the pitcher is ineligible to catch for the remainder of the day.
 
 ### Changing Catchers
 
-Works the same as pitchers. Tap **Change catcher** to swap or add a new catcher.
-
-### Ending a Half Inning
-
-Tap the **End half** button in the top bar. A confirmation dialog appears. This:
-- Records the current pitcher's batter count
-- Switches from top to bottom (or bottom to top, incrementing the inning)
-- Updates catcher inning tracking
+Tap **Change** in the catcher section to select or add a new catcher.
 
 ---
 
-## Quick Stats
+## Physical Button Mapping
 
-During a game, tap the **menu button** and select **Quick stats** to see a summary of all pitchers and catchers for both teams, including pitch counts, innings, and rest requirements.
+On supported iPhones, you can map physical buttons to app actions.
+
+### Setup
+
+1. From the game screen, tap ☰ → **Button mapping**
+2. Assign each button:
+
+| Button | Options |
+|--------|---------|
+| Volume Up | Pitch, Undo, Next Batter, None |
+| Volume Down | Pitch, Undo, Next Batter, None |
+| Action Button (iPhone 15 Pro+) | Pitch, Undo, Next Batter, None |
+
+### Default Mapping
+
+- **Volume Up** → + Pitch
+- **Volume Down** → Undo
+- **Action Button** → Next Batter
+
+Mappings persist across games.
 
 ---
 
-## Game Summary
+## Half Innings
+
+Tap **End half ›** in the header to advance. A confirmation dialog appears showing the current half/inning.
+
+In Advanced mode, half innings also end automatically when 3 outs are recorded.
+
+The half-inning transition:
+- Records the current pitcher's innings
+- Records the current catcher's innings
+- Switches the active pitcher/catcher to the other team's roster
+- Resets ball-strike count and outs
+
+---
+
+## Game Summary & Export
 
 ### Generating the Summary
 
-1. From the game screen, tap the **menu button** > **Game summary** (or tap **End game** > **Go to summary**)
-2. Fill in any additional information:
-   - **Home runs** — enter player names for each team
-   - **Last-batter pitches** — verify or correct the pitch count for each pitcher's last batter (highlighted in red if unusually high)
-   - **Umpire summary** — plate umpire, base umpire, any issues, and comments
-3. Tap **Generate summary**
+1. Tap ☰ → **Game summary**
+2. Fill in optional fields:
+   - **Home runs** — player names for each team
+   - **Umpire notes** — plate/base umpire names and any issues
+3. Tap **Generate Report**
 
-### Sharing the Summary
+### Export Format
 
-The generated summary includes all game data in a formatted text block:
-- Date, time, field
-- Final score
-- Each pitcher's total pitches and last-batter count
-- Home runs
-- Umpire notes
+The report includes:
+- Date, time, field, final score
+- Each pitcher's total pitches, innings, last-batter count, and rest requirement
+- Catcher innings
+- Home runs and umpire notes
+- Pitch type breakdown (Advanced mode only)
 
-You can:
-- **Copy to clipboard** — paste into a text message, email, or league app
-- **Email** — opens your email app with the summary pre-filled in the body
+### Sharing
 
----
-
-## Closing and Resuming Games
-
-### Close (Pause)
-
-From the game screen menu, tap **Close**. The game is saved to history with a red **LIVE** badge. You can return to it later.
-
-### Resume
-
-From the history screen, tap **Resume** on any game with a LIVE badge. The game restores exactly where you left off.
-
-### End Game
-
-Tap **End game** from the menu. This finalizes the game and saves it to history. You're prompted to generate the summary first.
+- **Copy to clipboard** — paste into text, email, or league app
+- **Email** — opens email with the summary pre-filled
 
 ---
 
 ## Game History
 
-The history screen shows all your games, newest first. Each card shows:
-
-- Team names and date
-- Final score and field
-- **Rest days required** — a breakdown of which pitchers need rest and for how long
+The history screen shows all games, newest first. Each card displays:
+- Team names, date, mode badge (Simple/Advanced)
+- Score
+- Rest days required for each pitcher
 
 ### Actions
 
-- **Resume** — reopen a LIVE (paused) game
-- **View stats** — see full pitcher/catcher stats for any completed game
-- **Summary** — generate or view the text summary for any game
+- **View stats** — pitcher/catcher stats for any game
+- **Summary** — generate the export text for any game
+- **Swipe left** → **Delete** — remove a game (with confirmation)
 
-### Deleting Games
+### Close vs. End
 
-Swipe a game card to the left to reveal the **Delete** button. A confirmation dialog prevents accidental deletion.
-
-### Export & Import
-
-From the history screen menu:
-
-- **Export games** — generates a CSV with all game data (pitchers, pitch counts, rest days). Copy or email it
-- **Import games** — paste CSV data exported from another device. Duplicates (same date + teams) are automatically skipped
+- **Close** (from ☰ menu) — saves as a live game, can be resumed later
+- **End game** — finalizes the game permanently
 
 ---
 
 ## Tips for Game Day
 
-1. **Set up before the game** — create the game entry with teams, pitchers, and catchers while you're still relaxed
-2. **Trust the alerts** — the app will warn you before a pitcher crosses a threshold so you can notify the coach in time
-3. **Use "Next batter" consistently** — this is critical for accurate last-batter tracking, which is required in the post-game report
-4. **Generate the summary before leaving the field** — the league typically requires the report within 2 hours
-5. **Close, don't end** — if you need to step away mid-game, use Close instead of End Game. You can resume later
-6. **Check rest days** — the history screen shows rest requirements for every pitcher, helping coaches plan for the next game
-
----
-
-## Troubleshooting
-
-### The pitch count seems wrong
-Tap the **Edit** button next to the pitch count to manually correct it. This is useful if you miscounted or if someone else was tracking for a few batters.
-
-### I forgot to tap "Next batter"
-The total pitch count is still accurate. The batter count will be higher than expected, but you can correct the "last batter pitches" in the game summary before generating the report.
-
-### The app shows an alert I don't understand
-All alerts reference specific league rules. Yellow means a threshold is approaching, red means a limit has been reached. When in doubt, notify the coach.
-
-### I accidentally ended the game
-Games cannot be re-opened once ended, but you can still view stats and generate the summary from the history screen.
-
-### Data didn't save
-The app saves after every action (pitch, score change, etc.). If the app was force-quit during a save, data from the last action may be lost. The auto-save on app background ensures the game state is preserved when switching apps.
+1. **Set up before the game** — create the game entry with teams and pitchers while you're relaxed
+2. **Trust the alerts** — the app warns you before a pitcher crosses a threshold
+3. **Use "Next batter" consistently** — critical for accurate last-batter tracking in the report
+4. **Generate the summary before leaving** — the league typically requires the report within 2 hours
+5. **Close, don't end** — if you need to step away, use Close to resume later
+6. **Use physical buttons** — map volume buttons to pitch/undo for eyes-free counting
 
 ---
 
 ## Privacy
 
-Simple Pitch Counter is fully offline. No data leaves your device — ever.
+Simple Pitch Counter is fully offline. No data leaves your device.
 
 - No account required
 - No internet connection needed
