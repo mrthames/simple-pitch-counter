@@ -211,9 +211,9 @@
   /* Scale inner content to look like a real phone screen */
   .phone-inner {
     flex: 1;
-    transform: scale(0.48);
+    transform: scale(0.44);
     transform-origin: top left;
-    width: 208.3%;
+    width: 227.3%;
     display: flex;
     flex-direction: column;
   }
@@ -270,7 +270,9 @@
   .pc-pitch-btn { flex: 1; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 1.5px solid transparent; }
   .pc-pitch-btn.row1 { height: 62px; }
   .pc-pitch-btn.row2 { height: 54px; }
-  .pc-pt-glyph { font-size: 26px; font-weight: 900; line-height: 1; }
+  .pc-pt-glyph { font-size: 26px; font-weight: 900; line-height: 1; font-family: -apple-system, 'SF Pro Display', 'DM Sans', sans-serif; }
+  .pc-pt-glyph.mirror { display: inline-block; transform: scaleX(-1); }
+  .pc-pt-glyph.bat-svg { display: flex; align-items: center; justify-content: center; }
   .pc-pt-name { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
   .pc-pt-B { background: #EBF1FF; border-color: rgba(26,107,255,.35); color: #1A6BFF; }
   .pc-pt-CS { background: #FFF0EF; border-color: rgba(255,59,48,.35); color: #FF3B30; }
@@ -606,7 +608,7 @@
             </div>
             <div class="pc-seq">
               <div class="pc-seq-chip" style="background:#EBF1FF;color:#1A6BFF">B</div>
-              <div class="pc-seq-chip" style="background:#FFF0EF;color:#FF3B30">K̲</div>
+              <div class="pc-seq-chip" style="background:#FFF0EF;color:#FF3B30"><span style="display:inline-block;transform:scaleX(-1)">K</span></div>
               <div class="pc-seq-chip" style="background:#FFF5E6;color:#FF9500">F</div>
               <div class="pc-seq-chip" style="background:#EBF1FF;color:#1A6BFF">B</div>
               <div class="pc-seq-chip" style="background:#fce8e8;color:#C0272D">K</div>
@@ -618,12 +620,12 @@
           <div class="pc-pitch-grid">
             <div class="pc-pitch-row">
               <div class="pc-pitch-btn pc-pt-B row1"><span class="pc-pt-glyph">B</span><span class="pc-pt-name">Ball</span></div>
-              <div class="pc-pitch-btn pc-pt-CS row1"><span class="pc-pt-glyph">K̲</span><span class="pc-pt-name">Called K</span></div>
+              <div class="pc-pitch-btn pc-pt-CS row1"><span class="pc-pt-glyph mirror">K</span><span class="pc-pt-name">Called K</span></div>
               <div class="pc-pitch-btn pc-pt-SS row1"><span class="pc-pt-glyph">K</span><span class="pc-pt-name">Swing K</span></div>
             </div>
             <div class="pc-pitch-row">
               <div class="pc-pitch-btn pc-pt-F row2"><span class="pc-pt-glyph">F</span><span class="pc-pt-name">Foul</span></div>
-              <div class="pc-pitch-btn pc-pt-BIP row2"><span class="pc-pt-glyph">⊙</span><span class="pc-pt-name">In Play</span></div>
+              <div class="pc-pitch-btn pc-pt-BIP row2"><span class="pc-pt-glyph bat-svg"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3.5 20.5l1.5-1.5m0 0l7-7m-7 7l-1-1m8-6l5.5-5.5c.8-.8 2.2-.8 2.8 0l.2.2c.6.6.6 1.6-.2 2.4L15 14.5m-3-3l-4.5 4.5M12 11.5l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pc-pt-name">In Play</span></div>
             </div>
           </div>
           <div class="pc-adv-secondary">
