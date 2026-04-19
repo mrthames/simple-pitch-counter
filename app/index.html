@@ -414,7 +414,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
   margin-bottom:10px;
 }
 /* Config screen */
-.config-nav{padding:calc(env(safe-area-inset-top,0px)+20px) 20px 8px;background:var(--bg)}
+.config-nav{padding-top:calc(env(safe-area-inset-top,0px)+20px);padding-left:20px;padding-right:20px;padding-bottom:8px;background:var(--bg)}
 .config-item{display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--sep)}
 .config-item:last-child{border-bottom:none}
 .config-name{font-size:14px;font-weight:600}
@@ -726,14 +726,16 @@ textarea{resize:vertical;min-height:56px}
       <div class="form-card">
         <div class="form-row"><div class="form-row-lbl">Plate</div><input class="form-input" id="sum-pu-name" placeholder="Name"></div>
         <div class="form-row"><div class="form-row-lbl">Issues?</div>
-          <label style="font-size:13px;display:flex;align-items:center;gap:4px"><input type="radio" name="pu-iss" value="Yes"> Yes</label>
-          <label style="font-size:13px;display:flex;align-items:center;gap:4px;margin-left:12px"><input type="radio" name="pu-iss" value="No" checked> No</label>
+          <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('pu-iss-detail').style.display='none'"><input type="radio" name="pu-iss" value="No" checked style="width:18px;height:18px"> No</label>
+          <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('pu-iss-detail').style.display='block'"><input type="radio" name="pu-iss" value="Yes" style="width:18px;height:18px"> Yes</label>
         </div>
+        <div class="form-row" id="pu-iss-detail" style="display:none;border-bottom:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-pu-comments" placeholder="Describe issues"></div>
         <div class="form-row"><div class="form-row-lbl">Base</div><input class="form-input" id="sum-bu-name" placeholder="Name"></div>
-        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Issues?</div>
-          <label style="font-size:13px;display:flex;align-items:center;gap:4px"><input type="radio" name="bu-iss" value="Yes"> Yes</label>
-          <label style="font-size:13px;display:flex;align-items:center;gap:4px;margin-left:12px"><input type="radio" name="bu-iss" value="No" checked> No</label>
+        <div class="form-row"><div class="form-row-lbl">Issues?</div>
+          <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('bu-iss-detail').style.display='none'"><input type="radio" name="bu-iss" value="No" checked style="width:18px;height:18px"> No</label>
+          <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('bu-iss-detail').style.display='block'"><input type="radio" name="bu-iss" value="Yes" style="width:18px;height:18px"> Yes</label>
         </div>
+        <div class="form-row" id="bu-iss-detail" style="display:none;border-bottom:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-bu-comments" placeholder="Describe issues"></div>
       </div>
     </div>
     <div id="sum-actions" style="display:flex;gap:8px">
@@ -881,7 +883,7 @@ function initSetup(){
   document.getElementById('s-time').value='';
   document.getElementById('s-home').value='';
   document.getElementById('s-away').value='';
-  ['hp-name','hp-num','hc-name','hc-num','ap-name','ap-num','ac-name','ac-num'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['hp-name','hp-num','hc-name','hc-num','ap-name','ap-num','ac-name','ac-num','s-ump-plate','s-ump-base'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const cfg=state.configs.find(c=>c.id===state.activeConfigId);
   if(cfg)document.getElementById('setup-config-name').textContent=cfg.name;
   setGameMode(selectedMode);
@@ -1464,7 +1466,7 @@ function getBtnRows(){
     </div>`).join('');
 }
 function showButtonMappingModal(){
-  const el=document.getElementById('screen-game');
+  const el=document.querySelector('.screen.active')||document.body;
   const existing=document.getElementById('btn-map-overlay');if(existing)existing.remove();
   const ov=document.createElement('div');ov.className='bip-overlay';ov.id='btn-map-overlay';
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
@@ -1732,6 +1734,10 @@ function initSummary(){
   document.getElementById('sum-hr-away').value=g.hrAway||'';
   document.getElementById('sum-pu-name').value=g.umpPlateName||'';
   document.getElementById('sum-bu-name').value=g.umpBaseName||'';
+  document.getElementById('sum-pu-comments').value=g.umpPlateComments||'';
+  document.getElementById('sum-bu-comments').value=g.umpBaseComments||'';
+  if(g.umpPlateIssue==='Yes'){document.querySelector('input[name="pu-iss"][value="Yes"]').checked=true;document.getElementById('pu-iss-detail').style.display='block';}
+  if(g.umpBaseIssue==='Yes'){document.querySelector('input[name="bu-iss"][value="Yes"]').checked=true;document.getElementById('bu-iss-detail').style.display='block';}
   // Pitcher sections
   const mkPitcherSection=(side)=>{
     const tn=g[side+'Team'];const roster=g[side];
@@ -1776,7 +1782,9 @@ function collectSummaryData(){
   g.umpPlateName=document.getElementById('sum-pu-name')?.value||'';
   g.umpBaseName=document.getElementById('sum-bu-name')?.value||'';
   const puR=document.querySelector('input[name="pu-iss"]:checked');if(puR)g.umpPlateIssue=puR.value;
+  g.umpPlateComments=document.getElementById('sum-pu-comments')?.value||'';
   const buR=document.querySelector('input[name="bu-iss"]:checked');if(buR)g.umpBaseIssue=buR.value;
+  g.umpBaseComments=document.getElementById('sum-bu-comments')?.value||'';
 }
 function generateExport(){
   collectSummaryData();
@@ -1802,8 +1810,9 @@ function buildSummaryText(){
     return cs.map(c=>`${tn}: ${c.name}${c.num?' #'+c.num:''} — ${c.innings.filter(Boolean).length} innings caught`).join('\n');
   };
   let txt=`Game Summary\n${'─'.repeat(30)}\n${g.homeTeam} vs ${g.awayTeam}\n${g.date}${g.time?' · '+g.time:''}${g.field?' · '+g.field:''}\nFinal: ${g.homeTeam} ${g.homeScore} – ${g.awayTeam} ${g.awayScore}\n\nPitchers\n${'─'.repeat(30)}\n${pitcherLines('home')}\n${pitcherLines('away')}\n\nCatchers\n${'─'.repeat(30)}\n${catcherLines('home')}\n${catcherLines('away')}`;
-  if(g.hrHome||g.hrAway)txt+=`\n\nHome Runs\n${'─'.repeat(30)}\n${g.homeTeam}: ${g.hrHome||'None'}\n${g.awayTeam}: ${g.hrAway||'None'}`;
-  txt+=`\n\nUmpires\n${'─'.repeat(30)}\nPlate: ${g.umpPlateName||'—'} (Issues: ${g.umpPlateIssue||'No'})\nBase: ${g.umpBaseName||'—'} (Issues: ${g.umpBaseIssue||'No'})`;
+  txt+=`\n\nHome Runs\n${'─'.repeat(30)}\n${g.homeTeam}: ${g.hrHome||'None'}\n${g.awayTeam}: ${g.hrAway||'None'}`;
+  txt+=`\n\nUmpires\n${'─'.repeat(30)}\nPlate: ${g.umpPlateName||'—'} (Issues: ${g.umpPlateIssue||'No'})${g.umpPlateComments?' — '+g.umpPlateComments:''}`;
+  txt+=`\nBase: ${g.umpBaseName||'—'} (Issues: ${g.umpBaseIssue||'No'})${g.umpBaseComments?' — '+g.umpBaseComments:''}`;
   return txt;
 }
 function copyExportModal(btn){
