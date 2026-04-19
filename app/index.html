@@ -703,7 +703,7 @@ textarea{resize:vertical;min-height:56px}
 <!-- ══ SUMMARY ══ -->
 <div id="screen-summary" class="screen">
   <div class="summary-nav">
-    <div class="btn-sm" onclick="showScreen('game')">‹ Back</div>
+    <div class="btn-sm" onclick="saveSummaryAndBack()">‹ Back</div>
     <div class="summary-nav-title">Game Summary</div>
     <div style="width:70px"></div>
   </div>
@@ -1762,6 +1762,7 @@ function showSummaryStats(side,idx){
   ov.innerHTML=`<div class="stats-sheet"><div class="stats-handle"></div><div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${p.name}${p.num?' #'+p.num:''}</div><div style="font-size:13px;color:var(--dark-label);margin-bottom:18px">${total} total pitches</div><div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP</div></div></div><div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>${barsHtml}<div onclick="document.getElementById('sum-stats-overlay').remove()" style="margin-top:16px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div></div>`;
   document.getElementById('screen-summary').appendChild(ov);
 }
+function saveSummaryAndBack(){collectSummaryData();saveState();showScreen('game');}
 function collectSummaryData(){
   const g=state.currentGame;if(!g)return;
   g.hrHome=document.getElementById('sum-hr-home')?.value||'';
