@@ -45,6 +45,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         webView.translatesAutoresizingMaskIntoConstraints = false
         webView.scrollView.bounces = false
         webView.scrollView.showsVerticalScrollIndicator = false
+        #if DEBUG
+        if #available(iOS 16.4, *) { webView.isInspectable = true }
+        #endif
 
         view.addSubview(webView)
         NSLayoutConstraint.activate([
