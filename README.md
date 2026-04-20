@@ -2,6 +2,8 @@
 
 A pitch counter app for youth baseball and softball coaches, built for the dugout.
 
+This is also a portfolio project by **Justin Thames** demonstrating AI-native product development — from concept and product requirements through design, development, testing, and App Store release, built end-to-end with AI as a core collaborator.
+
 **App Store:** [Simple Pitch Counter on iOS](https://apps.apple.com/us/app/simple-pitch-counter/id6760922314)
 **Website:** [simplepitchcounter.com](https://simplepitchcounter.com)
 
