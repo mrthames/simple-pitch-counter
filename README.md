@@ -6,8 +6,6 @@ This is also a portfolio project by **Justin Thames** demonstrating AI-native pr
 
 <p align="center">
   <img src="marketing/finals/03-simple-and-advanced.jpg" width="180" alt="Simple and Advanced modes" />
-  <img src="marketing/finals/01-advanced-pitch-tracking.png" width="180" alt="Advanced pitch tracking" />
-  <img src="marketing/finals/02-simple-mode.png" width="180" alt="Simple mode" />
   <img src="marketing/finals/06-game-history.png" width="180" alt="Game history" />
   <img src="marketing/finals/05-pitcher-stats.png" width="180" alt="Pitcher stats" />
   <img src="marketing/finals/07-game-summaries.png" width="180" alt="Game summaries" />
