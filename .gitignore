@@ -4,8 +4,10 @@
 # Claude Code
 .claude/
 
-# Marketing — generated PNGs (regenerate via: node marketing/capture.mjs)
+# Marketing — generated template PNGs (regenerate via: node marketing/capture.mjs)
 marketing/*.png
+marketing/*.jpg
+!marketing/finals/
 
 # Node
 node_modules/
