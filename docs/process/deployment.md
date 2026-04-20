@@ -41,18 +41,18 @@ Follow conventional style:
 
 ### Automated E2E Tests
 
-69 Playwright tests run on every push and PR to `main` via GitHub Actions (`test.yml`).
+91 Playwright tests run on every push and PR to `main` via GitHub Actions (`test.yml`).
 
 **Test suites:**
 
 | File | Tests | Coverage |
 |------|-------|----------|
-| `core-game-flow.spec.ts` | 13 | History, setup, pitching, innings, scoring, persistence |
-| `advanced-mode.spec.ts` | 16 | Pitch types, B/S/F counting, walks, strikeouts, BIP, auto-outs |
-| `thresholds-alerts.spec.ts` | 9 | Rest labels, limit alerts, catcher innings, at-bat warnings |
+| `core-game-flow.spec.ts` | 20 | Game lifecycle, scoring, outs (both modes), undo, persistence |
+| `advanced-mode.spec.ts` | 21 | Pitch types, B/S/F counting, walks, strikeouts, BIP, auto-outs |
+| `thresholds-alerts.spec.ts` | 17 | Rest labels, limit alerts, catcher innings, mercy rule, at-bat warnings |
 | `pitcher-catcher.spec.ts` | 10 | Mid-game changes, count preservation, stats, half-inning switching |
-| `summary-export.spec.ts` | 10 | Summary screen, export text, umpire data, pitch breakdowns |
-| `history-config.spec.ts` | 11 | History cards, persistence, setup screen, mode toggle |
+| `summary-export.spec.ts` | 11 | Summary screen, export text, umpire data, pitch breakdowns |
+| `history-config.spec.ts` | 12 | History cards, persistence, setup screen, mode toggle, umpire clearing |
 
 **Run locally:**
 ```bash

@@ -1,6 +1,12 @@
 # macOS
 .DS_Store
 
+# Claude Code
+.claude/
+
+# Marketing — generated PNGs (regenerate via: node marketing/capture.mjs)
+marketing/*.png
+
 # Node
 node_modules/
 

@@ -69,6 +69,10 @@ simple-pitch-counter/
 │   ├── contact.html        # Contact form
 │   ├── feedback.html       # Feedback form
 │   └── contact.php         # PHP backend (not tracked — contains credentials)
+├── marketing/              # App Store screenshot assets
+│   ├── screenshots.html    # Screenshot background templates (7 slides)
+│   ├── capture.mjs         # Playwright script to render slide PNGs
+│   └── sample-data.js      # Realistic sample data for simulator screenshots
 ├── docs/                   # Product and portfolio documentation
 ├── playwright.config.ts    # Playwright test configuration
 ├── CHANGELOG.md            # App change history
@@ -82,9 +86,9 @@ The project has **91 Playwright E2E tests** covering all app functionality:
 | Spec file | Tests | Coverage |
 |-----------|-------|----------|
 | `core-game-flow` | 20 | Game lifecycle, scoring, outs (both modes), undo, persistence |
-| `advanced-mode` | 17 | Pitch types, BSO count, BIP modal, auto-advance, non-pitch outs |
+| `advanced-mode` | 21 | Pitch types, BSO count, BIP modal, auto-advance, non-pitch outs |
 | `thresholds-alerts` | 17 | Rest days, pitch limits, mercy rule modal, at-bat warnings |
-| `pitcher-catcher` | 8 | Roster management, mid-game switches, inning tracking |
+| `pitcher-catcher` | 10 | Roster management, mid-game switches, inning tracking |
 | `summary-export` | 11 | Game summary, umpire data, report generation, export |
 | `history-config` | 12 | History cards, config presets, setup flow, umpire clearing |
 

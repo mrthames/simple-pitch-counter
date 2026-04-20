@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App Store Screenshots — Simple Pitch Counter</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;display:flex;flex-direction:column;align-items:center;gap:60px;padding:60px;background:#222}
+
+/* ── Slide ── */
+.slide{
+  width:1284px;height:2778px;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;
+  background:linear-gradient(175deg,#0a1628 0%,#0f2040 35%,#132a52 65%,#0d1d3a 100%);
+}
+
+/* ── Headline ── */
+.headline-area{padding:260px 80px 0;text-align:center;z-index:2;width:100%}
+.slide-headline{
+  font-size:96px;font-weight:900;line-height:1.05;letter-spacing:-1px;
+  color:#fff;text-transform:uppercase;margin-bottom:18px;
+}
+.slide-headline .green{color:#34C759}
+.slide-headline .blue{color:#1A6BFF}
+.slide-headline .amber{color:#FF9500}
+.slide-sub{font-size:30px;font-weight:400;color:rgba(255,255,255,.5);line-height:1.4;max-width:900px;margin:0 auto}
+
+/* ── Phone wrap ── */
+.phone-wrap{
+  flex:1;display:flex;justify-content:center;align-items:flex-start;
+  padding-top:80px;position:relative;z-index:1;
+}
+.phone-glow{
+  position:absolute;width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(26,107,255,.1) 0%,transparent 70%);
+  top:40%;left:50%;transform:translate(-50%,-40%);z-index:0;pointer-events:none;
+}
+
+/* ══ iPhone 16 Pro frame ══ */
+.iphone{
+  width:390px;height:830px;
+  background:#1a1a1a;
+  border-radius:55px;
+  padding:11px;
+  box-shadow:0 0 0 2px rgba(255,255,255,.06),0 0 60px rgba(26,107,255,.12),0 30px 100px rgba(0,0,0,.5);
+  display:flex;flex-direction:column;flex-shrink:0;
+  position:relative;
+  transform:scale(2.05);
+  transform-origin:top center;
+}
+.iphone-screen{
+  flex:1;
+  border-radius:45px;overflow:hidden;
+  display:flex;flex-direction:column;
+  background:#D0D0D0;
+}
+
+/* ── Hardware buttons (left side) ── */
+.hw-action{position:absolute;left:-5px;top:90px;width:4px;height:24px;background:rgba(255,255,255,.12);border-radius:2px}
+.hw-vol-up{position:absolute;left:-5px;top:135px;width:4px;height:38px;background:rgba(255,255,255,.12);border-radius:2px}
+.hw-vol-dn{position:absolute;left:-5px;top:183px;width:4px;height:38px;background:rgba(255,255,255,.12);border-radius:2px}
+/* Right side — single power button */
+.hw-power{position:absolute;right:-5px;top:145px;width:4px;height:70px;background:rgba(255,255,255,.12);border-radius:2px}
+
+/* ── Dual phone layout ── */
+.dual-phone-wrap{
+  flex:1;display:flex;justify-content:center;align-items:flex-start;
+  padding-top:80px;position:relative;z-index:1;
+}
+.dual-phone-wrap{
+  gap:0;padding-top:105px;
+}
+.dual-phone-wrap .iphone.back{
+  transform:scale(1.45) rotate(5deg);
+  transform-origin:top center;z-index:1;
+  margin-right:-60px;
+}
+.dual-phone-wrap .iphone.front{
+  transform:scale(1.45) rotate(-3deg);
+  transform-origin:top center;z-index:2;
+  margin-top:80px;margin-left:-60px;
+}
+
+/* ══ HW button callout system (slide 1) ══ */
+
+/* Each callout: positioned absolutely, right edge pinned to phone left edge.
+   Layout: [text-block] [line]
+   Text block: name + action, centered alignment.
+   Line: extends from text to phone edge, all lines end at same X. */
+
+.callout{
+  position:absolute;
+  display:flex;align-items:center;
+  z-index:5;
+}
+.callout-text{
+  display:flex;flex-direction:column;
+  align-items:center;
+  gap:1px;white-space:nowrap;
+}
+.callout-name{font-size:26px;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:1.5px}
+.callout-map{font-size:34px;font-weight:800}
+.callout-line{height:3px;background:rgba(255,255,255,.3);flex-shrink:0}
+.callout-heading{
+  position:absolute;font-size:22px;font-weight:700;color:rgba(255,255,255,.3);
+  text-transform:uppercase;letter-spacing:3px;white-space:nowrap;
+  z-index:5;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 1: Advanced Pitch Tracking (phone shifted right)        -->
+<!--                                                               -->
+<!-- Phone math (scale=2.05, translateX=70px pre-scale):           -->
+<!--   Phone pre-transform center X = 1284/2 = 642                -->
+<!--   After translateX(70): center = 642 + 70*2.05 = 785.5       -->
+<!--   Scaled half-width = 195*2.05 = 399.75                      -->
+<!--   Phone left edge = 785.5 - 399.75 ≈ 386                     -->
+<!--   HW buttons at left:-5px scaled = -10.25px → X ≈ 376        -->
+<!--                                                               -->
+<!--   Phone top Y = headline(~490px) + phone-wrap pad(80) = 570  -->
+<!--   Action center Y = 570 + (90+12)*2.05 = 570+209 = 779      -->
+<!--   Vol-up center Y = 570 + (135+19)*2.05 = 570+316 = 886     -->
+<!--   Vol-dn center Y = 570 + (183+19)*2.05 = 570+414 = 984     -->
+<!--                                                               -->
+<!--   All callout lines end at X = 376 (phone left / button X)   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-1">
+  <div class="headline-area">
+    <div class="slide-headline">TRACK<br><span class="green">EVERY PITCH</span></div>
+    <div class="slide-sub">Track every pitch — Ball, Strike, Foul, and Ball in Play</div>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone-glow" style="left:65%"></div>
+    <div class="iphone" style="transform:scale(2.05) translateX(70px);transform-origin:top center">
+      <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
+      <div class="iphone-screen"></div>
+    </div>
+  </div>
+
+  <!-- Heading -->
+  <div class="callout-heading" style="right:920px;top:725px">Custom Button Actions</div>
+
+  <!-- Action button — center Y = 811, callout height 80, top = 811-40 = 771 -->
+  <div class="callout" style="right:908px;top:771px">
+    <div class="callout-text">
+      <div class="callout-name">Action</div>
+      <div class="callout-map" style="color:#FF9500">+ Out</div>
+    </div>
+    <div class="callout-line" style="width:160px;margin-left:20px"></div>
+  </div>
+
+  <!-- Vol Up — center Y = 917, top = 917-40 = 877 -->
+  <div class="callout" style="right:908px;top:877px">
+    <div class="callout-text">
+      <div class="callout-name">Vol +</div>
+      <div class="callout-map" style="color:#34C759">Next Batter</div>
+    </div>
+    <div class="callout-line" style="width:120px;margin-left:20px"></div>
+  </div>
+
+  <!-- Vol Down — center Y = 1016, top = 1016-40 = 976 -->
+  <div class="callout" style="right:908px;top:976px">
+    <div class="callout-text">
+      <div class="callout-name">Vol &minus;</div>
+      <div class="callout-map" style="color:#FFFFFF">Undo</div>
+    </div>
+    <div class="callout-line" style="width:175px;margin-left:20px"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 2: Simple Mode                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-2">
+  <div class="headline-area">
+    <div class="slide-headline">SIMPLE<br><span class="blue">& FAST</span></div>
+    <div class="slide-sub">One-tap pitch counting with at-bat tracking and rest day alerts</div>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone-glow"></div>
+    <div class="iphone">
+      <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
+      <div class="iphone-screen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 3: Simple (front) + Advanced (back)                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-3-combo">
+  <div class="headline-area">
+    <div class="slide-headline"><span class="blue">SIMPLE</span> &amp;<br><span class="green">ADVANCED</span></div>
+    <div class="slide-sub">Two modes — tap to count or track every pitch type</div>
+  </div>
+  <div class="dual-phone-wrap">
+    <div class="phone-glow"></div>
+    <div class="iphone back">
+      <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
+      <div class="iphone-screen"></div>
+    </div>
+    <div class="iphone front">
+      <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
+      <div class="iphone-screen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 4: Live Scoreboard                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-4">
+  <div class="headline-area">
+    <div class="slide-headline">LIVE<br><span class="amber">SCOREBOARD</span></div>
+    <div class="slide-sub">Score, inning, outs, and catcher tracking — always at a glance</div>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone-glow"></div>
+    <div class="iphone">
+      <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
+      <div class="iphone-screen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 5: Pitcher Stats                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-5">
+  <div class="headline-area">
+    <div class="slide-headline">PITCHER<br><span class="green">STATS</span></div>
+    <div class="slide-sub">K, BB, BIP totals and full pitch type breakdown</div>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone-glow"></div>
+    <div class="iphone">
+      <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
+      <div class="iphone-screen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 6: Game History                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-6">
+  <div class="headline-area">
+    <div class="slide-headline">GAME<br><span class="blue">HISTORY</span></div>
+    <div class="slide-sub">Review past games, pitcher rest days, and detailed stats</div>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone-glow"></div>
+    <div class="iphone">
+      <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
+      <div class="iphone-screen"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 7: Game Summary                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-7">
+  <div class="headline-area">
+    <div class="slide-headline">GAME<br><span class="amber">SUMMARIES</span></div>
+    <div class="slide-sub">Generate post-game reports ready to share with your league</div>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone-glow"></div>
+    <div class="iphone">
+      <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
+      <div class="iphone-screen"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
