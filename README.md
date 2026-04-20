@@ -139,6 +139,10 @@ Hosted on a self-hosted Synology NAS via Web Station. Deployed via SCP over the 
 
 **Note:** `contact.php` contains SMTP credentials and is excluded from git via `.gitignore`. Connection details (host, port, SSH key) are kept outside the repo.
 
+## License
+
+This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). You are free to view, fork, and learn from the code, but **commercial use is not permitted**. The App Store deployment and distribution of Simple Pitch Counter is exclusively owned by Justin Thames.
+
 ## Future plans
 
 - Make the web app accessible directly from simplepitchcounter.com (browser-based version)
