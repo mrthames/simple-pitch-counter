@@ -477,6 +477,7 @@ textarea{resize:vertical;min-height:56px}
             <button class="hbg-item" onclick="closeHistoryMenu();showButtonMappingModal()">Button mapping</button>
             <button class="hbg-item" onclick="closeHistoryMenu();exportAllGames()">Export all games</button>
             <button class="hbg-item" onclick="closeHistoryMenu();importAllGames()">Import games</button>
+            <button class="hbg-item" onclick="closeHistoryMenu();showScreen('about')">About this app</button>
           </div>
         </div>
       </div>
@@ -781,6 +782,52 @@ textarea{resize:vertical;min-height:56px}
         <input type="text" id="new-field-input" placeholder="Add field name" style="flex:1" onkeydown="if(event.key==='Enter')addField()">
         <div class="btn-sm" style="background:var(--blue);color:#fff;border-radius:10px;padding:8px 14px" onclick="addField()">Add</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="screen-about" class="screen">
+  <div class="config-nav">
+    <div class="btn-sm" onclick="showScreen('history')">‹ Back</div>
+    <div style="font-size:17px;font-weight:700;margin:8px 0 4px">About This App</div>
+  </div>
+  <div style="padding:0 20px;padding-bottom:calc(env(safe-area-inset-bottom,0px)+40px)">
+    <div style="background:var(--card);border:1.5px solid var(--sep2);border-radius:var(--r-lg);padding:1.2rem 1.1rem;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="width:56px;height:56px;border-radius:14px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff">#</div>
+        <div>
+          <div style="font-size:18px;font-weight:700">Simple Pitch Counter</div>
+          <div style="font-size:13px;color:var(--t2)">Version 2.1</div>
+        </div>
+      </div>
+      <div style="font-size:14px;color:var(--t2);line-height:1.5">
+        A fast, focused pitch counting app for Little League coaches and parents. Track pitch counts, rest requirements, innings, and at-bats — all from your pocket. Built with love for the game.
+      </div>
+    </div>
+    <div style="background:var(--card);border:1.5px solid var(--sep2);border-radius:var(--r-lg);overflow:hidden;margin-bottom:12px">
+      <a href="https://simplepitchcounter.com" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;text-decoration:none;color:var(--text);border-bottom:1px solid var(--sep)">
+        <div style="font-size:15px;font-weight:600">Website</div>
+        <div style="font-size:13px;color:var(--t2)">simplepitchcounter.com ›</div>
+      </a>
+      <a href="https://simplepitchcounter.com/privacy.html" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;text-decoration:none;color:var(--text);border-bottom:1px solid var(--sep)">
+        <div style="font-size:15px;font-weight:600">Privacy Policy</div>
+        <div style="font-size:13px;color:var(--t2)">›</div>
+      </a>
+      <a href="https://simplepitchcounter.com/feedback.html" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;text-decoration:none;color:var(--text);border-bottom:1px solid var(--sep)">
+        <div style="font-size:15px;font-weight:600">Send Feedback</div>
+        <div style="font-size:13px;color:var(--t2)">›</div>
+      </a>
+      <a href="https://simplepitchcounter.com/contact.html" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;text-decoration:none;color:var(--text)">
+        <div style="font-size:15px;font-weight:600">Contact</div>
+        <div style="font-size:13px;color:var(--t2)">›</div>
+      </a>
+    </div>
+    <a href="https://buymeacoffee.com/simplepitchcounter" target="_blank" style="display:block;text-decoration:none;background:#FFDD00;border-radius:var(--r-lg);padding:16px;text-align:center;margin-bottom:12px">
+      <div style="font-size:16px;font-weight:700;color:#000">☕ Buy Me a Coffee</div>
+      <div style="font-size:13px;color:rgba(0,0,0,.6);margin-top:4px">Keep this app free and supported</div>
+    </a>
+    <div style="text-align:center;font-size:12px;color:var(--t3);margin-top:20px">
+      Made with ❤️ for Little League
     </div>
   </div>
 </div>
