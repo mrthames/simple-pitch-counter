@@ -1514,6 +1514,17 @@ function renderStatsCardToCanvas(pitcher,gameData){
     ctx.fillStyle=!ri||ri.days===0?'#34C759':ri.days===1?'#FF9500':'#FF3B30';
     ctx.font='600 20px -apple-system,system-ui,sans-serif';
     ctx.fillText(restText,pad,y+=30);y+=20;
+    const heroW=Math.floor((W-pad*2-16)/3),heroH=80,heroR=14;
+    const heroes=[{lbl:'K',val:s.ks,color:'#FF3B30'},{lbl:'BB',val:s.bbs,color:'#1A6BFF'},{lbl:'BIP',val:pitcher.bips||0,color:'#34C759'}];
+    heroes.forEach((h,i)=>{
+      const hx=pad+i*(heroW+8);
+      ctx.fillStyle='rgba(255,255,255,.07)';ctx.beginPath();ctx.roundRect(hx,y,heroW,heroH,heroR);ctx.fill();
+      ctx.fillStyle=h.color;ctx.font='bold 30px -apple-system,system-ui,sans-serif';
+      const vw=ctx.measureText(String(h.val)).width;ctx.fillText(String(h.val),hx+heroW/2-vw/2,y+34);
+      ctx.fillStyle='rgba(235,235,245,.5)';ctx.font='bold 14px -apple-system,system-ui,sans-serif';
+      const lw=ctx.measureText(h.lbl).width;ctx.fillText(h.lbl,hx+heroW/2-lw/2,y+58);
+    });
+    y+=heroH+16;
     const stats=[['P',total],['IP',s.ip],['BF',s.bf],['K',s.ks],['BB',s.bbs],['K/BB',s.kbb],['P/IP',s.pip],['P/BF',s.pbf]];
     stats.forEach(([lbl,val])=>{
       ctx.fillStyle='rgba(235,235,245,.06)';ctx.fillRect(pad,y,W-pad*2,1);
@@ -2023,7 +2034,7 @@ function generateExport(){
 }
 function buildSummaryText(){
   const g=state.currentGame||state._expGame;if(!g)return'';
-  const ri=(p)=>{const cfg=state.configs.find(c=>c.id===g.configId);const thr=(cfg?.thresholds||DEFAULT_THRESHOLDS).slice().sort((a,b)=>a.pitches-b.pitches);for(const t of thr){if(p<=t.pitches)return t.days===0?'No rest':'${t.days}d rest';}return'2d rest';};
+  const ri=(p)=>{const cfg=state.configs.find(c=>c.id===g.configId);const thr=(cfg?.thresholds||DEFAULT_THRESHOLDS).slice().sort((a,b)=>a.pitches-b.pitches);for(const t of thr){if(p<=t.pitches)return t.days===0?'No rest':t.days+'d rest';}return'2d rest';};
   const pitcherLines=(side)=>{
     const tn=g[side+'Team'];const ps=g[side].pitchers.filter(p=>p.pitches>0);
     if(!ps.length)return`${tn} pitchers: None\n`;
