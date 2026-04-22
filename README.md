@@ -159,5 +159,4 @@ This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENS
 
 ## Future plans
 
-- Make the web app accessible directly from simplepitchcounter.com (browser-based version)
 - Android support
