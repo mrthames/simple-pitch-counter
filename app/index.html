@@ -129,21 +129,21 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 
 /* ── Simple mode ── */
 .hero-card{
-  background:var(--card);border-radius:20px;padding:18px 16px 16px;
-  margin-bottom:12px;text-align:center;
+  background:var(--card);border-radius:20px;padding:14px 16px 12px;
+  margin-bottom:10px;text-align:center;
   box-shadow:0 1px 0 rgba(0,0,0,.05);
 }
-.hero-at-bat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.hero-at-bat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .hero-at-bat-lbl{font-size:12px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
 .hero-at-bat-num{font-size:20px;font-weight:800;letter-spacing:-.5px;transition:color .2s}
-.hero-sep{width:100%;height:1px;background:var(--sep);margin-bottom:14px}
+.hero-sep{width:100%;height:1px;background:var(--sep);margin-bottom:10px}
 .hero-num{
-  font-size:88px;font-weight:900;line-height:1;letter-spacing:-4px;
+  font-size:64px;font-weight:900;line-height:1;letter-spacing:-3px;
   transition:transform .22s cubic-bezier(.36,1.6,.5,1),color .3s;
 }
-.hero-of{font-size:13px;color:var(--t2);margin-top:4px}
-.hero-rest{font-size:13px;font-weight:700;margin-top:6px}
-.pitch-dots{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.hero-of{font-size:13px;color:var(--t2);margin-top:3px}
+.hero-rest{font-size:13px;font-weight:700;margin-top:4px}
+.pitch-dots{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:10px}
 .pitch-dot{width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,.12)}
 
 /* ── Advanced mode ── */
@@ -353,7 +353,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 }
 .setup-nav-title{font-size:17px;font-weight:700}
 .setup-content{padding:0 20px;display:flex;flex-direction:column;gap:20px;
-  padding-bottom:calc(env(safe-area-inset-bottom,0px)+60px)}
+  padding-bottom:calc(env(safe-area-inset-bottom,0px)+100px)}
 .section-header-lbl{font-size:13px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding:0 4px}
 /* Mode cards */
 .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -498,19 +498,16 @@ textarea{resize:vertical;min-height:56px}
     <div>
       <div class="section-header-lbl">Tracking Mode</div>
       <div class="mode-grid">
-        <div class="mode-card" id="mode-simple" onclick="setGameMode('simple')">
+        <div class="mode-card selected" id="mode-simple" onclick="setGameMode('simple')">
           <div class="mode-card-icon">#</div>
           <div class="mode-card-title">Simple</div>
           <div class="mode-card-sub">Pitch count only</div>
         </div>
-        <div class="mode-card selected" id="mode-advanced" onclick="setGameMode('advanced')">
+        <div class="mode-card" id="mode-advanced" onclick="setGameMode('advanced')">
           <div class="mode-card-icon">B·K·F</div>
           <div class="mode-card-title">Advanced</div>
           <div class="mode-card-sub">Track every pitch type</div>
         </div>
-      </div>
-      <div id="mode-info" style="background:var(--blue-bg);border-radius:12px;padding:10px 13px;margin-top:10px;font-size:12px;color:#0050CC;line-height:1.5">
-        <strong>Advanced mode</strong> tracks balls, called/swinging strikes, fouls, and balls in play. Outs and innings advance automatically.
       </div>
     </div>
     <!-- Config -->
@@ -531,16 +528,16 @@ textarea{resize:vertical;min-height:56px}
         <div class="form-row"><div class="form-row-lbl">Date</div><input class="form-input" type="date" id="s-date"></div>
         <div class="form-row"><div class="form-row-lbl">Time</div><input class="form-input" type="time" id="s-time"></div>
         <div class="form-row"><div class="form-row-lbl">Field</div><div id="field-sel-wrap" style="flex:1"></div></div>
-        <div class="form-row"><div class="form-row-lbl">Home</div><input class="form-input" type="text" id="s-home" placeholder="Home team name"></div>
-        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Away</div><input class="form-input" type="text" id="s-away" placeholder="Away team name"></div>
+        <div class="form-row"><div class="form-row-lbl">Home</div><input class="form-input" type="text" id="s-home" placeholder="Home team name" autocapitalize="words"></div>
+        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Away</div><input class="form-input" type="text" id="s-away" placeholder="Away team name" autocapitalize="words"></div>
       </div>
     </div>
     <!-- Umpires -->
     <div>
       <div class="section-header-lbl">Umpires (optional)</div>
       <div class="form-card">
-        <div class="form-row"><div class="form-row-lbl">Plate</div><input class="form-input" type="text" id="s-ump-plate" placeholder="Name"></div>
-        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Base</div><input class="form-input" type="text" id="s-ump-base" placeholder="Name"></div>
+        <div class="form-row"><div class="form-row-lbl">Plate</div><input class="form-input" type="text" id="s-ump-plate" placeholder="Name" autocapitalize="words"></div>
+        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Base</div><input class="form-input" type="text" id="s-ump-base" placeholder="Name" autocapitalize="words"></div>
       </div>
     </div>
     <!-- Home pitchers -->
@@ -548,8 +545,8 @@ textarea{resize:vertical;min-height:56px}
       <div class="section-header-lbl">Home Team</div>
       <div class="team-lbl home">Home</div>
       <div class="form-card">
-        <div class="form-row"><div class="form-row-lbl">Pitcher</div><input class="form-input" type="text" id="hp-name" placeholder="Name"><input type="text" id="hp-num" placeholder="#" style="width:52px;border:none;background:transparent;outline:none;font-size:16px;color:var(--t2);text-align:right;padding-right:4px"></div>
-        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Catcher</div><input class="form-input" type="text" id="hc-name" placeholder="Name"><input type="text" id="hc-num" placeholder="#" style="width:52px;border:none;background:transparent;outline:none;font-size:16px;color:var(--t2);text-align:right;padding-right:4px"></div>
+        <div class="form-row"><div class="form-row-lbl">Pitcher</div><input class="form-input" type="text" id="hp-name" placeholder="Name" autocapitalize="words"><input type="text" id="hp-num" placeholder="#" style="width:52px;border:none;background:transparent;outline:none;font-size:16px;color:var(--t2);text-align:right;padding-right:4px"></div>
+        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Catcher</div><input class="form-input" type="text" id="hc-name" placeholder="Name" autocapitalize="words"><input type="text" id="hc-num" placeholder="#" style="width:52px;border:none;background:transparent;outline:none;font-size:16px;color:var(--t2);text-align:right;padding-right:4px"></div>
       </div>
     </div>
     <!-- Away pitchers -->
@@ -557,8 +554,8 @@ textarea{resize:vertical;min-height:56px}
       <div class="section-header-lbl">Away Team</div>
       <div class="team-lbl away">Away</div>
       <div class="form-card">
-        <div class="form-row"><div class="form-row-lbl">Pitcher</div><input class="form-input" type="text" id="ap-name" placeholder="Name"><input type="text" id="ap-num" placeholder="#" style="width:52px;border:none;background:transparent;outline:none;font-size:16px;color:var(--t2);text-align:right;padding-right:4px"></div>
-        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Catcher</div><input class="form-input" type="text" id="ac-name" placeholder="Name"><input type="text" id="ac-num" placeholder="#" style="width:52px;border:none;background:transparent;outline:none;font-size:16px;color:var(--t2);text-align:right;padding-right:4px"></div>
+        <div class="form-row"><div class="form-row-lbl">Pitcher</div><input class="form-input" type="text" id="ap-name" placeholder="Name" autocapitalize="words"><input type="text" id="ap-num" placeholder="#" style="width:52px;border:none;background:transparent;outline:none;font-size:16px;color:var(--t2);text-align:right;padding-right:4px"></div>
+        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl">Catcher</div><input class="form-input" type="text" id="ac-name" placeholder="Name" autocapitalize="words"><input type="text" id="ac-num" placeholder="#" style="width:52px;border:none;background:transparent;outline:none;font-size:16px;color:var(--t2);text-align:right;padding-right:4px"></div>
       </div>
     </div>
     <div class="start-btn" onclick="startGame()">Start Game</div>
@@ -628,7 +625,7 @@ textarea{resize:vertical;min-height:56px}
       <div class="btn-sm" id="p-change-btn" onclick="togglePSelect()">Change</div>
     </div>
     <div id="pitcher-select-list" style="display:none"></div>
-    <div id="simple-alerts" style="display:none;min-height:48px"></div>
+    <div id="simple-alerts" style="display:none"></div>
 
     <!-- Advanced mode content -->
     <div id="adv-content" style="display:none">
@@ -719,8 +716,8 @@ textarea{resize:vertical;min-height:56px}
     <div>
       <div class="section-header-lbl">Home Runs</div>
       <div class="form-card">
-        <div class="form-row"><div class="form-row-lbl" id="sum-hr-hl">Home</div><input class="form-input" id="sum-hr-home" placeholder="Player names"></div>
-        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl" id="sum-hr-al">Away</div><input class="form-input" id="sum-hr-away" placeholder="Player names"></div>
+        <div class="form-row"><div class="form-row-lbl" id="sum-hr-hl">Home</div><input class="form-input" id="sum-hr-home" placeholder="Player names" autocapitalize="words"></div>
+        <div class="form-row" style="border-bottom:none"><div class="form-row-lbl" id="sum-hr-al">Away</div><input class="form-input" id="sum-hr-away" placeholder="Player names" autocapitalize="words"></div>
       </div>
     </div>
     <!-- Pitcher summary -->
@@ -831,7 +828,7 @@ const PT_TYPES = {
 const DEFAULT_THRESHOLDS=[{pitches:20,days:0},{pitches:35,days:1},{pitches:50,days:2}];
 let PITCH_MAX=50, C_INN_LIM=4, PITCH_C_LIM=41, MERCY_RUNS=0;
 const BATTER_WARN=6, BATTER_CRIT=9;
-let selectedMode='advanced'; // for setup
+let selectedMode='simple'; // for setup
 
 // ── State ──
 let state = { currentGame:null, games:[], configs:[], activeConfigId:null, fields:[] };
@@ -881,12 +878,11 @@ function setGameMode(m){
   selectedMode=m;
   document.getElementById('mode-simple').classList.toggle('selected',m==='simple');
   document.getElementById('mode-advanced').classList.toggle('selected',m==='advanced');
-  document.getElementById('mode-info').style.display=m==='advanced'?'block':'none';
 }
 function initSetup(){
   const today=new Date();
   document.getElementById('s-date').value=today.toISOString().split('T')[0];
-  document.getElementById('s-time').value='';
+  document.getElementById('s-time').value=today.getHours().toString().padStart(2,'0')+':'+today.getMinutes().toString().padStart(2,'0');
   document.getElementById('s-home').value='';
   document.getElementById('s-away').value='';
   ['hp-name','hp-num','hc-name','hc-num','ap-name','ap-num','ac-name','ac-num','s-ump-plate','s-ump-base'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -1318,11 +1314,12 @@ function renderPitcherSection(){
   const psl=document.getElementById('pitcher-select-list');
   if(g.pSelectOpen){
     psl.style.display='block';
-    let h=roster.pitchers.map((p,i)=>{
+    let h='<div class="player-picker">';
+    h+=roster.pitchers.map((p,i)=>{
       const isA=i===idx;const ri2=restInfo(p.pitches);
       return`<div class="player-row" onclick="selectPitcher(${i})"><div class="player-radio" style="background:${isA?'var(--blue)':'transparent'};border:2px solid ${isA?'var(--blue)':'var(--sep2)'}"></div><div class="player-info"><div class="player-info-name">${p.name}${p.num?' <span class="player-info-num">#'+p.num+'</span>':''}</div><div class="player-info-sub">${p.pitches} pitches${ri2?` · ${ri2.label}`:''}</div></div>${isA?'<div class="badge-active">Active</div>':''}</div>`;
     }).join('');
-    h+=`<div class="add-player-form"><input type="text" id="new-p-name" placeholder="New pitcher name"><input type="text" id="new-p-num" class="num-input" placeholder="#"><div class="btn-sm" style="background:var(--blue);color:#fff;border-radius:10px;white-space:nowrap" onclick="addNewPitcherMidGame()">Add</div></div>`;
+    h+=`<div class="add-player-form"><input type="text" id="new-p-name" placeholder="New pitcher name" autocapitalize="words"><input type="text" id="new-p-num" class="num-input" placeholder="#"><div class="btn-sm" style="background:var(--blue);color:#fff;border-radius:10px;white-space:nowrap" onclick="addNewPitcherMidGame()">Add</div></div></div>`;
     psl.innerHTML=h;
   }else psl.style.display='none';
 }
@@ -1345,7 +1342,7 @@ function renderCatcherSection(){
   if(g.cSelectOpen){
     h+=`<div class="player-picker">`;
     h+=roster.catchers.map((c,i)=>`<div class="player-row" onclick="selectCatcher(${i})"><div class="player-radio" style="background:${i===ci?'var(--blue)':'transparent'};border:2px solid ${i===ci?'var(--blue)':'var(--sep2)'}"></div><div class="player-info"><div class="player-info-name">${c.name}${c.num?' <span style="color:var(--t3)">#'+c.num+'</span>':''}</div><div class="player-info-sub">${c.innings.filter(Boolean).length} inning${c.innings.filter(Boolean).length!==1?'s':''} caught</div></div>${i===ci?'<div class="badge-active">Active</div>':''}</div>`).join('');
-    h+=`<div class="add-player-form"><input type="text" id="new-c-name" placeholder="New catcher name"><input type="text" id="new-c-num" class="num-input" placeholder="#"><div class="btn-sm" style="background:var(--blue);color:#fff;border-radius:10px;white-space:nowrap" onclick="addNewCatcherMidGame()">Add</div></div></div>`;
+    h+=`<div class="add-player-form"><input type="text" id="new-c-name" placeholder="New catcher name" autocapitalize="words"><input type="text" id="new-c-num" class="num-input" placeholder="#"><div class="btn-sm" style="background:var(--blue);color:#fff;border-radius:10px;white-space:nowrap" onclick="addNewCatcherMidGame()">Add</div></div></div>`;
   }
   if(cat){
     const inn=cat.innings.filter(Boolean).length;
@@ -1354,7 +1351,6 @@ function renderCatcherSection(){
     const pipColor=maxed?'var(--red)':warn?'var(--amber)':'var(--blue)';
     const pips=Array.from({length:C_INN_LIM}).map((_,i)=>`<div class="inn-pip ${i<inn?(maxed?'danger':warn?'warn':'filled'):''}"></div>`).join('');
     h+=`<div class="catcher-card ${maxed?'maxed':warn?'warn':''}"><div><div style="font-size:12px;color:${maxed?'var(--red)':'var(--t2)'};font-weight:500">${maxed?'Inning limit reached':`${left} inning${left!==1?'s':''} remaining`}</div><div class="inn-pips" style="margin-top:7px">${pips}</div></div><div style="text-align:right"><div class="catcher-count-num" style="color:${maxed?'var(--red)':warn?'var(--amber)':'var(--text)'}">${inn}</div><div style="font-size:11px;color:var(--t2);font-weight:600">of ${C_INN_LIM} inn.</div></div></div>`;
-    if(ap&&ap.pitches>=PITCH_C_LIM)h+=`<div class="alert a-warn"><div class="alert-dot"></div><span>Active pitcher threw ${ap.pitches}+ pitches — ineligible to catch remainder of day.</span></div>`;
     if(warn&&!maxed)h+=`<div class="alert a-warn"><div class="alert-dot"></div><span>${cat.name} is in their last allowed inning (${C_INN_LIM} inn. max).</span></div>`;
     if(maxed)h+=`<div class="alert a-danger"><div class="alert-dot"></div><span>${cat.name} has reached the ${C_INN_LIM}-inning catcher limit. Change catcher.</span></div>`;
   }else{h+=`<div style="font-size:13px;color:var(--t2);padding:6px 0">No catcher added.</div>`;}

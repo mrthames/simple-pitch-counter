@@ -128,4 +128,11 @@ test.describe('Pitcher and catcher management', () => {
     await expect(catcherSection).toContainText('3 innings remaining');
     await expect(catcherSection).toContainText('of 4 inn.');
   });
+
+  test('change pitcher picker uses player-picker card style', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await expect(page.locator('#pitcher-select-list .player-picker')).toBeVisible();
+  });
 });

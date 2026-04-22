@@ -92,13 +92,50 @@ test.describe('History and configuration', () => {
     await expect(page.locator('#setup-config-name')).toContainText('Default');
   });
 
+  test('setup defaults to simple mode', async ({ page }) => {
+    await page.click('.new-game-btn');
+    await expect(page.locator('#mode-simple')).toHaveClass(/selected/);
+    await expect(page.locator('#mode-advanced')).not.toHaveClass(/selected/);
+  });
+
   test('setup mode toggle between simple and advanced', async ({ page }) => {
     await page.click('.new-game-btn');
-    await page.click('#mode-simple');
     await expect(page.locator('#mode-simple')).toHaveClass(/selected/);
 
     await page.click('#mode-advanced');
     await expect(page.locator('#mode-advanced')).toHaveClass(/selected/);
+    await expect(page.locator('#mode-simple')).not.toHaveClass(/selected/);
+
+    await page.click('#mode-simple');
+    await expect(page.locator('#mode-simple')).toHaveClass(/selected/);
+    await expect(page.locator('#mode-advanced')).not.toHaveClass(/selected/);
+  });
+
+  test('setup auto-populates current time', async ({ page }) => {
+    await page.click('.new-game-btn');
+    const timeVal = await page.locator('#s-time').inputValue();
+    expect(timeVal).toMatch(/^\d{2}:\d{2}$/);
+  });
+
+  test('setup date is pre-filled with today', async ({ page }) => {
+    await page.click('.new-game-btn');
+    const dateVal = await page.locator('#s-date').inputValue();
+    const today = new Date().toISOString().split('T')[0];
+    expect(dateVal).toBe(today);
+  });
+
+  test('setup name fields have autocapitalize attribute', async ({ page }) => {
+    await page.click('.new-game-btn');
+    const nameFields = ['#hp-name', '#hc-name', '#ap-name', '#ac-name', '#s-ump-plate', '#s-ump-base', '#s-home', '#s-away'];
+    for (const sel of nameFields) {
+      await expect(page.locator(sel)).toHaveAttribute('autocapitalize', 'words');
+    }
+  });
+
+  test('advanced mode description text is not shown', async ({ page }) => {
+    await page.click('.new-game-btn');
+    await page.click('#mode-advanced');
+    await expect(page.locator('#mode-info')).toHaveCount(0);
   });
 
   test('setup cancel returns to history', async ({ page }) => {
