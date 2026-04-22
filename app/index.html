@@ -794,12 +794,7 @@ function haptic(t){try{window.webkit?.messageHandlers?.haptic?.postMessage(t||'m
 const BTN_DEFAULTS_SIMPLE = { volUp:'pitch', volDown:'undo', action:'nextBatter' };
 const BTN_DEFAULTS_ADVANCED = { volUp:'nextBatter', volDown:'undo', action:'recordOut' };
 let btnMapping = { ...BTN_DEFAULTS_SIMPLE };
-function hasActionButton(){
-  const ua=navigator.userAgent;
-  if(!/iPhone/.test(ua))return false;
-  const m=ua.match(/iPhone\s*OS\s*(\d+)/);
-  return m&&parseInt(m[1])>=17;
-}
+function hasActionButton(){return false;}
 function applyModeDefaults(){
   const g=state.currentGame;if(!g)return;
   const defs=g.mode==='advanced'?BTN_DEFAULTS_ADVANCED:BTN_DEFAULTS_SIMPLE;
