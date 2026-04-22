@@ -25,6 +25,15 @@ DerivedData/
 *.perspectivev3
 xcuserdata/
 
+# Android
+android/.gradle/
+android/.idea/
+android/app/build/
+android/app/src/main/assets/index.html
+android/local.properties
+*.jks
+keystore.properties
+
 # Sensitive credentials and NAS-only files
 website/contact.php
 website/feedback.php
