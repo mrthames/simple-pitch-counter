@@ -2034,7 +2034,7 @@ function generateExport(){
 }
 function buildSummaryText(){
   const g=state.currentGame||state._expGame;if(!g)return'';
-  const ri=(p)=>{const cfg=state.configs.find(c=>c.id===g.configId);const thr=(cfg?.thresholds||DEFAULT_THRESHOLDS).slice().sort((a,b)=>a.pitches-b.pitches);for(const t of thr){if(p<=t.pitches)return t.days===0?'No rest':'${t.days}d rest';}return'2d rest';};
+  const ri=(p)=>{const cfg=state.configs.find(c=>c.id===g.configId);const thr=(cfg?.thresholds||DEFAULT_THRESHOLDS).slice().sort((a,b)=>a.pitches-b.pitches);for(const t of thr){if(p<=t.pitches)return t.days===0?'No rest':t.days+'d rest';}return'2d rest';};
   const pitcherLines=(side)=>{
     const tn=g[side+'Team'];const ps=g[side].pitchers.filter(p=>p.pitches>0);
     if(!ps.length)return`${tn} pitchers: None\n`;
