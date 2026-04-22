@@ -74,22 +74,25 @@ npm run test:ui          # Interactive Playwright UI
 
 ## Versioning
 
-### Marketing Version (`CFBundleShortVersionString`)
+### Marketing Version
 
-Set manually in Xcode project (`MARKETING_VERSION`). Current: **2.2**
+Set manually. Current: **2.2**. Kept in sync between iOS (`MARKETING_VERSION` in Xcode) and Android (`versionName` in `build.gradle.kts`).
 
 Bump schedule:
 - **Patch** (2.0 → 2.1): bug fixes, small improvements
 - **Minor** (2.1 → 2.2): new features
 - **Major** (2.x → 3.0): defined by product owner
 
-### Build Number (`CFBundleVersion`)
+### Build Number / Version Code
 
-**Automated.** Set at build time by an Xcode build phase script:
+**Automated.** Both platforms derive the build number from git commit count at build time:
 
 ```bash
 git rev-list --count HEAD
 ```
+
+- **iOS:** Xcode build phase script sets `CFBundleVersion`
+- **Android:** Gradle `providers.exec` sets `versionCode`
 
 Every git commit increments the build number. No manual action needed.
 
@@ -116,27 +119,76 @@ Every git commit increments the build number. No manual action needed.
 
 ---
 
+## Android Deployment (Google Play)
+
+### Deploy Steps
+
+1. Merge feature branch to `main`
+2. Open Android Studio, pull latest from main
+3. **Build → Clean Project** (forces Gradle to re-read git commit count for versionCode)
+4. **Build → Generate Signed Bundle**
+   - Module: `SimplePitchCounter.app`
+   - Key store path: `android/upload-keystore.jks`
+   - Key alias: `upload`
+   - Check "Remember passwords" to save for future builds
+5. Go to **Google Play Console → Testing → Closed testing → Closed Beta**
+6. **Create new release** → upload AAB from `android/app/build/outputs/bundle/release/app-release.aab`
+7. Release name: `2.x (build N)` where N = versionCode shown in the console
+8. Add release notes → **Review release** → **Start rollout**
+
+> **Important:** Always Clean Project before generating a signed bundle. Gradle caches the versionCode and will reject the upload if it matches a previously uploaded version code.
+
+### Signing
+
+- **Upload keystore:** `android/upload-keystore.jks` (gitignored, stored locally)
+- **Keystore config:** `android/keystore.properties` (gitignored, contains passwords)
+- Google Play App Signing re-signs the app with Google's own key for distribution
+
+### Release Tracks
+
+| Track | Status | Purpose |
+|-------|--------|---------|
+| Internal testing | Available | Up to 100 testers, no review, available in minutes |
+| Closed testing (Closed Beta) | **Active** | Invite-only testers, requires review |
+| Production | Locked | Requires 12 opted-in testers on closed testing for 14 days |
+
+---
+
 ## Website Deployment (simplepitchcounter.com)
 
-Hosted on Synology NAS. Deploy via local SCP from Mac (NAS is on local network only — not reachable from GitHub Actions).
+Hosted on Synology NAS via Nginx (Web Station). Deploy via local SCP (NAS is on local network only — not reachable from GitHub Actions).
 
 ### Deploy Steps
 
 Deploy website files via SCP to the NAS web root. Connection details (host, port, SSH key path) are kept outside the repo.
 
+Each page must be deployed to **two locations** for clean URL support:
+
 ```bash
+# Root location (backward compatibility)
 scp -O -P <port> website/index.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/
-scp -O -P <port> website/privacy.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/
-scp -O -P <port> website/contact.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/
+
+# Subpage — both root .html and directory index.html
+scp -O -P <port> website/android-beta.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/android-beta.html
+scp -O -P <port> website/android-beta.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/android-beta/index.html
 ```
+
+Repeat the two-location pattern for `privacy`, `contact`, and `feedback` pages.
+
+### Clean URLs
+
+Pages are served via directory-based URLs (e.g., `simplepitchcounter.com/android-beta/` instead of `android-beta.html`). Nginx serves `index.html` from subdirectories automatically. All internal links use extensionless paths (e.g., `href="privacy"` not `href="privacy.html"`).
 
 ### NAS-Only Files (Not in Git)
 
 | File | Purpose |
 |------|---------|
+| `android-beta.php` | Android beta signup form mailer (AWS WorkMail SMTP credentials) |
 | `contact.php` | Contact form mailer (AWS WorkMail SMTP credentials) |
 | `feedback.php` | Feedback form → GitHub Issues (GitHub PAT) |
 | `phpmailer/` | PHPMailer library |
+
+These files contain credentials and are deployed directly via SCP — never committed to git.
 
 ---
 
@@ -154,3 +206,9 @@ scp -O -P <port> website/contact.html <user>@<nas-host>:/volume1/Websites/simple
 
 ### iOS signing error
 - Xcode → Signing & Capabilities → ensure automatic signing with Apple Developer account
+
+### Android version code already used
+- Gradle caches the versionCode from `git rev-list --count HEAD`. Run **Build → Clean Project** then rebuild the signed bundle. The new commit count will be picked up.
+
+### Android AAB timestamp looks stale
+- Gradle may report "UP-TO-DATE" for tasks if sources haven't changed since last build. Run **Build → Clean Project** first to force a full rebuild.
