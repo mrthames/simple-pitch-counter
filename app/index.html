@@ -833,8 +833,9 @@ textarea{resize:vertical;min-height:56px}
 
 </div><!-- end .app -->
 <script>
+if(!CanvasRenderingContext2D.prototype.roundRect){CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){if(typeof r==='number')r=[r,r,r,r];const[tl,tr,br,bl]=r;this.moveTo(x+tl,y);this.lineTo(x+w-tr,y);this.arcTo(x+w,y,x+w,y+tr,tr);this.lineTo(x+w,y+h-br);this.arcTo(x+w,y+h,x+w-br,y+h,br);this.lineTo(x+bl,y+h);this.arcTo(x,y+h,x,y+h-bl,bl);this.lineTo(x,y+tl);this.arcTo(x,y,x+tl,y,tl);return this;};}
 // ── Haptic ──
-function haptic(t){try{window.webkit?.messageHandlers?.haptic?.postMessage(t||'medium')}catch(e){}}
+function haptic(t){try{if(window.Android)window.Android.haptic(t||'medium');else window.webkit?.messageHandlers?.haptic?.postMessage(t||'medium')}catch(e){}}
 
 // ── Physical button mapping (JS side) ──
 const BTN_DEFAULTS_SIMPLE = { volUp:'pitch', volDown:'undo', action:'nextBatter' };
@@ -911,8 +912,19 @@ function showScreen(n){
     if(n==='summary')initSummary();
   };
   if(document.startViewTransition)document.startViewTransition(go);else go();
-  if(window.webkit?.messageHandlers?.screenChange)window.webkit.messageHandlers.screenChange.postMessage(n);
+  if(window.Android)window.Android.screenChange(n);else if(window.webkit?.messageHandlers?.screenChange)window.webkit.messageHandlers.screenChange.postMessage(n);
 }
+window.onAndroidBack=function(){
+  const modal=document.getElementById('modal-overlay');if(modal){closeModal();return true;}
+  const ss=document.querySelector('.stats-sheet-overlay');if(ss){ss.remove();return true;}
+  const active=document.querySelector('.screen.active');
+  if(!active)return false;
+  const id=active.id.replace('screen-','');
+  if(id==='game'){showScreen('history');return true;}
+  if(id==='setup'||id==='config'||id==='about'){showScreen('history');return true;}
+  if(id==='summary'){showScreen('history');return true;}
+  return false;
+};
 
 // ── Setup ──
 function setGameMode(m){
@@ -1596,12 +1608,12 @@ function renderPitcherListCardToCanvas(gameData){
 }
 function shareStatsCard(pitcher,gameData){
   const dataUrl=renderStatsCardToCanvas(pitcher,gameData);if(!dataUrl)return;
-  if(window.webkit?.messageHandlers?.shareImage)window.webkit.messageHandlers.shareImage.postMessage(dataUrl);
+  if(window.Android)window.Android.shareImage(dataUrl);else if(window.webkit?.messageHandlers?.shareImage)window.webkit.messageHandlers.shareImage.postMessage(dataUrl);
   else{const a=document.createElement('a');a.href=dataUrl;a.download='pitcher-stats.png';a.click();}
 }
 function sharePitcherListCard(gameData){
   const dataUrl=renderPitcherListCardToCanvas(gameData);if(!dataUrl)return;
-  if(window.webkit?.messageHandlers?.shareImage)window.webkit.messageHandlers.shareImage.postMessage(dataUrl);
+  if(window.Android)window.Android.shareImage(dataUrl);else if(window.webkit?.messageHandlers?.shareImage)window.webkit.messageHandlers.shareImage.postMessage(dataUrl);
   else{const a=document.createElement('a');a.href=dataUrl;a.download='game-stats.png';a.click();}
 }
 function showPitcherStats(){
