@@ -17,6 +17,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
     // Volume button tracking
     private var prevVolume: Float = 0.5
     private var volumeKVOActive = false
+    private weak var systemVolumeSlider: UISlider?
     // Debounce: ignore rapid repeat presses within 0.25s
     private var lastVolumeFire: TimeInterval = 0
     private let volumeDebounce: TimeInterval = 0.25
@@ -72,6 +73,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         // Activate audio session so we can observe outputVolume
         let session = AVAudioSession.sharedInstance()
         do {
+            try session.setCategory(.ambient, options: .mixWithOthers)
             try session.setActive(true)
         } catch {
             print("AVAudioSession activate error: \(error)")
@@ -83,12 +85,11 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
                             context: nil)
         volumeKVOActive = true
 
-        // Add an invisible MPVolumeView — this suppresses the system volume HUD
-        // so the volume overlay doesn't appear when the user presses the buttons.
         let volumeView = MPVolumeView(frame: CGRect(x: -100, y: -100, width: 1, height: 1))
         volumeView.alpha = 0.001
         volumeView.isUserInteractionEnabled = false
         view.addSubview(volumeView)
+        systemVolumeSlider = volumeView.subviews.first(where: { $0 is UISlider }) as? UISlider
     }
 
     override func observeValue(forKeyPath keyPath: String?,
@@ -115,11 +116,8 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         }
         prevVolume = newVol
 
-        // Reset volume toward center (0.5) so there's room for future presses
-        // without hitting the system min/max.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            let slider = MPVolumeView.volumeSlider()
-            slider?.value = 0.5
+            self.systemVolumeSlider?.value = 0.5
             self.prevVolume = 0.5
         }
     }
@@ -255,11 +253,3 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
     }
 }
 
-// MARK: - MPVolumeView helper (access hidden slider)
-
-private extension MPVolumeView {
-    static func volumeSlider() -> UISlider? {
-        let v = MPVolumeView(frame: .zero)
-        return v.subviews.first(where: { $0 is UISlider }) as? UISlider
-    }
-}
