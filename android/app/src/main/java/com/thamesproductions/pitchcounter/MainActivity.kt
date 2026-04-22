@@ -73,6 +73,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            override fun onPageFinished(view: WebView, url: String) {
+                super.onPageFinished(view, url)
+                val statusBarPx = getStatusBarHeight()
+                val statusBarCss = statusBarPx / resources.displayMetrics.density
+                view.evaluateJavascript(
+                    "document.documentElement.style.setProperty('--android-status-bar','${statusBarCss}px')",
+                    null
+                )
+            }
         }
 
         webView.webChromeClient = object : WebChromeClient() {
@@ -199,6 +208,11 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             android.util.Log.e("SimplePitchCounter", "Share failed", e)
         }
+    }
+
+    private fun getStatusBarHeight(): Int {
+        val resId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (resId > 0) resources.getDimensionPixelSize(resId) else 0
     }
 
     inner class WebAppInterface {
