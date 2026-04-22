@@ -1424,6 +1424,107 @@ function statLineHtml(p){
     ${mkStat('P/BF',s.pbf)}
   </div>`;
 }
+function renderStatsCardToCanvas(pitcher,gameData){
+  const g=gameData||state.currentGame;if(!g||!pitcher)return null;
+  const s=pitcherDerivedStats(pitcher);
+  const ri=restInfo(pitcher.pitches);
+  const restText=ri?ri.label:'No pitches';
+  const types=['B','CS','SS','F','BIP'];
+  const total=pitcher.pitches||0;const denom=total||1;
+  const ptColors={B:'#1A6BFF',CS:'#FF3B30',SS:'#C0272D',F:'#FF9500',BIP:'#34C759'};
+  const isAdv=g.mode==='advanced';
+  const W=720,pad=40;let y=pad;
+  const c=document.createElement('canvas');c.width=W;
+  const ctx=c.getContext('2d');
+  const drawCard=()=>{
+    ctx.fillStyle='#0b1c3a';ctx.fillRect(0,0,c.width,c.height);
+    y=pad;
+    ctx.fillStyle='#fff';ctx.font='bold 32px -apple-system,system-ui,sans-serif';
+    ctx.fillText(pitcher.name+(pitcher.num?' #'+pitcher.num:''),pad,y+=32);
+    ctx.fillStyle='rgba(235,235,245,.5)';ctx.font='500 22px -apple-system,system-ui,sans-serif';
+    ctx.fillText(`${total} pitches · ${s.ip} IP · ${s.bf} BF`,pad,y+=34);
+    ctx.fillStyle=!ri||ri.days===0?'#34C759':ri.days===1?'#FF9500':'#FF3B30';
+    ctx.font='600 20px -apple-system,system-ui,sans-serif';
+    ctx.fillText(restText,pad,y+=30);y+=20;
+    const stats=[['P',total],['IP',s.ip],['BF',s.bf],['K',s.ks],['BB',s.bbs],['K/BB',s.kbb],['P/IP',s.pip],['P/BF',s.pbf]];
+    stats.forEach(([lbl,val])=>{
+      ctx.fillStyle='rgba(235,235,245,.06)';ctx.fillRect(pad,y,W-pad*2,1);
+      ctx.fillStyle='rgba(235,235,245,.6)';ctx.font='500 22px -apple-system,system-ui,sans-serif';
+      ctx.fillText(lbl,pad,y+28);
+      ctx.fillStyle='#fff';ctx.font='bold 22px -apple-system,system-ui,sans-serif';
+      const tw=ctx.measureText(String(val)).width;ctx.fillText(String(val),W-pad-tw,y+28);
+      y+=38;
+    });
+    if(isAdv){
+      y+=10;ctx.fillStyle='rgba(235,235,245,.45)';ctx.font='bold 16px -apple-system,system-ui,sans-serif';
+      ctx.fillText('PITCH BREAKDOWN',pad,y+=20);y+=12;
+      types.forEach(k=>{
+        const v=(pitcher.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;
+        ctx.fillStyle=ptColors[k];ctx.beginPath();ctx.roundRect(pad,y,50,28,6);ctx.fill();
+        ctx.fillStyle='#fff';ctx.font='bold 16px -apple-system,system-ui,sans-serif';
+        const lw=ctx.measureText(k).width;ctx.fillText(k,pad+25-lw/2,y+19);
+        ctx.fillStyle='rgba(255,255,255,.15)';ctx.beginPath();ctx.roundRect(pad+60,y+6,W-pad*2-120,16,4);ctx.fill();
+        if(pct>0){ctx.fillStyle=ptColors[k];ctx.beginPath();ctx.roundRect(pad+60,y+6,Math.max(8,(W-pad*2-120)*pct/100),16,4);ctx.fill();}
+        ctx.fillStyle='#fff';ctx.font='bold 18px -apple-system,system-ui,sans-serif';
+        const vt=String(v);const vtw=ctx.measureText(vt).width;ctx.fillText(vt,W-pad-60-vtw,y+20);
+        ctx.fillStyle='rgba(235,235,245,.5)';ctx.font='500 16px -apple-system,system-ui,sans-serif';
+        const pt2=pct+'%';const ptw=ctx.measureText(pt2).width;ctx.fillText(pt2,W-pad-ptw,y+19);
+        y+=36;
+      });
+    }
+    y+=16;ctx.fillStyle='rgba(235,235,245,.3)';ctx.font='500 16px -apple-system,system-ui,sans-serif';
+    const tag='Simple Pitch Counter';const tagW=ctx.measureText(tag).width;ctx.fillText(tag,(W-tagW)/2,y+=20);
+    y+=pad;
+  };
+  c.height=800;drawCard();c.height=y;drawCard();
+  return c.toDataURL('image/png');
+}
+function renderPitcherListCardToCanvas(gameData){
+  const g=gameData||state.currentGame;if(!g)return null;
+  const allP=[...g.home.pitchers.map(p=>({...p,team:g.homeTeam})),...g.away.pitchers.map(p=>({...p,team:g.awayTeam}))];
+  const W=720,pad=40;let y=pad;
+  const c=document.createElement('canvas');c.width=W;
+  const ctx=c.getContext('2d');
+  const drawCard=()=>{
+    ctx.fillStyle='#0b1c3a';ctx.fillRect(0,0,c.width,c.height);
+    y=pad;
+    ctx.fillStyle='#fff';ctx.font='bold 28px -apple-system,system-ui,sans-serif';
+    ctx.fillText(`${g.awayTeam} vs ${g.homeTeam}`,pad,y+=28);
+    ctx.fillStyle='rgba(235,235,245,.5)';ctx.font='500 20px -apple-system,system-ui,sans-serif';
+    ctx.fillText(`${g.date||''}${g.time?' · '+g.time:''}`,pad,y+=30);
+    ctx.fillText(`Final: ${g.homeTeam} ${g.homeScore} – ${g.awayTeam} ${g.awayScore}`,pad,y+=26);
+    y+=20;
+    allP.forEach(p=>{
+      const s=pitcherDerivedStats(p);const ri2=restInfo(p.pitches);
+      const rc=!ri2||ri2.days===0?'#34C759':ri2.days===1?'#FF9500':'#FF3B30';
+      ctx.fillStyle='rgba(255,255,255,.06)';ctx.beginPath();ctx.roundRect(pad,y,W-pad*2,80,14);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='bold 22px -apple-system,system-ui,sans-serif';
+      ctx.fillText(p.name+(p.num?' #'+p.num:''),pad+16,y+28);
+      ctx.fillStyle='rgba(235,235,245,.5)';ctx.font='500 16px -apple-system,system-ui,sans-serif';
+      ctx.fillText(`${p.team} · ${s.ip} IP · Last batter: ${p.lastBatterPitches||0}`,pad+16,y+52);
+      ctx.fillStyle='#fff';ctx.font='bold 30px -apple-system,system-ui,sans-serif';
+      const ct=String(p.pitches);const cw=ctx.measureText(ct).width;ctx.fillText(ct,W-pad-16-cw,y+34);
+      ctx.fillStyle=rc;ctx.font='600 14px -apple-system,system-ui,sans-serif';
+      const rt=ri2?ri2.label:'';const rw=ctx.measureText(rt).width;ctx.fillText(rt,W-pad-16-rw,y+56);
+      y+=92;
+    });
+    y+=10;ctx.fillStyle='rgba(235,235,245,.3)';ctx.font='500 16px -apple-system,system-ui,sans-serif';
+    const tag='Simple Pitch Counter';const tagW=ctx.measureText(tag).width;ctx.fillText(tag,(W-tagW)/2,y+=20);
+    y+=pad;
+  };
+  c.height=1200;drawCard();c.height=y;drawCard();
+  return c.toDataURL('image/png');
+}
+function shareStatsCard(pitcher,gameData){
+  const dataUrl=renderStatsCardToCanvas(pitcher,gameData);if(!dataUrl)return;
+  if(window.webkit?.messageHandlers?.shareImage)window.webkit.messageHandlers.shareImage.postMessage(dataUrl);
+  else{const a=document.createElement('a');a.href=dataUrl;a.download='pitcher-stats.png';a.click();}
+}
+function sharePitcherListCard(gameData){
+  const dataUrl=renderPitcherListCardToCanvas(gameData);if(!dataUrl)return;
+  if(window.webkit?.messageHandlers?.shareImage)window.webkit.messageHandlers.shareImage.postMessage(dataUrl);
+  else{const a=document.createElement('a');a.href=dataUrl;a.download='game-stats.png';a.click();}
+}
 function showPitcherStats(){
   const ap=activePitcher();if(!ap)return;
   const g=state.currentGame;
@@ -1451,8 +1552,12 @@ function showPitcherStats(){
     <div style="font-size:12px;font-weight:600;color:${restColor};margin-bottom:16px">${restText}</div>
     ${statLineHtml(ap)}
     ${barsHtml}
-    <div onclick="document.getElementById('stats-sheet-overlay').remove();showStatsQuick()" style="margin-top:16px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">‹ All Pitchers</div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <div onclick="shareStatsCard(window._sharedPitcher)" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Share</div>
+      <div onclick="document.getElementById('stats-sheet-overlay').remove();showStatsQuick()" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">‹ All Pitchers</div>
+    </div>
   </div>`;
+  window._sharedPitcher=ap;
   el.appendChild(ov);
 }
 
@@ -1587,7 +1692,7 @@ function showStatsQuick(){
       <div onclick="const d=document.getElementById('${pid}');if(d)d.style.display=d.style.display==='none'?'block':'none'" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-size:15px;font-weight:700;color:#fff">${p.name}${p.num?' <span style="color:rgba(235,235,245,.4)">#'+p.num+'</span>':''}</div>
-          <div style="font-size:12px;color:rgba(235,235,245,.5);margin-top:2px">${team} · ${s.ip} IP · ${s.bf} BF</div>
+          <div style="font-size:12px;color:rgba(235,235,245,.5);margin-top:2px">${team} · ${s.ip} IP · Last batter: ${p.lastBatterPitches||0}</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:22px;font-weight:800;color:#fff">${p.pitches}</div>
@@ -1605,7 +1710,10 @@ function showStatsQuick(){
     <div style="font-size:13px;color:var(--dark-label);margin-bottom:16px">All pitchers · pitch counts & rest</div>
     ${homePitchers.join('')}
     ${awayPitchers.join('')}
-    <div onclick="document.getElementById('stats-sheet-overlay').remove()" style="margin-top:12px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <div onclick="sharePitcherListCard()" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Share</div>
+      <div onclick="document.getElementById('stats-sheet-overlay').remove()" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
+    </div>
   </div>`;
   el.appendChild(ov);
 }
@@ -1886,7 +1994,7 @@ function openSavedStats(gi){
       <div onclick="const d=document.getElementById('${pid}');if(d)d.style.display=d.style.display==='none'?'block':'none'" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-size:15px;font-weight:700;color:#fff">${p.name}${p.num?' <span style="color:rgba(235,235,245,.4)">#'+p.num+'</span>':''}</div>
-          <div style="font-size:12px;color:rgba(235,235,245,.5);margin-top:2px">${team} · ${s.ip} IP · ${s.bf} BF</div>
+          <div style="font-size:12px;color:rgba(235,235,245,.5);margin-top:2px">${team} · ${s.ip} IP · Last batter: ${p.lastBatterPitches||0}</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:22px;font-weight:800;color:#fff">${p.pitches}</div>
@@ -1898,6 +2006,7 @@ function openSavedStats(gi){
   };
   const homePitchers=(g.home?.pitchers||[]).filter(p=>p.pitches>0).map(p=>mkPitcherRow(p,g.homeTeam));
   const awayPitchers=(g.away?.pitchers||[]).filter(p=>p.pitches>0).map(p=>mkPitcherRow(p,g.awayTeam));
+  const savedGi=gi;
   ov.innerHTML=`<div class="stats-sheet">
     <div class="stats-handle"></div>
     <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${g.awayTeam} vs ${g.homeTeam}</div>
@@ -1905,7 +2014,10 @@ function openSavedStats(gi){
     ${homePitchers.join('')}
     ${awayPitchers.join('')}
     ${!homePitchers.length&&!awayPitchers.length?'<div style="font-size:13px;color:rgba(235,235,245,.5);text-align:center;padding:20px 0">No pitcher data recorded.</div>':''}
-    <div onclick="document.getElementById('saved-stats-overlay').remove()" style="margin-top:12px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <div onclick="sharePitcherListCard(state.games[${savedGi}])" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Share</div>
+      <div onclick="document.getElementById('saved-stats-overlay').remove()" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
+    </div>
   </div>`;
   document.body.appendChild(ov);
 }

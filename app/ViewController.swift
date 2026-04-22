@@ -34,6 +34,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         config.defaultWebpagePreferences = prefs
         config.userContentController.add(self, name: "haptic")
         config.userContentController.add(self, name: "screenChange")
+        config.userContentController.add(self, name: "shareImage")
 
         impactLight.prepare()
         impactMedium.prepare()
@@ -212,6 +213,10 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
 
     func userContentController(_ userContentController: WKUserContentController,
                                 didReceive message: WKScriptMessage) {
+        if message.name == "shareImage", let base64 = message.body as? String {
+            shareImageFromBase64(base64)
+            return
+        }
         if message.name == "screenChange", let screen = message.body as? String {
             let isDark = (screen == "game")
             currentStatusBarStyle = isDark ? .lightContent : .darkContent
@@ -234,6 +239,18 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         case "selection": selectionFeedback.selectionChanged(); selectionFeedback.prepare()
         default:        impactMedium.impactOccurred();  impactMedium.prepare()
         }
+    }
+
+    // MARK: - Share image via native share sheet
+
+    private func shareImageFromBase64(_ base64: String) {
+        let cleaned = base64.replacingOccurrences(of: "data:image/png;base64,", with: "")
+        guard let data = Data(base64Encoded: cleaned),
+              let image = UIImage(data: data) else { return }
+        let ac = UIActivityViewController(activityItems: [image], applicationActivities: nil)
+        ac.popoverPresentationController?.sourceView = view
+        ac.popoverPresentationController?.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
+        present(ac, animated: true)
     }
 
     // MARK: - Error fallback
