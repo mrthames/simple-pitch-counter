@@ -78,7 +78,8 @@ class MainActivity : AppCompatActivity() {
                 val statusBarPx = getStatusBarHeight()
                 val statusBarCss = statusBarPx / resources.displayMetrics.density
                 view.evaluateJavascript(
-                    "document.documentElement.style.setProperty('--android-status-bar','${statusBarCss}px')",
+                    "document.documentElement.style.setProperty('--android-status-bar','${statusBarCss}px');" +
+                    "document.documentElement.style.setProperty('--top-inset','${statusBarCss}px')",
                     null
                 )
             }
