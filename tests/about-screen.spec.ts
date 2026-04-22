@@ -50,7 +50,7 @@ test.describe('About screen', () => {
   test('about screen has buy me a coffee link', async ({ page }) => {
     await page.click('.hist-menu-btn');
     await page.click('text=About this app');
-    const coffeeLink = page.locator('#screen-about a[href*="buymeacoffee"]');
+    const coffeeLink = page.locator('#screen-about a[href*="justinttha1"]');
     await expect(coffeeLink).toBeVisible();
     await expect(coffeeLink).toContainText('Keep this app free and supported');
   });
