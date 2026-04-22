@@ -223,4 +223,50 @@ test.describe('Game summary and export', () => {
     await page.locator('#screen-summary .btn-sm').filter({ hasText: 'Back' }).click();
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
   });
+
+  test('mid-game summary back returns to game after viewing history', async ({ page }) => {
+    // Regression: if _expGame was set from a prior history view, mid-game
+    // summary Back would exit to history instead of returning to game.
+    await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
+    await addSimplePitches(page, 5);
+
+    await page.click('.menu-btn');
+    await page.click('text=Game summary');
+    await expect(page.locator('#screen-summary')).toHaveClass(/active/);
+
+    await page.locator('#screen-summary .btn-sm').filter({ hasText: 'Back' }).click();
+    await expect(page.locator('#screen-game')).toHaveClass(/active/);
+  });
+
+  test('umpire radio buttons render as radio inputs', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.click('text=Game summary');
+
+    const radios = page.locator('input[type="radio"][name="pu-iss"]');
+    await expect(radios).toHaveCount(2);
+    const firstRadio = radios.first();
+    const appearance = await firstRadio.evaluate(el => {
+      const style = window.getComputedStyle(el);
+      return style.appearance || style.webkitAppearance;
+    });
+    expect(appearance).toBe('radio');
+  });
+
+  test('export tagline uses website URL not app store', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
+    await addSimplePitches(page, 5);
+
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+    await page.click('.modal-btn.red');
+
+    await page.click('text=Edit summary');
+    await page.click('text=Share');
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+
+    const modalText = await page.locator('.modal-box').textContent();
+    expect(modalText).toContain('simplepitchcounter.com');
+    expect(modalText).not.toContain('apps.apple.com');
+  });
 });
