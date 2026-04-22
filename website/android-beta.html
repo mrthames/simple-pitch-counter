@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android Beta — Simple Pitch Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1c3a;
+    --cream: #f7f4ed;
+    --cream-dark: #ede9e0;
+    --red: #c8392b;
+    --red-light: #e8453a;
+    --gold: #e8a030;
+    --green: #34C759;
+    --text: #0b1c3a;
+    --text-muted: #4a5568;
+    --white: #ffffff;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,28,58,0.96); backdrop-filter: blur(12px);
+    padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+    height: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .nav-logo .ball { width: 28px; height: 28px; background: #f7f4ed; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; overflow: hidden; }
+  .nav-logo .ball::before, .nav-logo .ball::after { content: ''; position: absolute; border: 1.5px solid #c8392b; border-radius: 50%; width: 60%; height: 200%; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(20deg); }
+  .nav-logo .ball::after { transform: translate(-50%, -50%) rotate(-20deg); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: rgba(247,244,237,0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
+  .nav-links a:hover { color: #f7f4ed; }
+
+  .page-header {
+    padding: 130px 8% 70px;
+    background: var(--navy);
+  }
+  .page-header-eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--green); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-header-eyebrow::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--green); }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 4vw, 3rem); color: #f7f4ed; margin-bottom: 14px; }
+  .page-header-sub { font-size: 0.9rem; color: rgba(247,244,237,0.55); font-weight: 300; max-width: 520px; line-height: 1.7; }
+
+  .beta-wrap {
+    max-width: 1000px; margin: 0 auto;
+    padding: 80px 8% 100px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .beta-info h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem; color: var(--navy);
+    margin-bottom: 16px; line-height: 1.2;
+  }
+  .beta-info p {
+    font-size: 0.9rem; line-height: 1.8; color: var(--text-muted);
+    margin-bottom: 24px; font-weight: 300;
+  }
+
+  .beta-steps { margin-bottom: 24px; }
+  .beta-step {
+    display: flex; gap: 12px; margin-bottom: 18px; align-items: flex-start;
+  }
+  .beta-step-num {
+    width: 26px; height: 26px; flex-shrink: 0;
+    background: var(--navy); color: var(--white);
+    border-radius: 50%; font-size: 0.72rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .beta-step-text {
+    font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; font-weight: 300; padding-top: 3px;
+  }
+
+  .beta-note {
+    background: var(--cream-dark);
+    border-left: 3px solid var(--green);
+    padding: 16px 18px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 32px;
+  }
+  .beta-note p {
+    font-size: 0.82rem; color: var(--text-muted); margin: 0; line-height: 1.6; font-weight: 300;
+  }
+
+  .form-group { margin-bottom: 22px; }
+  .form-group label {
+    display: block;
+    font-size: 0.78rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid rgba(11,28,58,0.22);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+  .form-group input:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(11,28,58,0.1);
+  }
+
+  .form-submit {
+    background: var(--green);
+    color: var(--white);
+    border: none;
+    padding: 15px 36px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.02em;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .form-submit:hover { background: #2db84e; transform: translateY(-1px); }
+  .form-submit:active { transform: none; }
+  .form-submit:disabled { opacity: 0.6; cursor: default; transform: none; }
+
+  .form-feedback {
+    display: none;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+  .form-feedback.success { background: #e8f5e9; color: #1b5e20; border: 1.5px solid #a5d6a7; }
+  .form-feedback.error { background: #fce8e8; color: #7f1010; border: 1.5px solid #f5a0a0; }
+
+  footer {
+    background: var(--navy); padding: 40px 8%;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; color: rgba(247,244,237,0.8); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: rgba(247,244,237,0.5); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: #f7f4ed; }
+  .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
+
+  @media (max-width: 760px) {
+    .beta-wrap { grid-template-columns: 1fr; gap: 50px; padding: 60px 6% 80px; }
+    .nav-links { display: none; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo"><div class="ball"></div>Simple Pitch Counter</a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#how-it-works">How it works</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="contact.html">Contact</a>
+    <a href="feedback.html" style="color:#e8a030">Feedback</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">Android Beta</div>
+  <h1>Be the first to try it on Android</h1>
+  <p class="page-header-sub">Simple Pitch Counter is coming to Google Play. Sign up to get early access as a beta tester.</p>
+</div>
+
+<div class="beta-wrap">
+
+  <div class="beta-info">
+    <h2>Help us launch on Android.</h2>
+    <p>We're testing Simple Pitch Counter on Android before it goes live on Google Play. Sign up with your Google account email and we'll send you an invite to join the beta.</p>
+
+    <div class="beta-steps">
+      <div class="beta-step">
+        <div class="beta-step-num">1</div>
+        <div class="beta-step-text"><strong>Sign up below</strong> with the Gmail or Google account on your Android phone.</div>
+      </div>
+      <div class="beta-step">
+        <div class="beta-step-num">2</div>
+        <div class="beta-step-text"><strong>We'll add you to the beta</strong> and send you a link to opt in on Google Play.</div>
+      </div>
+      <div class="beta-step">
+        <div class="beta-step-num">3</div>
+        <div class="beta-step-text"><strong>Install from Google Play</strong> and start tracking pitches on your Android device.</div>
+      </div>
+    </div>
+
+    <div class="beta-note">
+      <p>You must use the same Google account email that's signed into your Android device. The beta is free and includes all features — same app, just on Android.</p>
+    </div>
+  </div>
+
+  <div class="beta-form-wrap">
+    <form id="beta-form" novalidate>
+
+      <div class="form-group">
+        <label for="beta-name">Your name</label>
+        <input type="text" id="beta-name" name="name" placeholder="Coach Smith" autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label for="beta-email">Google account email *</label>
+        <input type="email" id="beta-email" name="email" placeholder="you@gmail.com" autocomplete="email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="beta-device">Android device (optional)</label>
+        <input type="text" id="beta-device" name="device" placeholder="e.g., Samsung Galaxy S24, Pixel 8">
+      </div>
+
+      <button type="submit" class="form-submit" id="submit-btn">Join the Android beta</button>
+
+      <div class="form-feedback success" id="form-success">
+        You're in! We'll add you to the beta and send an invite link to your email shortly.
+      </div>
+      <div class="form-feedback error" id="form-error"></div>
+    </form>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Simple Pitch Counter</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="contact.html">Contact</a>
+    <a href="feedback.html">Feedback</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Simple Pitch Counter. All rights reserved.</div>
+</footer>
+
+<script>
+  const form = document.getElementById('beta-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const successEl = document.getElementById('form-success');
+  const errorEl = document.getElementById('form-error');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('beta-email').value.trim();
+    if (!email) {
+      errorEl.textContent = 'Please enter your Google account email.';
+      errorEl.style.display = 'block';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+    errorEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    const data = {
+      name: document.getElementById('beta-name').value.trim(),
+      email: email,
+      device: document.getElementById('beta-device').value.trim()
+    };
+
+    try {
+      const response = await fetch('android-beta.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        successEl.style.display = 'block';
+        form.reset();
+        submitBtn.textContent = 'Signed up!';
+      } else {
+        throw new Error(result.error || 'Submission failed');
+      }
+    } catch (err) {
+      errorEl.textContent = 'Could not submit. Please email hello@simplepitchcounter.com to join the beta.';
+      errorEl.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Join the Android beta';
+    }
+  });
+</script>
+</body>
+</html>
