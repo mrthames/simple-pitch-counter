@@ -1863,7 +1863,7 @@ function renderHistory(){
         </div>
         ${allRest.length?`<div class="rest-section"><div class="rest-section-lbl">Rest required</div>${allRest.map(r=>`<div class="rest-row"><div class="rest-name">${r.name}${r.num?' <span style="color:var(--t3)">#'+r.num+'</span>':''} <span class="rest-sub">· ${r.pitches} pitches</span></div><div class="rest-chip" style="background:${r.days>=2?'var(--red-bg)':'var(--amber-bg)'};color:${r.days>=2?'var(--red)':'var(--amber)'}">${r.days}d rest</div></div>`).join('')}</div>`:''}
         <div class="hist-card-actions">
-          ${live?`<div class="hist-action-btn primary" onclick="resumeGame(${gi})">Resume</div>`:`<div class="hist-action-btn secondary" onclick="openSavedStats(${gi})">View stats</div><div class="hist-action-btn secondary" onclick="openExportForGame(${gi})">Edit summary</div>`}
+          ${live?`<div class="hist-action-btn primary" onclick="resumeGame(${gi})">Resume</div>`:`<div class="hist-action-btn secondary" onclick="openSavedStats(${gi})">View stats</div><div class="hist-action-btn secondary" onclick="openExportForGame(${gi})">Summary</div>`}
         </div>
       </div>
     </div>`;
