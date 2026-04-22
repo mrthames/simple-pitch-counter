@@ -35,6 +35,7 @@ android/local.properties
 keystore.properties
 
 # Sensitive credentials and NAS-only files
+website/android-beta.php
 website/contact.php
 website/feedback.php
 website/phpmailer/
