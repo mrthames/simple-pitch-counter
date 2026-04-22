@@ -19,6 +19,7 @@
 html,body{height:100%;background:var(--bg);overscroll-behavior:none;color-scheme:light only}
 body{font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font-family:var(--font);-webkit-appearance:none;appearance:none}
+input[type="radio"]{-webkit-appearance:radio;appearance:radio}
 button{touch-action:manipulation;-webkit-user-select:none;user-select:none;cursor:pointer;border:none;background:transparent}
 .screen{display:none}.screen.active{display:block}
 
@@ -584,7 +585,7 @@ textarea{resize:vertical;min-height:56px}
           <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/></svg>
           <div class="hbg-menu" id="game-hbg-menu">
             <button class="hbg-item" onclick="closeGameMenu();showStatsQuick()">Quick stats</button>
-            <button class="hbg-item" onclick="closeGameMenu();showScreen('summary')">Game summary</button>
+            <button class="hbg-item" onclick="closeGameMenu();state._expGame=null;state._expGameIdx=null;showScreen('summary')">Game summary</button>
             <button class="hbg-item" onclick="closeGameMenu();showButtonMappingModal()">Button mapping</button>
             <button class="hbg-item" onclick="closeGameMenu();closeGameToHistory()">Close</button>
             <div style="border-top:0.5px solid var(--sep);margin:5px 0"></div>
@@ -1947,7 +1948,7 @@ function buildSummaryText(){
   txt+=`\n\nHome Runs\n${'─'.repeat(30)}\n${g.homeTeam}: ${g.hrHome||'None'}\n${g.awayTeam}: ${g.hrAway||'None'}`;
   txt+=`\n\nUmpires\n${'─'.repeat(30)}\nPlate: ${g.umpPlateName||'—'} (Issues: ${g.umpPlateIssue||'No'})${g.umpPlateComments?' — '+g.umpPlateComments:''}`;
   txt+=`\nBase: ${g.umpBaseName||'—'} (Issues: ${g.umpBaseIssue||'No'})${g.umpBaseComments?' — '+g.umpBaseComments:''}`;
-  txt+=`\n\n—\nGenerated with Simple Pitch Counter\nhttps://apps.apple.com/us/app/simple-pitch-counter/id6760922314`;
+  txt+=`\n\n—\nGenerated with Simple Pitch Counter\nsimplepitchcounter.com`;
   return txt;
 }
 function copyExportModal(btn){
