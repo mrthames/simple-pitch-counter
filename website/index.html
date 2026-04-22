@@ -196,72 +196,6 @@
     display: flex;
     flex-direction: column;
   }
-  /* Physical hardware buttons */
-  .hw-btn {
-    position: absolute;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 3px;
-  }
-  .hw-action {
-    width: 4px; height: 28px;
-    left: -6px; top: 100px;
-  }
-  .hw-vol-up {
-    width: 4px; height: 44px;
-    left: -6px; top: 155px;
-  }
-  .hw-vol-down {
-    width: 4px; height: 44px;
-    left: -6px; top: 210px;
-  }
-  /* Button labels with connecting lines */
-  .hw-label {
-    position: absolute;
-    left: -130px;
-    width: 90px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
-    white-space: nowrap;
-    transform: translateY(-50%);
-  }
-  .hw-label::after {
-    content: '';
-    position: absolute;
-    right: -24px;
-    top: 50%;
-    width: 22px;
-    border-top: 1px dashed rgba(255,255,255,0.3);
-  }
-  .hw-label-name {
-    font-size: 10px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.5);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .hw-label-map {
-    font-size: 12px;
-    font-weight: 700;
-  }
-  .hw-heading {
-    position: absolute;
-    left: -138px;
-    top: 61px;
-    width: 106px;
-    text-align: center;
-    font-size: 9px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.35);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .hw-label-action { top: 114px; }
-  .hw-label-vol-up { top: 177px; }
-  .hw-label-vol-down { top: 232px; }
-
   .phone-notch {
     background: #0b1c3a;
     height: 28px;
@@ -517,6 +451,52 @@
   .app-store-label small { display: block; font-size: 0.7rem; opacity: 0.6; letter-spacing: 0.04em; }
   .app-store-label strong { font-size: 1rem; font-weight: 600; }
 
+  /* ── SUPPORT ── */
+  .support {
+    padding: 80px 8%;
+    background: var(--cream);
+    display: flex;
+    justify-content: center;
+  }
+  .support-card {
+    max-width: 600px;
+    background: var(--white);
+    border: 1.5px solid rgba(11,28,58,0.10);
+    border-radius: 16px;
+    padding: 40px 36px;
+    text-align: center;
+  }
+  .support-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: var(--navy);
+    margin-bottom: 14px;
+  }
+  .support-desc {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 28px;
+  }
+  .bmc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #FFDD00;
+    color: #000;
+    text-decoration: none;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+    transition: transform 0.15s, box-shadow 0.2s;
+    border: 1.5px solid rgba(0,0,0,0.08);
+  }
+  .bmc-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+  .bmc-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+
   /* ── FOOTER ── */
   footer {
     background: var(--navy);
@@ -558,18 +538,7 @@
     .hero-sub { margin: 0 auto 40px; }
     .cta-group { justify-content: center; }
     .hero-visual { order: -1; }
-    .phone-frame { width: 260px; margin-left: 100px; }
-    .hw-heading { left: -108px; top: 52px; width: 86px; font-size: 8px; }
-    .hw-label { left: -104px; width: 76px; }
-    .hw-label::after { right: -18px; width: 16px; }
-    .hw-label-name { font-size: 8px; }
-    .hw-label-map { font-size: 10px; }
-    .hw-label-action { top: 88px; }
-    .hw-label-vol-up { top: 136px; }
-    .hw-label-vol-down { top: 179px; }
-    .hw-btn.hw-action { top: 77px; height: 22px; }
-    .hw-btn.hw-vol-up { top: 120px; height: 34px; }
-    .hw-btn.hw-vol-down { top: 163px; height: 34px; }
+    .phone-frame { width: 260px; }
     .phone-inner { transform: scale(0.61); width: 163.9%; }
     .features-grid { grid-template-columns: 1fr 1fr; }
     .steps { grid-template-columns: 1fr 1fr; }
@@ -581,19 +550,8 @@
     .nav-links { display: none; }
     footer { flex-direction: column; text-align: center; }
     .footer-links { flex-wrap: wrap; justify-content: center; }
-    .phone-frame { width: 220px; margin-left: 90px; }
+    .phone-frame { width: 220px; }
     .phone-inner { transform: scale(0.52); width: 192.3%; }
-    .hw-heading { left: -94px; top: 44px; width: 76px; font-size: 7px; }
-    .hw-label { left: -90px; width: 68px; }
-    .hw-label::after { right: -16px; width: 14px; }
-    .hw-label-name { font-size: 7px; }
-    .hw-label-map { font-size: 9px; }
-    .hw-label-action { top: 74px; }
-    .hw-label-vol-up { top: 114px; }
-    .hw-label-vol-down { top: 150px; }
-    .hw-btn.hw-action { top: 65px; height: 18px; }
-    .hw-btn.hw-vol-up { top: 100px; height: 28px; }
-    .hw-btn.hw-vol-down { top: 136px; height: 28px; }
   }
 </style>
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
@@ -758,15 +716,6 @@
         </div>
         </div><!-- end phone-inner -->
       </div>
-      <!-- Physical buttons on phone frame -->
-      <div class="hw-btn hw-action"></div>
-      <div class="hw-btn hw-vol-up"></div>
-      <div class="hw-btn hw-vol-down"></div>
-      <!-- Button labels -->
-      <div class="hw-heading">Custom Button Actions</div>
-      <div class="hw-label hw-label-action"><span class="hw-label-name">Action</span><span class="hw-label-map" style="color:#FF9500">+ Out</span></div>
-      <div class="hw-label hw-label-vol-up"><span class="hw-label-name">Vol +</span><span class="hw-label-map" style="color:#34C759">Next Batter</span></div>
-      <div class="hw-label hw-label-vol-down"><span class="hw-label-name">Vol −</span><span class="hw-label-map" style="color:#FFFFFF">Undo</span></div>
     </div>
   </div>
 </section>
@@ -861,6 +810,18 @@
   </a>
 </section>
 
+<!-- SUPPORT -->
+<section class="support">
+  <div class="support-card">
+    <div class="support-title">Keep this app free</div>
+    <p class="support-desc">I'm <strong>Justin</strong> — a Little League dad who built Simple Pitch Counter to make tracking pitch counts easier for coaches and parents. What started as a personal project for my kid's games turned into a full-featured iOS app used by teams across the country. I design, build, and maintain this app entirely on my own time — free, with no ads. If it's saved you time at the ballpark, consider buying me a coffee to help keep it going.</p>
+    <a href="https://buymeacoffee.com/justinttha1" target="_blank" rel="noopener" class="bmc-btn">
+      <svg viewBox="0 0 884 1279" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M791.109 297.518L790.231 297.002L788.201 296.383C789.018 297.072 790.04 297.472 791.109 297.518Z" fill="#0D0C22"/><path d="M803.896 388.891L802.916 389.166L803.896 388.891Z" fill="#0D0C22"/><path d="M791.484 297.377C791.359 297.361 791.237 297.332 791.118 297.291C791.111 297.371 791.111 297.451 791.118 297.531C791.252 297.501 791.378 297.447 791.484 297.377Z" fill="#0D0C22"/><path d="M791.113 297.518H791.244V297.377L791.113 297.518Z" fill="#0D0C22"/><path d="M803.111 388.726L804.591 387.883L805.142 387.573L805.641 387.04C804.702 387.444 803.846 388.009 803.111 388.726Z" fill="#0D0C22"/><path d="M312.958 1076.49C312.958 1076.49 310.381 1076.67 308.108 1077.6C305.835 1078.54 283.689 1088.97 283.689 1088.97L232.498 1111.06C232.498 1111.06 198.76 1121.06 196.377 1121.06H195.71C193.327 1121.06 159.316 1111.06 159.316 1111.06L108.124 1088.97C108.124 1088.97 87.0752 1079.19 83.7056 1077.6C80.336 1076.01 78.856 1076.49 78.856 1076.49C76.0432 1076.49 73.7512 1078.78 73.7512 1081.59V1193.84C73.7512 1196.65 76.0432 1198.94 78.856 1198.94H312.958C315.771 1198.94 318.063 1196.65 318.063 1193.84V1081.59C318.063 1078.78 315.771 1076.49 312.958 1076.49Z" fill="#0D0C22"/><path d="M196.018 1045.3C269.15 1045.3 328.456 986.001 328.456 912.869C328.456 839.737 269.15 780.438 196.018 780.438C122.886 780.438 63.5869 839.737 63.5869 912.869C63.5869 986.001 122.886 1045.3 196.018 1045.3Z" fill="#0D0C22"/><path d="M867.175 356.677C858.098 332.597 841.949 309.498 819.948 296.358C818.584 295.555 817.181 294.816 815.744 294.145C815.744 294.145 815.196 293.893 814.218 293.42C813.024 292.849 812.036 292.362 811.195 291.917C806.372 289.423 801.09 287.6 795.565 287.069C794.453 286.968 793.337 286.915 792.224 286.909C791.884 286.909 791.545 286.909 791.205 286.909H791.11C785.485 286.909 781.211 288.846 778.389 291.684C778.167 291.684 777.774 291.684 777.508 291.684C775.533 291.684 773.618 291.684 771.778 292.175L752.63 296.358H443.303L424.155 292.175C422.315 291.684 420.4 291.684 418.419 291.684C418.159 291.684 417.766 291.684 417.538 291.684C414.716 288.846 410.442 286.909 404.817 286.909H404.722C404.382 286.909 404.043 286.909 403.703 286.909C402.59 286.915 401.474 286.968 400.362 287.069C394.837 287.606 389.555 289.423 384.732 291.917C383.897 292.362 382.903 292.849 381.709 293.42C380.731 293.887 380.183 294.145 380.183 294.145C378.746 294.816 377.343 295.555 375.979 296.358C353.978 309.498 337.829 332.597 328.752 356.677C319.675 380.757 316.486 407.3 316.846 433.06C317.206 458.82 321.104 484.46 327.624 509.327C338.2 548.788 355.145 587.597 382.903 617.634C410.661 647.671 449.781 668.474 490.474 668.474H705.453C746.146 668.474 785.266 647.671 813.024 617.634C840.782 587.597 857.727 548.788 868.303 509.327C874.823 484.454 878.721 458.82 879.081 433.06C879.441 407.3 876.252 380.757 867.175 356.677Z" fill="#FFDD00"/></svg>
+      Buy me a coffee
+    </a>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">Simple Pitch Counter</div>
@@ -868,6 +829,7 @@
     <a href="#features">Features</a>
     <a href="privacy.html">Privacy Policy</a>
     <a href="contact.html">Contact</a>
+    <a href="feedback.html">Feedback</a>
   </div>
   <div class="footer-copy">&copy; 2026 Simple Pitch Counter. All rights reserved.</div>
 </footer>
