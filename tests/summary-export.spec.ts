@@ -50,6 +50,15 @@ test.describe('Game summary and export', () => {
     await expect(page.locator('#sum-bu-name')).toBeVisible();
   });
 
+  test('summary radio button labels are visible', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.click('text=Game summary');
+
+    await expect(page.locator('.form-row-lbl').filter({ hasText: 'Plate issues?' })).toBeVisible();
+    await expect(page.locator('.form-row-lbl').filter({ hasText: 'Base issues?' })).toBeVisible();
+  });
+
   test('mid-game summary hides report and end actions', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     await addSimplePitches(page, 5);
@@ -60,43 +69,86 @@ test.describe('Game summary and export', () => {
     await expect(page.locator('#sum-actions')).not.toBeVisible();
   });
 
-  test('generate report creates export text', async ({ page }) => {
+  test('edit summary from history card opens summary screen', async ({ page }) => {
     await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
     await addSimplePitches(page, 10);
 
-    // End game first
     await page.click('.menu-btn');
     await page.click('text=End game');
     await page.click('.modal-btn.red');
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
 
-    // Open summary from history card
-    await page.click('text=Summary');
+    await page.click('text=Edit summary');
+    await expect(page.locator('#screen-summary')).toHaveClass(/active/);
+    await expect(page.locator('#sum-home-pitchers-wrap')).toContainText('Jake M.');
+  });
+
+  test('history summary shows save and share buttons', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
+    await addSimplePitches(page, 5);
+
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+    await page.click('.modal-btn.red');
+
+    await page.click('text=Edit summary');
+    await expect(page.locator('#sum-actions')).toBeVisible();
+    await expect(page.locator('#sum-actions')).toContainText('Save');
+    await expect(page.locator('#sum-actions')).toContainText('Share');
+  });
+
+  test('history summary save persists umpire edits', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 5);
+
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+    await page.click('.modal-btn.red');
+
+    await page.click('text=Edit summary');
+    await page.fill('#sum-pu-name', 'John Doe');
+    await page.click('text=Save');
+
+    await page.locator('#screen-summary .btn-sm').filter({ hasText: 'Back' }).click();
+    await expect(page.locator('#screen-history')).toHaveClass(/active/);
+
+    await page.click('text=Edit summary');
+    await expect(page.locator('#sum-pu-name')).toHaveValue('John Doe');
+  });
+
+  test('history summary share generates export with tagline', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
+    await addSimplePitches(page, 5);
+
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+    await page.click('.modal-btn.red');
+
+    await page.click('text=Edit summary');
+    await page.click('text=Share');
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
     const modalText = await page.locator('.modal-box').textContent();
     expect(modalText).toContain('Tigers');
-    expect(modalText).toContain('Lions');
+    expect(modalText).toContain('Simple Pitch Counter');
   });
 
   test('export includes umpire data when filled', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     await addSimplePitches(page, 5);
 
-    // Fill umpire in summary
     await page.click('.menu-btn');
     await page.click('text=Game summary');
     await page.fill('#sum-pu-name', 'John Doe');
 
-    // Go back and end game
     await page.locator('#screen-summary .btn-sm').filter({ hasText: 'Back' }).click();
     await page.click('.menu-btn');
     await page.click('text=End game');
     await page.click('.modal-btn.red');
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
 
-    // Open summary from history
-    await page.click('text=Summary');
+    await page.click('text=Edit summary');
+    await page.click('text=Share');
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
     const modalText = await page.locator('.modal-box').textContent();
@@ -108,31 +160,41 @@ test.describe('Game summary and export', () => {
     await throwPitches(page, 'B', 3);
     await throwPitches(page, 'CS', 2);
 
-    // End game
     await page.click('.menu-btn');
     await page.click('text=End game');
     await page.click('.modal-btn.red');
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
 
-    // Open summary from history
-    await page.click('text=Summary');
+    await page.click('text=Edit summary');
+    await page.click('text=Share');
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
     const modalText = await page.locator('.modal-box').textContent();
     expect(modalText).toContain('5');
   });
 
-  test('end game from summary saves to history', async ({ page }) => {
+  test('end game from menu saves to history', async ({ page }) => {
     await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
     await addSimplePitches(page, 5);
 
-    // End game via menu
     await page.click('.menu-btn');
     await page.click('text=End game');
     await page.click('.modal-btn.red');
 
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
     await expect(page.locator('#history-list')).toContainText('Lions vs Tigers');
+  });
+
+  test('end game modal only shows cancel and end now', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    const modalText = await page.locator('.modal-box').textContent();
+    expect(modalText).toContain('Cancel');
+    expect(modalText).toContain('End now');
+    expect(modalText).not.toContain('Go to summary');
   });
 
   test('back button returns to game from summary', async ({ page }) => {
@@ -146,19 +208,19 @@ test.describe('Game summary and export', () => {
     await expect(page.locator('#screen-game')).toHaveClass(/active/);
   });
 
-  test('export back button returns to summary', async ({ page }) => {
+  test('back button from history summary returns to history', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     await addSimplePitches(page, 3);
 
-    // End game first
     await page.click('.menu-btn');
     await page.click('text=End game');
     await page.click('.modal-btn.red');
-
-    // View stats opens summary modal; test the history export flow
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
-    await page.click('text=Summary');
-    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
-    await expect(page.locator('.modal-box')).toBeVisible();
+
+    await page.click('text=Edit summary');
+    await expect(page.locator('#screen-summary')).toHaveClass(/active/);
+
+    await page.locator('#screen-summary .btn-sm').filter({ hasText: 'Back' }).click();
+    await expect(page.locator('#screen-history')).toHaveClass(/active/);
   });
 });

@@ -730,18 +730,18 @@ textarea{resize:vertical;min-height:56px}
     <div>
       <div class="section-header-lbl">Umpire Notes</div>
       <div class="form-card">
-        <div class="form-row"><div class="form-row-lbl">Plate</div><input class="form-input" id="sum-pu-name" placeholder="Name"></div>
-        <div class="form-row"><div class="form-row-lbl">Issues?</div>
+        <div class="form-row"><div class="form-row-lbl">Plate</div><input class="form-input" id="sum-pu-name" placeholder="Name" autocapitalize="words"></div>
+        <div class="form-row"><div class="form-row-lbl">Plate issues?</div>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('pu-iss-detail').style.display='none'"><input type="radio" name="pu-iss" value="No" checked style="width:18px;height:18px"> No</label>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('pu-iss-detail').style.display='block'"><input type="radio" name="pu-iss" value="Yes" style="width:18px;height:18px"> Yes</label>
         </div>
-        <div class="form-row" id="pu-iss-detail" style="display:none;border-bottom:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-pu-comments" placeholder="Describe issues"></div>
-        <div class="form-row"><div class="form-row-lbl">Base</div><input class="form-input" id="sum-bu-name" placeholder="Name"></div>
-        <div class="form-row"><div class="form-row-lbl">Issues?</div>
+        <div class="form-row" id="pu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-pu-comments" placeholder="Describe issues"></div>
+        <div class="form-row"><div class="form-row-lbl">Base</div><input class="form-input" id="sum-bu-name" placeholder="Name" autocapitalize="words"></div>
+        <div class="form-row"><div class="form-row-lbl">Base issues?</div>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('bu-iss-detail').style.display='none'"><input type="radio" name="bu-iss" value="No" checked style="width:18px;height:18px"> No</label>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('bu-iss-detail').style.display='block'"><input type="radio" name="bu-iss" value="Yes" style="width:18px;height:18px"> Yes</label>
         </div>
-        <div class="form-row" id="bu-iss-detail" style="display:none;border-bottom:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-bu-comments" placeholder="Describe issues"></div>
+        <div class="form-row" id="bu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-bu-comments" placeholder="Describe issues"></div>
       </div>
     </div>
     <div id="sum-actions" style="display:flex;gap:8px">
@@ -1627,9 +1627,8 @@ function showModal(title,sub,actions,dismissable=false){
 function closeModal(){const m=document.getElementById('active-modal');if(m)m.remove();}
 
 function confirmEndGame(){
-  showModal('End game?','This will close the game and save it to history. Generate the summary first to send the required report.',[
+  showModal('End game?','This will close the game and save it to history. You can edit and share the summary from the game card later.',[
     {label:'Cancel',fn:'closeModal()'},
-    {label:'Go to summary',fn:"closeModal();showScreen('summary')",cls:'primary'},
     {label:'End now',fn:'closeModal();endGame()',cls:'red'},
   ]);
 }
@@ -1691,7 +1690,7 @@ function renderHistory(){
         </div>
         ${allRest.length?`<div class="rest-section"><div class="rest-section-lbl">Rest required</div>${allRest.map(r=>`<div class="rest-row"><div class="rest-name">${r.name}${r.num?' <span style="color:var(--t3)">#'+r.num+'</span>':''} <span class="rest-sub">· ${r.pitches} pitches</span></div><div class="rest-chip" style="background:${r.days>=2?'var(--red-bg)':'var(--amber-bg)'};color:${r.days>=2?'var(--red)':'var(--amber)'}">${r.days}d rest</div></div>`).join('')}</div>`:''}
         <div class="hist-card-actions">
-          ${live?`<div class="hist-action-btn primary" onclick="resumeGame(${gi})">Resume</div>`:`<div class="hist-action-btn secondary" onclick="openSavedStats(${gi})">View stats</div><div class="hist-action-btn secondary" onclick="openExportForGame(${gi})">Summary</div>`}
+          ${live?`<div class="hist-action-btn primary" onclick="resumeGame(${gi})">Resume</div>`:`<div class="hist-action-btn secondary" onclick="openSavedStats(${gi})">View stats</div><div class="hist-action-btn secondary" onclick="openExportForGame(${gi})">Edit summary</div>`}
         </div>
       </div>
     </div>`;
@@ -1753,6 +1752,8 @@ function initSummary(){
   document.getElementById('sum-bu-name').value=g.umpBaseName||'';
   document.getElementById('sum-pu-comments').value=g.umpPlateComments||'';
   document.getElementById('sum-bu-comments').value=g.umpBaseComments||'';
+  document.querySelector('input[name="pu-iss"][value="No"]').checked=true;document.getElementById('pu-iss-detail').style.display='none';
+  document.querySelector('input[name="bu-iss"][value="No"]').checked=true;document.getElementById('bu-iss-detail').style.display='none';
   if(g.umpPlateIssue==='Yes'){document.querySelector('input[name="pu-iss"][value="Yes"]').checked=true;document.getElementById('pu-iss-detail').style.display='block';}
   if(g.umpBaseIssue==='Yes'){document.querySelector('input[name="bu-iss"][value="Yes"]').checked=true;document.getElementById('bu-iss-detail').style.display='block';}
   // Pitcher sections
@@ -1773,10 +1774,18 @@ function initSummary(){
   document.getElementById('sum-home-pitchers-wrap').innerHTML=mkPitcherSection('home');
   document.getElementById('sum-away-pitchers-wrap').innerHTML=mkPitcherSection('away');
   const live=!g.endedAt;
+  const fromHistory=!!state._expGame;
   const sumActions=document.getElementById('sum-actions');
   if(sumActions){
     if(live){sumActions.style.display='none';}
-    else{sumActions.style.display='flex';}
+    else{
+      sumActions.style.display='flex';
+      if(fromHistory){
+        sumActions.innerHTML=`<div class="summary-action-btn" style="background:var(--blue)" onclick="saveSummaryFromHistory()">Save</div><div class="summary-action-btn" style="background:var(--dark)" onclick="generateExport()">Share</div>`;
+      }else{
+        sumActions.innerHTML=`<div class="summary-action-btn" style="background:var(--blue)" onclick="generateExport()">Generate Report</div>`;
+      }
+    }
   }
 }
 function showSummaryStats(side,idx){
@@ -1791,9 +1800,18 @@ function showSummaryStats(side,idx){
   ov.innerHTML=`<div class="stats-sheet"><div class="stats-handle"></div><div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${p.name}${p.num?' #'+p.num:''}</div><div style="font-size:13px;color:var(--dark-label);margin-bottom:18px">${total} total pitches</div><div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP</div></div></div><div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>${barsHtml}<div onclick="document.getElementById('sum-stats-overlay').remove()" style="margin-top:16px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div></div>`;
   document.getElementById('screen-summary').appendChild(ov);
 }
-function saveSummaryAndBack(){collectSummaryData();saveState();showScreen('game');}
+function saveSummaryAndBack(){
+  collectSummaryData();saveState();
+  if(state._expGame){state._expGame=null;state._expGameIdx=null;renderHistory();showScreen('history');}
+  else showScreen('game');
+}
+function saveSummaryFromHistory(){
+  collectSummaryData();saveState();
+  const btn=document.querySelector('#sum-actions .summary-action-btn');
+  if(btn){const orig=btn.textContent;btn.textContent='Saved ✓';setTimeout(()=>btn.textContent=orig,1200);}
+}
 function collectSummaryData(){
-  const g=state.currentGame;if(!g)return;
+  const g=state.currentGame||state._expGame;if(!g)return;
   g.hrHome=document.getElementById('sum-hr-home')?.value||'';
   g.hrAway=document.getElementById('sum-hr-away')?.value||'';
   g.umpPlateName=document.getElementById('sum-pu-name')?.value||'';
@@ -1830,6 +1848,7 @@ function buildSummaryText(){
   txt+=`\n\nHome Runs\n${'─'.repeat(30)}\n${g.homeTeam}: ${g.hrHome||'None'}\n${g.awayTeam}: ${g.hrAway||'None'}`;
   txt+=`\n\nUmpires\n${'─'.repeat(30)}\nPlate: ${g.umpPlateName||'—'} (Issues: ${g.umpPlateIssue||'No'})${g.umpPlateComments?' — '+g.umpPlateComments:''}`;
   txt+=`\nBase: ${g.umpBaseName||'—'} (Issues: ${g.umpBaseIssue||'No'})${g.umpBaseComments?' — '+g.umpBaseComments:''}`;
+  txt+=`\n\n—\nGenerated with Simple Pitch Counter\nhttps://apps.apple.com/us/app/simple-pitch-counter/id6760922314`;
   return txt;
 }
 function copyExportModal(btn){
@@ -1899,12 +1918,8 @@ function sharePitcherLine(line){
   else if(navigator.clipboard?.writeText){navigator.clipboard.writeText(line).then(()=>alert('Copied to clipboard'));}
 }
 function openExportForGame(gi){
-  const g=state.games[gi];state._expGame=g;
-  const txt=buildSummaryText();
-  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
-  ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
-  ov.innerHTML=`<div class="modal-box" style="max-width:420px"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title" style="margin-bottom:8px">Game Summary</div><div class="export-box" id="hist-export-box">${txt}</div><div style="display:flex;gap:8px"><div class="modal-btn primary" onclick="copyExportModal(this)">Copy</div><div class="modal-btn" onclick="emailExportModal()">Email ↗</div></div></div>`;
-  document.body.appendChild(ov);window._histExportTxt=txt;
+  const g=state.games[gi];state._expGame=g;state._expGameIdx=gi;
+  initSummary();showScreen('summary');
 }
 
 // ── Config ──
