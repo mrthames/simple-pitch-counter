@@ -75,7 +75,7 @@ npm run test:ui          # Interactive Playwright UI
 
 ### Marketing Version (`CFBundleShortVersionString`)
 
-Set manually in Xcode project (`MARKETING_VERSION`). Current: **2.1**
+Set manually in Xcode project (`MARKETING_VERSION`). Current: **2.2**
 
 Bump schedule:
 - **Patch** (2.0 → 2.1): bug fixes, small improvements

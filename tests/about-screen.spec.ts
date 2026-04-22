@@ -17,7 +17,7 @@ test.describe('About screen', () => {
     await page.click('.hist-menu-btn');
     await page.click('text=About this app');
     await expect(page.locator('#screen-about')).toContainText('Simple Pitch Counter');
-    await expect(page.locator('#screen-about')).toContainText('Version 2.1');
+    await expect(page.locator('#screen-about')).toContainText('Version 2.2');
   });
 
   test('about screen shows app description', async ({ page }) => {
