@@ -1618,6 +1618,7 @@ function showPitcherStats(){
     <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${ap.name}${ap.num?' #'+ap.num:''}</div>
     <div style="font-size:13px;color:var(--dark-label);margin-bottom:4px">${total} total pitches · ${s.ip} innings</div>
     <div style="font-size:12px;font-weight:600;color:${restColor};margin-bottom:16px">${restText}</div>
+    <div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${ap.ks||0}</div><div class="stats-summary-lbl">K</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${ap.bbs||0}</div><div class="stats-summary-lbl">BB</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${ap.bips||0}</div><div class="stats-summary-lbl">BIP</div></div></div>
     ${statLineHtml(ap)}
     ${barsHtml}
     <div style="display:flex;gap:8px;margin-top:16px">
@@ -1963,13 +1964,30 @@ function initSummary(){
 function showSummaryStats(side,idx){
   const g=state.currentGame||state._expGame;if(!g)return;
   const p=g[side].pitchers[idx];if(!p)return;
-  // Use same stats sheet
   const types=['B','CS','SS','F','BIP'];const total=p.pitches||0;const denom=total||1;
+  const s=pitcherDerivedStats(p);
+  const ri=restInfo(p.pitches);
+  const restColor=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
+  const restText=ri?ri.label:'No pitches';
   const existing=document.getElementById('sum-stats-overlay');if(existing)existing.remove();
   const ov=document.createElement('div');ov.className='stats-sheet-overlay';ov.id='sum-stats-overlay';
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
-  let barsHtml=types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
-  ov.innerHTML=`<div class="stats-sheet"><div class="stats-handle"></div><div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${p.name}${p.num?' #'+p.num:''}</div><div style="font-size:13px;color:var(--dark-label);margin-bottom:18px">${total} total pitches</div><div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP</div></div></div><div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>${barsHtml}<div onclick="document.getElementById('sum-stats-overlay').remove()" style="margin-top:16px;width:100%;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div></div>`;
+  let barsHtml='';
+  if(g.mode==='advanced'){
+    barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
+  }
+  window._sumStatsPitcher=p;window._sumStatsGame=g;
+  ov.innerHTML=`<div class="stats-sheet"><div class="stats-handle"></div>
+    <div style="font-size:17px;font-weight:700;color:#fff;margin-bottom:4px">${p.name}${p.num?' #'+p.num:''}</div>
+    <div style="font-size:13px;color:var(--dark-label);margin-bottom:4px">${total} total pitches · ${s.ip} innings</div>
+    <div style="font-size:12px;font-weight:600;color:${restColor};margin-bottom:16px">${restText}</div>
+    <div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP</div></div></div>
+    ${statLineHtml(p)}
+    ${barsHtml}
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <div onclick="shareStatsCard(window._sumStatsPitcher,window._sumStatsGame)" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Share</div>
+      <div onclick="document.getElementById('sum-stats-overlay').remove()" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
+    </div></div>`;
   document.getElementById('screen-summary').appendChild(ov);enableSwipeDismiss(ov);
 }
 function saveSummaryAndBack(){
@@ -2054,6 +2072,7 @@ function openSavedStats(gi){
       barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin:12px 0 10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
     }
     const detailHtml=`<div id="${pid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
+      <div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP</div></div></div>
       ${statLineHtml(p)}
       ${barsHtml}
       <div onclick="shareStatsCard(window._svPitchers[${svIdx}].p,window._svPitchers[${svIdx}].g)" style="margin-top:10px;width:100%;height:40px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">Share pitcher stats ↗</div>
