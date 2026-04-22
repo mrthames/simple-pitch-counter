@@ -29,7 +29,10 @@
     padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
     height: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
   }
-  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .nav-logo .ball { width: 28px; height: 28px; background: #f7f4ed; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; overflow: hidden; }
+  .nav-logo .ball::before, .nav-logo .ball::after { content: ''; position: absolute; border: 1.5px solid #c8392b; border-radius: 50%; width: 60%; height: 200%; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(20deg); }
+  .nav-logo .ball::after { transform: translate(-50%, -50%) rotate(-20deg); }
   .nav-links { display: flex; gap: 28px; }
   .nav-links a { color: rgba(247,244,237,0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
   .nav-links a:hover { color: #f7f4ed; }
@@ -192,7 +195,7 @@
 <body>
 
 <nav>
-  <a href="/" class="nav-logo">Simple Pitch Counter</a>
+  <a href="/" class="nav-logo"><div class="ball"></div>Simple Pitch Counter</a>
   <div class="nav-links">
     <a href="/#features">Features</a>
     <a href="/#how-it-works">How it works</a>
@@ -205,7 +208,7 @@
 <div class="page-header">
   <div class="page-header-eyebrow">Get in touch</div>
   <h1>Contact us</h1>
-  <p class="page-header-sub">Questions about the app, feedback, or a bug report? We'd love to hear from you.</p>
+  <p class="page-header-sub">Questions about the app? We'd love to hear from you. For bugs or feature requests, use our <a href="feedback.html" style="color:#e8a030;text-decoration:none">feedback form</a>.</p>
 </div>
 
 <div class="contact-wrap">
@@ -213,7 +216,7 @@
   <!-- Sidebar -->
   <div class="contact-info">
     <h2>We're happy to help.</h2>
-    <p>Whether you have a question about how the app works, found a bug, or have a feature idea for a future version — send us a message.</p>
+    <p>Whether you have a question about how the app works or need help with something — send us a message. For bugs or feature requests, use our <a href="feedback.html" style="color:#e8a030">feedback form</a>.</p>
 
     <div class="contact-detail">
       <div class="contact-detail-label">Email</div>
@@ -258,8 +261,6 @@
         <label for="topic">Topic</label>
         <select id="topic" name="topic" required>
           <option value="">Select a topic…</option>
-          <option value="bug">Bug report</option>
-          <option value="feature">Feature request</option>
           <option value="question">General question</option>
           <option value="privacy">Privacy inquiry</option>
           <option value="other">Other</option>
