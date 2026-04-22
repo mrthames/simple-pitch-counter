@@ -833,7 +833,7 @@ function loadState(){
   if(!state.configs)state.configs=[];
   if(!state.fields)state.fields=[];
   if(!state.configs.length){
-    state.configs.push({id:'default',name:'Default Minors 7-10',pitchMax:50,catcherInnMax:4,mercyRuns:5,isDefault:true,thresholds:JSON.parse(JSON.stringify(DEFAULT_THRESHOLDS))});
+    state.configs.push({id:'default',name:'Default Minors 7-10',pitchMax:50,catcherInnMax:4,mercyRuns:5,pitchCatchLim:41,isDefault:true,thresholds:JSON.parse(JSON.stringify(DEFAULT_THRESHOLDS))});
     state.activeConfigId='default';
   }
   state.configs.forEach(c=>{if(!c.thresholds)c.thresholds=JSON.parse(JSON.stringify(DEFAULT_THRESHOLDS));});
@@ -848,7 +848,7 @@ function saveState(){try{localStorage.setItem('spc_v1',JSON.stringify(state));}c
 function saveBtnMapping(){const g=state.currentGame;const mode=g?g.mode:'simple';try{localStorage.setItem('spc_btnmap_'+mode,JSON.stringify(btnMapping));}catch(e){}}
 function applyActiveConfig(){
   const cfg=state.configs.find(c=>c.id===state.activeConfigId)||state.configs[0];
-  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;}
+  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;PITCH_C_LIM=cfg.pitchCatchLim||0;}
 }
 
 // ── Navigation ──
@@ -1191,7 +1191,7 @@ function animatePop(){
 function renderGame(){
   const g=state.currentGame;if(!g)return;
   const cfg=state.configs.find(c=>c.id===g.configId);
-  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;}
+  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;PITCH_C_LIM=cfg.pitchCatchLim||0;}
   // Scoreboard
   document.getElementById('sb-home-name').textContent=g.homeTeam;
   document.getElementById('sb-away-name').textContent=g.awayTeam;
@@ -1365,7 +1365,7 @@ function addNewCatcherMidGame(){
 function pitchAlerts(p){
   const a=[];
   if(p.pitches>=PITCH_MAX){a.push({t:'danger',m:`${p.pitches} pitches — ${p.pitches-PITCH_MAX} over the ${PITCH_MAX}-pitch limit. Notify coach.`});return a;}
-  if(p.pitches>=PITCH_C_LIM)a.push({t:'danger',m:`${p.pitches} pitches — cannot catch remainder of day. ${PITCH_MAX-p.pitches} left.`});
+  if(PITCH_C_LIM>0&&p.pitches>=PITCH_C_LIM)a.push({t:'danger',m:`${p.pitches} pitches — cannot catch remainder of day. ${PITCH_MAX-p.pitches} left.`});
   if(PITCH_MAX-p.pitches<=4&&p.pitches<PITCH_MAX)a.push({t:'warn',m:`${p.pitches} pitches — approaching ${PITCH_MAX}-pitch limit. ${PITCH_MAX-p.pitches} remain.`});
   return a;
 }
@@ -1800,7 +1800,7 @@ function goSetup(){initSetup();showScreen('setup');}
 function resumeGame(gi){
   const g=state.games[gi];state.currentGame=g;state.games.splice(gi,1);
   const cfg=state.configs.find(c=>c.id===g.configId);
-  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;}
+  if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;PITCH_C_LIM=cfg.pitchCatchLim||0;}
   saveState();renderGame();showScreen('game');
 }
 function confirmDelGame(i){
@@ -2030,7 +2030,7 @@ function renderConfigScreen(){
   const list=document.getElementById('config-list');
   list.innerHTML=state.configs.map(cfg=>`
     <div class="config-item">
-      <div style="flex:1;min-width:0"><div class="config-name">${cfg.name}${cfg.isDefault?'<span class="default-badge">Default</span>':''}</div><div class="config-sub">Max ${cfg.pitchMax} pitches · ${cfg.catcherInnMax} catcher inn.${cfg.mercyRuns?' · '+cfg.mercyRuns+'-run mercy':''}</div></div>
+      <div style="flex:1;min-width:0"><div class="config-name">${cfg.name}${cfg.isDefault?'<span class="default-badge">Default</span>':''}</div><div class="config-sub">Max ${cfg.pitchMax} pitches · ${cfg.catcherInnMax} catcher inn.${cfg.mercyRuns?' · '+cfg.mercyRuns+'-run mercy':''}${cfg.pitchCatchLim?' · no catch @'+cfg.pitchCatchLim+'p':''}</div></div>
       <div class="config-actions">
         ${!cfg.isDefault?`<div class="btn-xs" onclick="setDefaultConfig('${cfg.id}')">Set default</div>`:''}
         <div class="btn-xs" onclick="showConfigForm('${cfg.id}')">Edit</div>
@@ -2052,7 +2052,7 @@ function showConfigForm(id){
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
   ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
   const thrRows=thr.map((t,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:7px;align-items:end;margin-bottom:8px"><div><div class="lbl">Threshold ${i+1} (pitches)</div><input type="number" id="thr-p-${i}" value="${t.pitches}" min="1" max="200"></div><div><div class="lbl">Days rest</div><input type="number" id="thr-d-${i}" value="${t.days}" min="0" max="10"></div><div class="trash-btn" onclick="this.closest('div[style]').remove()"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M5 3V2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1M2 3h11M13 3l-.867 9.356A2 2 0 0 1 10.14 14H4.86a2 2 0 0 1-1.993-1.644L2 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div></div>`).join('');
-  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title">${existing?'Edit':'New'} Configuration</div><div style="margin-bottom:10px"><div class="lbl">Name</div><input type="text" id="cfg-name" value="${existing?existing.name:''}" placeholder="e.g. Minors 7-10"></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Max pitches</div><input type="number" id="cfg-pitch" value="${existing?existing.pitchMax:50}" min="1" max="200"></div><div><div class="lbl">Catcher inn. max</div><input type="number" id="cfg-catch" value="${existing?existing.catcherInnMax:4}" min="1" max="9"></div></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Mercy runs / half inning</div><input type="number" id="cfg-mercy" value="${existing?existing.mercyRuns||0:5}" min="0" max="99" placeholder="0 = off"></div><div></div></div><div class="lbl" style="margin-bottom:8px">Rest thresholds</div><div id="thr-rows">${thrRows}</div><div class="btn-sm" onclick="addThrRow()" style="margin-bottom:14px;display:inline-flex">+ Add threshold</div><div class="modal-actions"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="saveConfigForm('${id||''}')">Save</div></div></div>`;
+  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title">${existing?'Edit':'New'} Configuration</div><div style="margin-bottom:10px"><div class="lbl">Name</div><input type="text" id="cfg-name" value="${existing?existing.name:''}" placeholder="e.g. Minors 7-10"></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Max pitches</div><input type="number" id="cfg-pitch" value="${existing?existing.pitchMax:50}" min="1" max="200"></div><div><div class="lbl">Catcher inn. max</div><input type="number" id="cfg-catch" value="${existing?existing.catcherInnMax:4}" min="1" max="9"></div></div><div class="row2" style="margin-bottom:12px"><div><div class="lbl">Mercy runs / half inning</div><input type="number" id="cfg-mercy" value="${existing?existing.mercyRuns||0:5}" min="0" max="99" placeholder="0 = off"></div><div><div class="lbl">Pitcher can't catch after</div><input type="number" id="cfg-pcatch" value="${existing?existing.pitchCatchLim||0:41}" min="0" max="200" placeholder="0 = off"></div></div><div class="lbl" style="margin-bottom:8px">Rest thresholds</div><div id="thr-rows">${thrRows}</div><div class="btn-sm" onclick="addThrRow()" style="margin-bottom:14px;display:inline-flex">+ Add threshold</div><div class="modal-actions"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="saveConfigForm('${id||''}')">Save</div></div></div>`;
   document.body.appendChild(ov);
 }
 function addThrRow(){
@@ -2066,14 +2066,15 @@ function saveConfigForm(id){
   const pitchMax=parseInt(document.getElementById('cfg-pitch').value)||50;
   const catcherInnMax=parseInt(document.getElementById('cfg-catch').value)||4;
   const mercyRuns=parseInt(document.getElementById('cfg-mercy').value)||0;
+  const pitchCatchLim=parseInt(document.getElementById('cfg-pcatch').value)||0;
   const thresholds=[];
   document.getElementById('thr-rows').querySelectorAll('[id^="thr-p-"]').forEach((el,i)=>{
     const pitches=parseInt(el.value);const days=parseInt(document.getElementById('thr-d-'+i)?.value)||0;
     if(pitches>0)thresholds.push({pitches,days});
   });
   thresholds.sort((a,b)=>a.pitches-b.pitches);
-  if(id){const cfg=state.configs.find(c=>c.id===id);if(cfg){cfg.name=name;cfg.pitchMax=pitchMax;cfg.catcherInnMax=catcherInnMax;cfg.mercyRuns=mercyRuns;cfg.thresholds=thresholds;}}
-  else state.configs.push({id:'cfg_'+Date.now(),name,pitchMax,catcherInnMax,mercyRuns,thresholds,isDefault:state.configs.length===0});
+  if(id){const cfg=state.configs.find(c=>c.id===id);if(cfg){cfg.name=name;cfg.pitchMax=pitchMax;cfg.catcherInnMax=catcherInnMax;cfg.mercyRuns=mercyRuns;cfg.pitchCatchLim=pitchCatchLim;cfg.thresholds=thresholds;}}
+  else state.configs.push({id:'cfg_'+Date.now(),name,pitchMax,catcherInnMax,mercyRuns,pitchCatchLim,thresholds,isDefault:state.configs.length===0});
   applyActiveConfig();saveState();closeModal();renderConfigScreen();
 }
 function setDefaultConfig(id){state.configs.forEach(c=>c.isDefault=(c.id===id));state.activeConfigId=id;applyActiveConfig();saveState();renderConfigScreen();}
