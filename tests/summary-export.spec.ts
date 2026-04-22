@@ -78,7 +78,7 @@ test.describe('Game summary and export', () => {
     await page.click('.modal-btn.red');
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
 
-    await page.click('text=Edit summary');
+    await page.click('text=Summary');
     await expect(page.locator('#screen-summary')).toHaveClass(/active/);
     await expect(page.locator('#sum-home-pitchers-wrap')).toContainText('Jake M.');
   });
@@ -91,7 +91,7 @@ test.describe('Game summary and export', () => {
     await page.click('text=End game');
     await page.click('.modal-btn.red');
 
-    await page.click('text=Edit summary');
+    await page.click('text=Summary');
     await expect(page.locator('#sum-actions')).toBeVisible();
     await expect(page.locator('#sum-actions')).toContainText('Save');
     await expect(page.locator('#sum-actions')).toContainText('Share');
@@ -105,14 +105,14 @@ test.describe('Game summary and export', () => {
     await page.click('text=End game');
     await page.click('.modal-btn.red');
 
-    await page.click('text=Edit summary');
+    await page.click('text=Summary');
     await page.fill('#sum-pu-name', 'John Doe');
     await page.click('text=Save');
 
     await page.locator('#screen-summary .btn-sm').filter({ hasText: 'Back' }).click();
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
 
-    await page.click('text=Edit summary');
+    await page.click('text=Summary');
     await expect(page.locator('#sum-pu-name')).toHaveValue('John Doe');
   });
 
@@ -124,7 +124,7 @@ test.describe('Game summary and export', () => {
     await page.click('text=End game');
     await page.click('.modal-btn.red');
 
-    await page.click('text=Edit summary');
+    await page.click('text=Summary');
     await page.click('text=Share');
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
@@ -147,7 +147,7 @@ test.describe('Game summary and export', () => {
     await page.click('.modal-btn.red');
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
 
-    await page.click('text=Edit summary');
+    await page.click('text=Summary');
     await page.click('text=Share');
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
@@ -165,7 +165,7 @@ test.describe('Game summary and export', () => {
     await page.click('.modal-btn.red');
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
 
-    await page.click('text=Edit summary');
+    await page.click('text=Summary');
     await page.click('text=Share');
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
@@ -217,7 +217,7 @@ test.describe('Game summary and export', () => {
     await page.click('.modal-btn.red');
     await expect(page.locator('#screen-history')).toHaveClass(/active/);
 
-    await page.click('text=Edit summary');
+    await page.click('text=Summary');
     await expect(page.locator('#screen-summary')).toHaveClass(/active/);
 
     await page.locator('#screen-summary .btn-sm').filter({ hasText: 'Back' }).click();
@@ -261,7 +261,7 @@ test.describe('Game summary and export', () => {
     await page.click('text=End game');
     await page.click('.modal-btn.red');
 
-    await page.click('text=Edit summary');
+    await page.click('text=Summary');
     await page.click('text=Share');
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
