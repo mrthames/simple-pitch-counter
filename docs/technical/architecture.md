@@ -1,6 +1,6 @@
 # Technical Documentation: Simple Pitch Counter
 
-**Last updated:** 2026-03-26
+**Last updated:** 2026-04-21
 
 ---
 
@@ -158,7 +158,7 @@ The entire UI lives in a single `index.html` file, structured as:
 
 ### HTML Screens (lines 200-440)
 
-Six screen divs, toggled via `.active` class:
+Seven screen divs, toggled via `.active` class:
 
 | Screen ID | Purpose |
 |-----------|---------|
@@ -168,6 +168,7 @@ Six screen divs, toggled via `.active` class:
 | `screen-export` | Generated summary text with copy/email actions |
 | `screen-history` | Game list with swipe-to-delete, resume, and stats access |
 | `screen-config` | League configuration presets and field list management |
+| `screen-about` | App info, version, links (website, privacy, feedback, support) |
 
 ### JavaScript Logic (lines 441-1614)
 
@@ -315,23 +316,28 @@ Hosted on Synology NAS via Web Station. Deploy by copying `website/` contents to
 
 ## Testing
 
-### Manual Testing Checklist
+### Automated E2E Tests
 
-The app does not currently have automated tests. Testing is manual:
+The project has **134 Playwright E2E tests** across 8 spec files, run on every push and PR to `main` via GitHub Actions (`test.yml`).
 
-- [ ] Create new game with home/away pitchers and catchers
-- [ ] Tap pitch button — count increments, alerts appear at thresholds
-- [ ] Next batter — resets batter count, records in break history
-- [ ] Undo — reverses last action correctly
-- [ ] Change pitcher mid-game — old pitcher marked done, new pitcher starts fresh
-- [ ] Score adjustments — +/- buttons update scoreboard
-- [ ] End half inning — switches top/bottom, increments inning
-- [ ] Generate summary — all data appears in formatted text
-- [ ] Copy/email summary — clipboard and mailto: link work
-- [ ] Close and resume game — appears as LIVE in history
-- [ ] End game — saved to history with correct rest-day calculations
-- [ ] Import/export CSV — round-trip data integrity
-- [ ] Config presets — custom thresholds apply to new games
+| Spec file | Tests | Coverage |
+|-----------|-------|----------|
+| `core-game-flow` | 20 | Game lifecycle, scoring, outs (both modes), undo, persistence |
+| `advanced-mode` | 21 | Pitch types, BSO count, BIP modal, auto-advance, non-pitch outs |
+| `thresholds-alerts` | 18 | Rest days, pitch limits, mercy rule modal, at-bat warnings |
+| `pitcher-catcher` | 11 | Roster management, mid-game switches, inning tracking |
+| `summary-export` | 19 | Game summary, umpire data, report generation, export |
+| `shareable-stats` | 18 | Share features, swipe-to-dismiss, image card exports, K/BB/BIP boxes |
+| `history-config` | 19 | History cards, config presets, setup flow, umpire clearing |
+| `about-screen` | 8 | About screen, app info, links, back navigation |
+
+```bash
+npm test              # Run all tests (headless)
+npm run test:headed   # Run with visible browser
+npm run test:ui       # Open Playwright UI
+```
+
+Tests run in Chromium against the web app layer (`index.html`) served locally. Shared helpers (`tests/helpers.ts`) provide utilities for game setup, pitch throwing, and state management.
 
 ### Device Testing
 

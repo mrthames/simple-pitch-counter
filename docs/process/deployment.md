@@ -41,7 +41,7 @@ Follow conventional style:
 
 ### Automated E2E Tests
 
-116 Playwright tests run on every push and PR to `main` via GitHub Actions (`test.yml`).
+134 Playwright tests run on every push and PR to `main` via GitHub Actions (`test.yml`).
 
 **Test suites:**
 
@@ -49,11 +49,12 @@ Follow conventional style:
 |------|-------|----------|
 | `core-game-flow.spec.ts` | 20 | Game lifecycle, scoring, outs (both modes), undo, persistence |
 | `advanced-mode.spec.ts` | 21 | Pitch types, B/S/F counting, walks, strikeouts, BIP, auto-outs |
-| `thresholds-alerts.spec.ts` | 17 | Rest labels, limit alerts, catcher innings, mercy rule, at-bat warnings |
-| `pitcher-catcher.spec.ts` | 10 | Mid-game changes, count preservation, stats, half-inning switching |
-| `summary-export.spec.ts` | 11 | Summary screen, export text, umpire data, pitch breakdowns |
-| `shareable-stats.spec.ts` | 14 | Share features, swipe-to-dismiss, image card exports |
-| `history-config.spec.ts` | 12 | History cards, persistence, setup screen, mode toggle, umpire clearing |
+| `thresholds-alerts.spec.ts` | 18 | Rest labels, limit alerts, catcher innings, mercy rule, at-bat warnings |
+| `pitcher-catcher.spec.ts` | 11 | Mid-game changes, count preservation, stats, half-inning switching |
+| `summary-export.spec.ts` | 19 | Summary screen, export text, umpire data, pitch breakdowns |
+| `shareable-stats.spec.ts` | 18 | Share features, swipe-to-dismiss, image card exports, K/BB/BIP boxes |
+| `history-config.spec.ts` | 19 | History cards, persistence, setup screen, mode toggle, umpire clearing |
+| `about-screen.spec.ts` | 8 | About screen, app info, links, back navigation |
 
 **Run locally:**
 ```bash

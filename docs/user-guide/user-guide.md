@@ -1,7 +1,7 @@
 # Simple Pitch Counter: User Guide
 
-**Version:** 2.0
-**Last updated:** 2026-04-19
+**Version:** 2.2
+**Last updated:** 2026-04-21
 
 ---
 
@@ -239,6 +239,36 @@ The report includes:
 
 - **Copy to clipboard** — paste into text, email, or league app
 - **Email** — opens email with the summary pre-filled
+- **Share** — generates a formatted text report; on iOS, opens the native Share Sheet
+
+---
+
+## Shareable Stats Cards
+
+Stats drawers throughout the app include a **Share** button that generates a dark-themed image card (PNG) you can save or send.
+
+### Where to Share From
+
+| Location | What's shared | How to access |
+|----------|--------------|---------------|
+| Live game pitcher stats | Individual pitcher card | Tap **Stats ›** next to pitcher name → **Share** |
+| Quick stats (mid-game) | All pitchers summary | ☰ → **Quick stats** → **Share** |
+| Game summary pitcher stats | Individual pitcher card | ☰ → **Game summary** → tap pitcher stats button → **Share** |
+| History stats | All pitchers summary | History card → **Stats** → **Share** |
+| History individual pitcher | Individual pitcher card | History card → **Stats** → tap pitcher name → **Share pitcher stats** |
+
+### What's Included
+
+Each image card shows:
+- Pitcher name, team, date, and inning count
+- **K / BB / BIP** hero number boxes
+- Stat lines (pitches, batters, last batter count, rest days)
+- Pitch type breakdown with percentages (Advanced mode)
+- App branding
+
+### Swipe to Dismiss
+
+All stats drawers support **swipe down to dismiss** — drag the sheet downward to close it. A small swipe snaps back; a larger swipe closes the drawer.
 
 ---
 
@@ -270,6 +300,17 @@ The history screen shows all games, newest first. Each card displays:
 4. **Generate the summary before leaving** — the league typically requires the report within 2 hours
 5. **Close, don't end** — if you need to step away, use Close to resume later
 6. **Use physical buttons** — map volume buttons to pitch/undo for eyes-free counting
+
+---
+
+## About This App
+
+Access from the history screen: tap the ☰ menu → **About this app**.
+
+The About screen shows:
+- App name and current version
+- Links to the website, privacy policy, and feedback form
+- A **Buy Me a Coffee** link to support ongoing development
 
 ---
 

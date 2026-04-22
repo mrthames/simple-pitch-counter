@@ -25,6 +25,7 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 - **Mercy rule auto-prompt** — when runs scored in a half inning reach the configured mercy limit, a modal prompts to end the half or continue playing; tracks runs from either team
 - **Advanced pitch tracking** — tracks balls, strikes, and outs automatically; records pitch-by-pitch sequences per at-bat with visual chips; auto-advances count on walks, strikeouts, and balls in play
 - **Ball in play outcomes** — when a ball is put in play, a bottom sheet prompts for Safe/Out with automatic out tracking and side-retired detection
+- **Shareable stats cards** — generate and share pitcher stats as image cards (PNG) with K/BB/BIP hero boxes, pitch breakdowns, and rest info; works from live game, game summary, and history views
 - **Live pitcher stats** — dark-themed bottom sheet showing K, BB, BIP totals and a full pitch type breakdown with percentage bars
 - **Configurable league rules** — set pitch limits, rest-day thresholds, and catcher inning rules per division (e.g., Minors 8, Minors 9/10, Majors)
 - **Threshold awareness** — alerts when a pitcher approaches or crosses a rest-day threshold, with support for the "finish the batter" rule
@@ -38,6 +39,8 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 - **Result flash animations** — full-screen animated overlays for strikeouts, walks, outs, safe calls, and side retired
 - **Data export/import** — export all game data as JSON (via Share Sheet on iOS) and import backups from the history menu
 - **Pitch dot visualization** — dots below the hero count alternate shading per batter to show at-bat boundaries at a glance
+- **Swipe-to-dismiss stats** — swipe down on any stats bottom sheet to dismiss it
+- **About screen** — accessible from the history menu; shows app version, links to website, privacy policy, feedback form, and Buy Me a Coffee
 - **Fully offline** — no account, no internet, no ads. All data stays on your device via localStorage
 
 ### Game summary output
@@ -69,7 +72,9 @@ simple-pitch-counter/
 │   ├── thresholds-alerts.spec.ts   # Rest days, pitch limits, mercy rule
 │   ├── pitcher-catcher.spec.ts     # Roster management, mid-game switches
 │   ├── summary-export.spec.ts      # Game summary, report generation, export
-│   └── history-config.spec.ts      # History cards, config presets, setup flow
+│   ├── shareable-stats.spec.ts     # Share features, swipe-to-dismiss, image cards
+│   ├── history-config.spec.ts      # History cards, config presets, setup flow
+│   └── about-screen.spec.ts        # About screen, links, back navigation
 ├── .github/workflows/      # CI/CD
 │   └── test.yml            # Runs Playwright tests on push/PR to main
 ├── website/                # simplepitchcounter.com
@@ -90,16 +95,18 @@ simple-pitch-counter/
 
 ## Testing
 
-The project has **91 Playwright E2E tests** covering all app functionality:
+The project has **134 Playwright E2E tests** covering all app functionality:
 
 | Spec file | Tests | Coverage |
 |-----------|-------|----------|
 | `core-game-flow` | 20 | Game lifecycle, scoring, outs (both modes), undo, persistence |
 | `advanced-mode` | 21 | Pitch types, BSO count, BIP modal, auto-advance, non-pitch outs |
-| `thresholds-alerts` | 17 | Rest days, pitch limits, mercy rule modal, at-bat warnings |
-| `pitcher-catcher` | 10 | Roster management, mid-game switches, inning tracking |
-| `summary-export` | 11 | Game summary, umpire data, report generation, export |
-| `history-config` | 12 | History cards, config presets, setup flow, umpire clearing |
+| `thresholds-alerts` | 18 | Rest days, pitch limits, mercy rule modal, at-bat warnings |
+| `pitcher-catcher` | 11 | Roster management, mid-game switches, inning tracking |
+| `summary-export` | 19 | Game summary, umpire data, report generation, export |
+| `shareable-stats` | 18 | Share features, swipe-to-dismiss, image card exports, K/BB/BIP boxes |
+| `history-config` | 19 | History cards, config presets, setup flow, umpire clearing |
+| `about-screen` | 8 | About screen, app info, links, back navigation |
 
 ```bash
 npm test              # Run all tests (headless)
