@@ -77,8 +77,15 @@ test.describe('Thresholds and alerts', () => {
     await startGame(page, { mode: 'simple', homeCatcher: 'Mike C.' });
     await addSimplePitches(page, 41);
 
-    const catcherSection = page.locator('#catcher-section');
-    await expect(catcherSection).toContainText('ineligible to catch');
+    await expect(page.locator('#simple-alerts')).toContainText('cannot catch remainder');
+  });
+
+  test('pitcher cant catch alert does not appear in catcher section', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeCatcher: 'Mike C.' });
+    await addSimplePitches(page, 41);
+
+    await expect(page.locator('#catcher-section')).not.toContainText('ineligible');
+    await expect(page.locator('#catcher-section')).not.toContainText('pitcher');
   });
 
   test('at-bat warning shows at 6+ pitches in simple mode', async ({ page }) => {

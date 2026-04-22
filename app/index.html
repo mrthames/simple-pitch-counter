@@ -129,21 +129,21 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 
 /* ── Simple mode ── */
 .hero-card{
-  background:var(--card);border-radius:20px;padding:18px 16px 16px;
-  margin-bottom:12px;text-align:center;
+  background:var(--card);border-radius:20px;padding:14px 16px 12px;
+  margin-bottom:10px;text-align:center;
   box-shadow:0 1px 0 rgba(0,0,0,.05);
 }
-.hero-at-bat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.hero-at-bat-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .hero-at-bat-lbl{font-size:12px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
 .hero-at-bat-num{font-size:20px;font-weight:800;letter-spacing:-.5px;transition:color .2s}
-.hero-sep{width:100%;height:1px;background:var(--sep);margin-bottom:14px}
+.hero-sep{width:100%;height:1px;background:var(--sep);margin-bottom:10px}
 .hero-num{
-  font-size:88px;font-weight:900;line-height:1;letter-spacing:-4px;
+  font-size:64px;font-weight:900;line-height:1;letter-spacing:-3px;
   transition:transform .22s cubic-bezier(.36,1.6,.5,1),color .3s;
 }
-.hero-of{font-size:13px;color:var(--t2);margin-top:4px}
-.hero-rest{font-size:13px;font-weight:700;margin-top:6px}
-.pitch-dots{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.hero-of{font-size:13px;color:var(--t2);margin-top:3px}
+.hero-rest{font-size:13px;font-weight:700;margin-top:4px}
+.pitch-dots{display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:10px}
 .pitch-dot{width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,.12)}
 
 /* ── Advanced mode ── */
@@ -625,7 +625,7 @@ textarea{resize:vertical;min-height:56px}
       <div class="btn-sm" id="p-change-btn" onclick="togglePSelect()">Change</div>
     </div>
     <div id="pitcher-select-list" style="display:none"></div>
-    <div id="simple-alerts" style="display:none;min-height:48px"></div>
+    <div id="simple-alerts" style="display:none"></div>
 
     <!-- Advanced mode content -->
     <div id="adv-content" style="display:none">
@@ -1314,11 +1314,12 @@ function renderPitcherSection(){
   const psl=document.getElementById('pitcher-select-list');
   if(g.pSelectOpen){
     psl.style.display='block';
-    let h=roster.pitchers.map((p,i)=>{
+    let h='<div class="player-picker">';
+    h+=roster.pitchers.map((p,i)=>{
       const isA=i===idx;const ri2=restInfo(p.pitches);
       return`<div class="player-row" onclick="selectPitcher(${i})"><div class="player-radio" style="background:${isA?'var(--blue)':'transparent'};border:2px solid ${isA?'var(--blue)':'var(--sep2)'}"></div><div class="player-info"><div class="player-info-name">${p.name}${p.num?' <span class="player-info-num">#'+p.num+'</span>':''}</div><div class="player-info-sub">${p.pitches} pitches${ri2?` · ${ri2.label}`:''}</div></div>${isA?'<div class="badge-active">Active</div>':''}</div>`;
     }).join('');
-    h+=`<div class="add-player-form"><input type="text" id="new-p-name" placeholder="New pitcher name" autocapitalize="words"><input type="text" id="new-p-num" class="num-input" placeholder="#"><div class="btn-sm" style="background:var(--blue);color:#fff;border-radius:10px;white-space:nowrap" onclick="addNewPitcherMidGame()">Add</div></div>`;
+    h+=`<div class="add-player-form"><input type="text" id="new-p-name" placeholder="New pitcher name" autocapitalize="words"><input type="text" id="new-p-num" class="num-input" placeholder="#"><div class="btn-sm" style="background:var(--blue);color:#fff;border-radius:10px;white-space:nowrap" onclick="addNewPitcherMidGame()">Add</div></div></div>`;
     psl.innerHTML=h;
   }else psl.style.display='none';
 }
@@ -1350,7 +1351,6 @@ function renderCatcherSection(){
     const pipColor=maxed?'var(--red)':warn?'var(--amber)':'var(--blue)';
     const pips=Array.from({length:C_INN_LIM}).map((_,i)=>`<div class="inn-pip ${i<inn?(maxed?'danger':warn?'warn':'filled'):''}"></div>`).join('');
     h+=`<div class="catcher-card ${maxed?'maxed':warn?'warn':''}"><div><div style="font-size:12px;color:${maxed?'var(--red)':'var(--t2)'};font-weight:500">${maxed?'Inning limit reached':`${left} inning${left!==1?'s':''} remaining`}</div><div class="inn-pips" style="margin-top:7px">${pips}</div></div><div style="text-align:right"><div class="catcher-count-num" style="color:${maxed?'var(--red)':warn?'var(--amber)':'var(--text)'}">${inn}</div><div style="font-size:11px;color:var(--t2);font-weight:600">of ${C_INN_LIM} inn.</div></div></div>`;
-    if(ap&&ap.pitches>=PITCH_C_LIM)h+=`<div class="alert a-warn"><div class="alert-dot"></div><span>Active pitcher threw ${ap.pitches}+ pitches — ineligible to catch remainder of day.</span></div>`;
     if(warn&&!maxed)h+=`<div class="alert a-warn"><div class="alert-dot"></div><span>${cat.name} is in their last allowed inning (${C_INN_LIM} inn. max).</span></div>`;
     if(maxed)h+=`<div class="alert a-danger"><div class="alert-dot"></div><span>${cat.name} has reached the ${C_INN_LIM}-inning catcher limit. Change catcher.</span></div>`;
   }else{h+=`<div style="font-size:13px;color:var(--t2);padding:6px 0">No catcher added.</div>`;}
