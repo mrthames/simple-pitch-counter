@@ -175,4 +175,25 @@ test.describe('History and configuration', () => {
     await page.click('.new-game-btn');
     await expect(page.locator('#s-ump-plate')).toHaveValue('');
   });
+
+  test('config form includes pitcher catch limit field', async ({ page }) => {
+    await page.click('.hist-menu-btn');
+    await page.click('text=Configuration');
+    await page.waitForSelector('#screen-config.active');
+
+    // Click edit on default config
+    await page.locator('.config-actions .btn-xs', { hasText: 'Edit' }).first().click();
+    await page.waitForSelector('.modal-overlay');
+
+    const catchField = page.locator('#cfg-pcatch');
+    await expect(catchField).toBeVisible();
+    await expect(catchField).toHaveValue('41');
+  });
+
+  test('config summary shows pitcher catch limit', async ({ page }) => {
+    await page.click('.hist-menu-btn');
+    await page.click('text=Configuration');
+    await page.waitForSelector('#screen-config.active');
+    await expect(page.locator('.config-sub').first()).toContainText('no catch @41p');
+  });
 });
