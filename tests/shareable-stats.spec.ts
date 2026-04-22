@@ -143,7 +143,7 @@ test.describe('Shareable stats cards', () => {
     }
   });
 
-  test('individual pitcher share from history detail', async ({ page }) => {
+  test('individual pitcher share from history triggers image download', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     await addSimplePitches(page, 10);
 
@@ -155,11 +155,83 @@ test.describe('Shareable stats cards', () => {
     await page.click('text=Stats');
     await page.waitForSelector('#saved-stats-overlay .stats-sheet');
 
-    // Click a pitcher row to expand details
     const pitcherRow = page.locator('#saved-stats-overlay .stats-sheet').getByText('Jake M.');
     await pitcherRow.click();
-
-    // Expanded detail should have individual share link
     await expect(page.locator('#saved-stats-overlay')).toContainText('Share pitcher stats');
+
+    const downloadPromise = page.waitForEvent('download', { timeout: 5000 }).catch(() => null);
+    await page.locator('#saved-stats-overlay').getByText('Share pitcher stats').click();
+    const download = await downloadPromise;
+    expect(download).not.toBeNull();
+    if (download) {
+      expect(download.suggestedFilename()).toBe('pitcher-stats.png');
+    }
+  });
+
+  test('swipe down dismisses stats sheet overlay', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 5);
+
+    await page.click('.menu-btn');
+    await page.click('text=Quick stats');
+    await page.waitForSelector('.stats-sheet');
+
+    const sheet = page.locator('.stats-sheet');
+    const box = await sheet.boundingBox();
+    expect(box).not.toBeNull();
+
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + 20);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + 200, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(300);
+    await expect(page.locator('.stats-sheet-overlay')).toHaveCount(0);
+  });
+
+  test('small swipe does not dismiss stats sheet', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 5);
+
+    await page.click('.menu-btn');
+    await page.click('text=Quick stats');
+    await page.waitForSelector('.stats-sheet');
+
+    const sheet = page.locator('.stats-sheet');
+    const box = await sheet.boundingBox();
+    expect(box).not.toBeNull();
+
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + 20);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + 50, { steps: 5 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(300);
+    await expect(page.locator('.stats-sheet-overlay')).toHaveCount(1);
+  });
+
+  test('history stats overlay supports swipe dismiss', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 5);
+
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+    await page.click('.modal-btn.red');
+    await expect(page.locator('#screen-history')).toHaveClass(/active/);
+
+    await page.click('text=Stats');
+    await page.waitForSelector('#saved-stats-overlay .stats-sheet');
+
+    const sheet = page.locator('#saved-stats-overlay .stats-sheet');
+    const box = await sheet.boundingBox();
+    expect(box).not.toBeNull();
+
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + 20);
+    await page.mouse.down();
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + 200, { steps: 10 });
+    await page.mouse.up();
+
+    await page.waitForTimeout(300);
+    await expect(page.locator('#saved-stats-overlay')).toHaveCount(0);
   });
 });

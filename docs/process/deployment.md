@@ -41,7 +41,7 @@ Follow conventional style:
 
 ### Automated E2E Tests
 
-91 Playwright tests run on every push and PR to `main` via GitHub Actions (`test.yml`).
+116 Playwright tests run on every push and PR to `main` via GitHub Actions (`test.yml`).
 
 **Test suites:**
 
@@ -52,6 +52,7 @@ Follow conventional style:
 | `thresholds-alerts.spec.ts` | 17 | Rest labels, limit alerts, catcher innings, mercy rule, at-bat warnings |
 | `pitcher-catcher.spec.ts` | 10 | Mid-game changes, count preservation, stats, half-inning switching |
 | `summary-export.spec.ts` | 11 | Summary screen, export text, umpire data, pitch breakdowns |
+| `shareable-stats.spec.ts` | 14 | Share features, swipe-to-dismiss, image card exports |
 | `history-config.spec.ts` | 12 | History cards, persistence, setup screen, mode toggle, umpire clearing |
 
 **Run locally:**
