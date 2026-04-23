@@ -7,21 +7,27 @@ test.describe('Name editing in live game', () => {
     await clearState(page);
   });
 
-  test('pitcher edit button is visible during game', async ({ page }) => {
+  test('pitcher edit button is visible in change picker', async ({ page }) => {
     await startGame(page, { mode: 'simple', homePitcher: 'Jake M.' });
-    await expect(page.locator('.edit-name-btn').first()).toBeVisible();
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await expect(page.locator('#pitcher-select-list .edit-name-btn').first()).toBeVisible();
   });
 
   test('clicking pitcher edit opens modal with current name', async ({ page }) => {
     await startGame(page, { mode: 'simple', homePitcher: 'Jake M.' });
-    await page.locator('.edit-name-btn').first().click();
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.locator('#pitcher-select-list .edit-name-btn').first().click();
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
     await expect(page.locator('#edit-player-name')).toHaveValue('Jake M.');
   });
 
   test('saving pitcher name updates display', async ({ page }) => {
     await startGame(page, { mode: 'simple', homePitcher: 'Jake M.' });
-    await page.locator('.edit-name-btn').first().click();
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.locator('#pitcher-select-list .edit-name-btn').first().click();
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
     await page.fill('#edit-player-name', 'Jacob Miller');
@@ -34,7 +40,9 @@ test.describe('Name editing in live game', () => {
     await startGame(page, { mode: 'simple', homePitcher: 'Jake M.' });
     await addSimplePitches(page, 7);
 
-    await page.locator('.edit-name-btn').first().click();
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.locator('#pitcher-select-list .edit-name-btn').first().click();
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
     await page.fill('#edit-player-name', 'Jacob Miller');
     await page.click('.modal-btn.primary');
@@ -42,15 +50,18 @@ test.describe('Name editing in live game', () => {
     await expect(page.locator('.pitch-count-badge-num').first()).toHaveText('7');
   });
 
-  test('catcher edit button is visible when catcher is set', async ({ page }) => {
+  test('catcher edit button is visible in change picker', async ({ page }) => {
     await startGame(page, { mode: 'simple', homeCatcher: 'Mike C.' });
-    const catcherEdit = page.locator('#catcher-section .edit-name-btn');
-    await expect(catcherEdit).toBeVisible();
+    const catcherSection = page.locator('#catcher-section');
+    await catcherSection.locator('.btn-sm').filter({ hasText: 'Change' }).click();
+    await expect(page.locator('#catcher-section .edit-name-btn').first()).toBeVisible();
   });
 
   test('saving catcher name updates display', async ({ page }) => {
     await startGame(page, { mode: 'simple', homeCatcher: 'Mike C.' });
-    await page.locator('#catcher-section .edit-name-btn').click();
+    const catcherSection = page.locator('#catcher-section');
+    await catcherSection.locator('.btn-sm').filter({ hasText: 'Change' }).click();
+    await page.locator('#catcher-section .edit-name-btn').first().click();
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
     await page.fill('#edit-player-name', 'Michael Clark');
@@ -61,7 +72,9 @@ test.describe('Name editing in live game', () => {
 
   test('cancel edit does not change name', async ({ page }) => {
     await startGame(page, { mode: 'simple', homePitcher: 'Jake M.' });
-    await page.locator('.edit-name-btn').first().click();
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.locator('#pitcher-select-list .edit-name-btn').first().click();
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
     await page.fill('#edit-player-name', 'Wrong Name');
@@ -72,7 +85,9 @@ test.describe('Name editing in live game', () => {
 
   test('edit number updates display', async ({ page }) => {
     await startGame(page, { mode: 'simple', homePitcher: 'Jake M.' });
-    await page.locator('.edit-name-btn').first().click();
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.locator('#pitcher-select-list .edit-name-btn').first().click();
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
 
     await page.fill('#edit-player-num', '42');

@@ -113,7 +113,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .pitch-count-badge-num{font-size:16px;font-weight:800;transition:color .3s,transform .22s cubic-bezier(.36,1.6,.5,1)}
 .pitch-count-badge-lbl{font-size:10px;color:var(--t2);font-weight:600}
 .stats-link{font-size:12px;color:var(--blue);font-weight:600;padding:4px 0;cursor:pointer}
-.edit-name-btn{font-size:14px;color:var(--t3);margin-left:6px;cursor:pointer;vertical-align:middle}
+.edit-name-btn{margin-left:6px;cursor:pointer;vertical-align:middle;display:inline-flex;align-items:center}
 .rest-lbl{font-size:12px;font-weight:600;margin-top:2px;min-height:18px;visibility:visible}
 .rest-lbl:empty{visibility:hidden}
 
@@ -1385,7 +1385,7 @@ function renderPitcherSection(){
   const ri=ap?restInfo(ap.pitches):null;
   const rc=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
   if(ap){
-    pDisp.innerHTML=`<div class="pitcher-name">${ap.name}${ap.num?' <span class="pitcher-num">#'+ap.num+'</span>':''}<span class="edit-name-btn" onclick="editPlayerName('pitcher')">✎</span></div><div class="pitch-count-badge"><div class="pitch-count-badge-num" style="color:${countColor(ap.pitches)}">${ap.pitches}</div><div class="pitch-count-badge-lbl">pitches</div></div>${g.mode==='advanced'?`<div class="stats-link" onclick="showPitcherStats()">Stats ›</div>`:''}`;
+    pDisp.innerHTML=`<div class="pitcher-name">${ap.name}${ap.num?' <span class="pitcher-num">#'+ap.num+'</span>':''}</div><div class="pitch-count-badge"><div class="pitch-count-badge-num" style="color:${countColor(ap.pitches)}">${ap.pitches}</div><div class="pitch-count-badge-lbl">pitches</div></div>${g.mode==='advanced'?`<div class="stats-link" onclick="showPitcherStats()">Stats ›</div>`:''}`;
     // Rest label
     const rl=document.querySelector('.rest-lbl');
     if(!rl){const d=document.createElement('div');d.className='rest-lbl';pDisp.parentElement.appendChild(d);}
@@ -1400,7 +1400,7 @@ function renderPitcherSection(){
     let h='<div class="player-picker">';
     h+=roster.pitchers.map((p,i)=>{
       const isA=i===idx;const ri2=restInfo(p.pitches);
-      return`<div class="player-row" onclick="selectPitcher(${i})"><div class="player-radio" style="background:${isA?'var(--blue)':'transparent'};border:2px solid ${isA?'var(--blue)':'var(--sep2)'}"></div><div class="player-info"><div class="player-info-name">${p.name}${p.num?' <span class="player-info-num">#'+p.num+'</span>':''}</div><div class="player-info-sub">${p.pitches} pitches${ri2?` · ${ri2.label}`:''}</div></div>${isA?'<div class="badge-active">Active</div>':''}</div>`;
+      return`<div class="player-row" onclick="selectPitcher(${i})"><div class="player-radio" style="background:${isA?'var(--blue)':'transparent'};border:2px solid ${isA?'var(--blue)':'var(--sep2)'}"></div><div class="player-info"><div class="player-info-name">${p.name}${p.num?' <span class="player-info-num">#'+p.num+'</span>':''}</div><div class="player-info-sub">${p.pitches} pitches${ri2?` · ${ri2.label}`:''}</div></div><div class="edit-name-btn" onclick="event.stopPropagation();editPlayerName('pitcher',${i})"><svg width="16" height="16" viewBox="0 -0.5 25 25" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.265 4.16231L19.21 5.74531C19.3978 5.9283 19.5031 6.17982 19.5015 6.44201C19.5 6.70421 19.3919 6.9545 19.202 7.13531L17.724 8.93531L12.694 15.0723C12.6069 15.1749 12.4897 15.2473 12.359 15.2793L9.75102 15.8793C9.40496 15.8936 9.10654 15.6384 9.06702 15.2943L9.18902 12.7213C9.19806 12.5899 9.25006 12.4652 9.33702 12.3663L14.15 6.50131L15.845 4.43331C16.1743 3.98505 16.7938 3.86684 17.265 4.16231Z" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 18.2413H19.2M13.4545 6.78206C13.6872 7.35843 14.165 8.18012 14.8765 8.8128C15.6011 9.45718 16.633 9.95371 17.8893 9.66991" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>${isA?'<div class="badge-active">Active</div>':''}</div>`;
     }).join('');
     h+=`<div class="add-player-form"><input type="text" id="new-p-name" placeholder="New pitcher name" autocapitalize="words"><input type="text" id="new-p-num" class="num-input" placeholder="#"><div class="btn-sm" style="background:var(--blue);color:#fff;border-radius:10px;white-space:nowrap" onclick="addNewPitcherMidGame()">Add</div></div></div>`;
     psl.innerHTML=h;
@@ -1421,10 +1421,10 @@ function renderCatcherSection(){
   const roster=fRoster();const ci=getCI();const cat=ci!==null?roster.catchers[ci]:null;
   const ap=activePitcher();
   const el=document.getElementById('catcher-section');
-  let h=`<div class="section-header" style="margin-bottom:10px"><div><div class="section-lbl">Catcher</div>${cat?`<div style="font-size:16px;font-weight:700;letter-spacing:-.3px;margin-top:2px">${cat.name}${cat.num?' <span style="color:var(--t3);font-weight:500">#'+cat.num+'</span>':''}<span class="edit-name-btn" onclick="editPlayerName('catcher')">✎</span></div>`:''}</div><div class="btn-sm" onclick="toggleCSelect()">${g.cSelectOpen?'Done':'Change'}</div></div>`;
+  let h=`<div class="section-header" style="margin-bottom:10px"><div><div class="section-lbl">Catcher</div>${cat?`<div style="font-size:16px;font-weight:700;letter-spacing:-.3px;margin-top:2px">${cat.name}${cat.num?' <span style="color:var(--t3);font-weight:500">#'+cat.num+'</span>':''}</div>`:''}</div><div class="btn-sm" onclick="toggleCSelect()">${g.cSelectOpen?'Done':'Change'}</div></div>`;
   if(g.cSelectOpen){
     h+=`<div class="player-picker">`;
-    h+=roster.catchers.map((c,i)=>`<div class="player-row" onclick="selectCatcher(${i})"><div class="player-radio" style="background:${i===ci?'var(--blue)':'transparent'};border:2px solid ${i===ci?'var(--blue)':'var(--sep2)'}"></div><div class="player-info"><div class="player-info-name">${c.name}${c.num?' <span style="color:var(--t3)">#'+c.num+'</span>':''}</div><div class="player-info-sub">${c.innings.filter(Boolean).length} inning${c.innings.filter(Boolean).length!==1?'s':''} caught</div></div>${i===ci?'<div class="badge-active">Active</div>':''}</div>`).join('');
+    h+=roster.catchers.map((c,i)=>`<div class="player-row" onclick="selectCatcher(${i})"><div class="player-radio" style="background:${i===ci?'var(--blue)':'transparent'};border:2px solid ${i===ci?'var(--blue)':'var(--sep2)'}"></div><div class="player-info"><div class="player-info-name">${c.name}${c.num?' <span style="color:var(--t3)">#'+c.num+'</span>':''}</div><div class="player-info-sub">${c.innings.filter(Boolean).length} inning${c.innings.filter(Boolean).length!==1?'s':''} caught</div></div><div class="edit-name-btn" onclick="event.stopPropagation();editPlayerName('catcher',${i})"><svg width="16" height="16" viewBox="0 -0.5 25 25" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.265 4.16231L19.21 5.74531C19.3978 5.9283 19.5031 6.17982 19.5015 6.44201C19.5 6.70421 19.3919 6.9545 19.202 7.13531L17.724 8.93531L12.694 15.0723C12.6069 15.1749 12.4897 15.2473 12.359 15.2793L9.75102 15.8793C9.40496 15.8936 9.10654 15.6384 9.06702 15.2943L9.18902 12.7213C9.19806 12.5899 9.25006 12.4652 9.33702 12.3663L14.15 6.50131L15.845 4.43331C16.1743 3.98505 16.7938 3.86684 17.265 4.16231Z" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 18.2413H19.2M13.4545 6.78206C13.6872 7.35843 14.165 8.18012 14.8765 8.8128C15.6011 9.45718 16.633 9.95371 17.8893 9.66991" stroke="var(--t3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>${i===ci?'<div class="badge-active">Active</div>':''}</div>`).join('');
     h+=`<div class="add-player-form"><input type="text" id="new-c-name" placeholder="New catcher name" autocapitalize="words"><input type="text" id="new-c-num" class="num-input" placeholder="#"><div class="btn-sm" style="background:var(--blue);color:#fff;border-radius:10px;white-space:nowrap" onclick="addNewCatcherMidGame()">Add</div></div></div>`;
   }
   if(cat){
@@ -1448,24 +1448,25 @@ function addNewCatcherMidGame(){
   setCI(fRoster().catchers.length-1);
   saveState();renderGame();
 }
-function editPlayerName(type){
+function editPlayerName(type,idx){
   const g=state.currentGame;if(!g)return;
   const roster=fRoster();
-  const player=type==='pitcher'?roster.pitchers[getPI()]:roster.catchers[getCI()];
+  const player=type==='pitcher'?roster.pitchers[idx]:roster.catchers[idx];
   if(!player)return;
+  window._editPlayerType=type;window._editPlayerIdx=idx;
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
   ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
-  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title">Edit ${type==='pitcher'?'Pitcher':'Catcher'}</div><div style="margin:12px 0"><input class="form-input" type="text" id="edit-player-name" value="${player.name}" placeholder="Name" autocapitalize="words" style="margin-bottom:8px"><input class="form-input" type="text" id="edit-player-num" value="${player.num||''}" placeholder="Number"></div><div class="modal-btns"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="savePlayerName('${type}')">Save</div></div></div>`;
+  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title">Edit ${type==='pitcher'?'Pitcher':'Catcher'}</div><div style="margin:12px 0"><input class="form-input" type="text" id="edit-player-name" value="${player.name}" placeholder="Name" autocapitalize="words" style="margin-bottom:8px"><input class="form-input" type="text" id="edit-player-num" value="${player.num||''}" placeholder="Number"></div><div class="modal-btns"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="savePlayerName()">Save</div></div></div>`;
   document.body.appendChild(ov);
   document.getElementById('edit-player-name').focus();
 }
-function savePlayerName(type){
+function savePlayerName(){
   const g=state.currentGame;if(!g)return;
   const name=document.getElementById('edit-player-name')?.value.trim();
   if(!name){alert('Name cannot be empty.');return;}
   const num=document.getElementById('edit-player-num')?.value.trim()||'';
   const roster=fRoster();
-  const player=type==='pitcher'?roster.pitchers[getPI()]:roster.catchers[getCI()];
+  const player=window._editPlayerType==='pitcher'?roster.pitchers[window._editPlayerIdx]:roster.catchers[window._editPlayerIdx];
   if(player){player.name=name;player.num=num;}
   closeModal();saveState();renderGame();
 }
