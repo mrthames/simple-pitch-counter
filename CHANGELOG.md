@@ -4,6 +4,58 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-04-23] V2.3 — Quality-of-life features and native review prompts
+
+**Files:** `index.html`, `ViewController.swift`, `MainActivity.kt`, `build.gradle.kts`, `project.pbxproj`
+
+### New features
+- **In-game name editing** — edit a pitcher or catcher's name and number mid-game from the Change picker via a pencil icon, without interrupting the game
+- **Called Strike & Ball button mapping** — Advanced mode adds "Called Strike" and "Ball" as physical button options, letting coaches track specific pitch types hands-free like a traditional umpire dial
+- **In-app review prompts** — automatically prompts users to rate the app after games 3, 10, and 25 using native StoreKit (iOS) and Google Play In-App Review API (Android)
+- **Rate This App link** — added to the About screen for manual review access
+
+### Improvements
+- **Pitcher card layout** — game summary pitcher cards now show K/BB totals on a separate line in Advanced mode for better readability
+- **Umpire feedback wording** — "Plate issues?" and "Base issues?" renamed to "Feedback?" with updated placeholder text
+- **Export content** — game summary export now includes innings count, end time range, and updated feedback wording
+- **History card start time** — game cards in history now show the start time alongside the date
+- **Instant navigation** — removed View Transitions API fade effect for instant screen changes
+
+### Testing & versioning
+- Added 23 new E2E tests (`v2-features.spec.ts`) covering all v2.3 features
+- Added version sync test (`version-sync.spec.ts`) enforcing version consistency across Android, iOS, and app UI (134 → 159 total tests)
+- Version bumped to 2.3 across all three locations
+
+---
+
+## [2026-04-23] Android beta polish and website improvements
+
+**Files:** `index.html`, `MainActivity.kt`, `website/index.html`, `website/android-beta.html`, `website/privacy.html`, `website/contact.html`, `website/feedback.html`, `marketing/beta-tester-email.html`, `docs/process/deployment.md`
+
+### Android fixes
+- **Status bar overlap** — inject native status bar height as `--top-inset` CSS variable directly from Kotlin, bypassing CSS `max()` for compatibility with older WebViews
+- **Navigation bar overlap** — inject native nav bar height as `--bottom-inset` CSS variable so Start Game button and all bottom content clear the system nav bar
+- **Header padding** — introduce `--header-pad` variable (20px on iOS, 8px on Android) to tighten gap between status bar and content on Android devices
+- **Status bar text color** — add pre-API-30 fallback using `SYSTEM_UI_FLAG_LIGHT_STATUS_BAR` so status bar text switches to white on the dark game header on older devices
+- **Adaptive icons** — replace legacy PNG launcher icons with adaptive icon (foreground + background layers) supporting circle, squircle, and rounded square launcher shapes
+
+### Website improvements
+- **Hamburger navigation** — added full-screen overlay menu to all 5 pages for mobile navigation
+- **Clean URLs** — switched to directory-based URLs (e.g., `/android-beta/` instead of `/android-beta.html`) using Nginx subdirectory pattern
+- **OG meta tags** — added Open Graph images (1200×630) and meta tags to all pages for link preview support; added `og:image:width`, `og:image:height`, and `twitter:image` for iMessage compatibility
+- **Android beta page** — linked from homepage badge, form submits to PHP backend
+- **Bottom whitespace** — fixed excess padding on mobile for homepage and beta page
+
+### Email system
+- **Confirmation emails** — all three PHP form handlers (contact, feedback, android-beta) now send branded HTML confirmation emails to submitters using table-based layout compatible with Gmail
+- **Beta tester email template** — created Gmail-compatible onboarding email with setup steps, Play Store screenshot, and CTA button; updated to reflect improved Play Store listing (removed warning cards)
+
+### Documentation
+- Added Android deployment procedures to `docs/process/deployment.md`
+- Added clean URL deployment pattern (dual-location SCP)
+
+---
+
 ## [2026-04-19] Simple mode outs, mercy rule, UI refinements
 
 **Files:** `index.html`, `ViewController.swift`, `website/index.html`
