@@ -113,63 +113,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 <body>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- SLIDE 1: Advanced Pitch Tracking (phone shifted right)        -->
+<!-- SLIDE 1: Strike & Ball Button Mapping                         -->
 <!--                                                               -->
-<!-- Phone math (scale=2.05, translateX=70px pre-scale):           -->
-<!--   Phone pre-transform center X = 1284/2 = 642                -->
-<!--   After translateX(70): center = 642 + 70*2.05 = 785.5       -->
-<!--   Scaled half-width = 195*2.05 = 399.75                      -->
-<!--   Phone left edge = 785.5 - 399.75 ≈ 386                     -->
-<!--   HW buttons at left:-5px scaled = -10.25px → X ≈ 376        -->
+<!-- Phone shifted RIGHT, scale=1.7 for breathing room.            -->
+<!-- Callouts on the LEFT pointing to volume buttons.              -->
 <!--                                                               -->
-<!--   Phone top Y = headline(~490px) + phone-wrap pad(80) = 570  -->
-<!--   Action center Y = 570 + (90+12)*2.05 = 570+209 = 779      -->
-<!--   Vol-up center Y = 570 + (135+19)*2.05 = 570+316 = 886     -->
-<!--   Vol-dn center Y = 570 + (183+19)*2.05 = 570+414 = 984     -->
+<!-- Phone math (scale=1.7, translateX=100px pre-scale):           -->
+<!--   Phone center X = 642 + (100*1.7) = 812                     -->
+<!--   Scaled half-width = 195*1.7 = 331.5                        -->
+<!--   Phone left edge = 812 - 331.5 ≈ 480                        -->
+<!--   HW vol buttons at left:-5px scaled → X ≈ 472               -->
 <!--                                                               -->
-<!--   All callout lines end at X = 376 (phone left / button X)   -->
+<!--   Phone top Y (measured from screenshot)                      -->
+<!--   Vol-up: top:135px, h:38px → center 154px from phone top    -->
+<!--   Vol-dn: top:183px, h:38px → center 202px from phone top    -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div class="slide" id="slide-1">
   <div class="headline-area">
-    <div class="slide-headline">TRACK<br><span class="green">EVERY PITCH</span></div>
-    <div class="slide-sub">Track every pitch — Ball, Strike, Foul, and Ball in Play</div>
+    <div class="slide-headline">TRACK LIKE<br>AN <span class="amber">UMPIRE</span></div>
+    <div class="slide-sub">Map volume buttons to Strike and Ball — hands-free pitch tracking</div>
   </div>
   <div class="phone-wrap">
     <div class="phone-glow" style="left:65%"></div>
-    <div class="iphone" style="transform:scale(2.05) translateX(70px);transform-origin:top center">
+    <div class="iphone" style="transform:scale(1.7) translateX(140px);transform-origin:top center">
       <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
       <div class="iphone-screen"></div>
     </div>
   </div>
 
   <!-- Heading -->
-  <div class="callout-heading" style="right:920px;top:725px">Custom Button Actions</div>
+  <div class="callout-heading" style="right:935px;top:730px">Custom Actions</div>
 
-  <!-- Action button — center Y = 811, callout height 80, top = 811-40 = 771 -->
-  <div class="callout" style="right:908px;top:771px">
-    <div class="callout-text">
-      <div class="callout-name">Action</div>
-      <div class="callout-map" style="color:#FF9500">+ Out</div>
-    </div>
-    <div class="callout-line" style="width:160px;margin-left:20px"></div>
-  </div>
-
-  <!-- Vol Up — center Y = 917, top = 917-40 = 877 -->
-  <div class="callout" style="right:908px;top:877px">
-    <div class="callout-text">
+  <!-- Vol Up → Strike -->
+  <div class="callout" style="right:740px;top:810px">
+    <div class="callout-text" style="align-items:flex-end">
       <div class="callout-name">Vol +</div>
-      <div class="callout-map" style="color:#34C759">Next Batter</div>
+      <div class="callout-map" style="color:#FF3B30">Strike</div>
     </div>
-    <div class="callout-line" style="width:120px;margin-left:20px"></div>
+    <div class="callout-line" style="width:140px;margin-left:20px"></div>
   </div>
 
-  <!-- Vol Down — center Y = 1016, top = 1016-40 = 976 -->
-  <div class="callout" style="right:908px;top:976px">
-    <div class="callout-text">
+  <!-- Vol Down → Ball -->
+  <div class="callout" style="right:740px;top:900px">
+    <div class="callout-text" style="align-items:flex-end">
       <div class="callout-name">Vol &minus;</div>
-      <div class="callout-map" style="color:#FFFFFF">Undo</div>
+      <div class="callout-map" style="color:#1A6BFF">Ball</div>
     </div>
-    <div class="callout-line" style="width:175px;margin-left:20px"></div>
+    <div class="callout-line" style="width:140px;margin-left:20px"></div>
   </div>
 </div>
 
@@ -278,6 +268,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
     </div>
   </div>
 </div>
+
 
 </body>
 </html>

@@ -41,7 +41,7 @@ Follow conventional style:
 
 ### Automated E2E Tests
 
-134 Playwright tests run on every push and PR to `main` via GitHub Actions (`test.yml`).
+159 Playwright tests run on every push and PR to `main` via GitHub Actions (`test.yml`).
 
 **Test suites:**
 
@@ -55,6 +55,8 @@ Follow conventional style:
 | `shareable-stats.spec.ts` | 18 | Share features, swipe-to-dismiss, image card exports, K/BB/BIP boxes |
 | `history-config.spec.ts` | 19 | History cards, persistence, setup screen, mode toggle, umpire clearing |
 | `about-screen.spec.ts` | 8 | About screen, app info, links, back navigation |
+| `v2-features.spec.ts` | 23 | Name editing, button mapping, pitcher card layout, feedback wording, review prompts |
+| `version-sync.spec.ts` | 2 | Version string consistency across Android, iOS, and app UI |
 
 **Run locally:**
 ```bash
@@ -76,7 +78,11 @@ npm run test:ui          # Interactive Playwright UI
 
 ### Marketing Version
 
-Set manually. Current: **2.2**. Kept in sync between iOS (`MARKETING_VERSION` in Xcode) and Android (`versionName` in `build.gradle.kts`).
+Set manually. Current: **2.3**. Kept in sync across three locations — a Playwright test (`version-sync.spec.ts`) enforces consistency:
+
+1. `android/app/build.gradle.kts` — `versionName`
+2. `app/Little League Pitch Counter.xcodeproj/project.pbxproj` — `MARKETING_VERSION` (Debug and Release)
+3. `app/index.html` — About page "Version X.X" text
 
 Bump schedule:
 - **Patch** (2.0 → 2.1): bug fixes, small improvements
@@ -183,10 +189,10 @@ Pages are served via directory-based URLs (e.g., `simplepitchcounter.com/android
 
 | File | Purpose |
 |------|---------|
-| `android-beta.php` | Android beta signup form mailer (AWS WorkMail SMTP credentials) |
-| `contact.php` | Contact form mailer (AWS WorkMail SMTP credentials) |
-| `feedback.php` | Feedback form → GitHub Issues (GitHub PAT) |
-| `phpmailer/` | PHPMailer library |
+| `android-beta.php` | Android beta signup form mailer + confirmation email (AWS WorkMail SMTP) |
+| `contact.php` | Contact form mailer + confirmation email (AWS WorkMail SMTP) |
+| `feedback.php` | Feedback form → GitHub Issues (GitHub PAT) + confirmation email (AWS WorkMail SMTP) |
+| `phpmailer/` | PHPMailer library (used by all three PHP handlers) |
 
 These files contain credentials and are deployed directly via SCP — never committed to git.
 

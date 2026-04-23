@@ -16,7 +16,7 @@ This is also a portfolio project by **Justin Thames** demonstrating AI-native pr
 
 ## What it does
 
-Simple Pitch Counter tracks pitch counts and catcher innings during live games, enforces league rest-day rules, and generates post-game summary reports — all from your iPhone.
+Simple Pitch Counter tracks pitch counts and catcher innings during live games, enforces league rest-day rules, and generates post-game summary reports — available on iPhone and Android.
 
 ### Key features
 
@@ -30,8 +30,9 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 - **Configurable league rules** — set pitch limits, rest-day thresholds, and catcher inning rules per division (e.g., Minors 8, Minors 9/10, Majors)
 - **Threshold awareness** — alerts when a pitcher approaches or crosses a rest-day threshold, with support for the "finish the batter" rule
 - **Catcher/pitcher eligibility** — flags when a catcher has caught 4+ innings (can't pitch) or a pitcher has thrown 41+ pitches (can't catch)
-- **Physical button support** — map iPhone volume buttons and Action Button to pitch counting, undo, or next batter actions with configurable button mapping
-- **Game summaries** — generates a formatted summary with pitcher data, scores, homeruns, pitch type breakdowns, and umpire notes, ready to email
+- **Physical button support** — map volume buttons and Action Button to pitch counting, undo, next batter, or — in Advanced mode — Called Strike and Ball actions, mimicking a traditional umpire tracking dial. Configurable per-button mapping
+- **In-game name editing** — edit a pitcher or catcher's name and number mid-game from the Change picker without interrupting the game
+- **Game summaries** — generates a formatted summary with pitcher data, scores, homeruns, pitch type breakdowns, innings count, end time, and umpire feedback, ready to email
 - **Dark scoreboard header** — persistent dark-themed header with live score, inning/half indicator, and out tracking dots
 - **Score and inning tracking** — built-in scoreboard with inning management
 - **Swipe-to-delete history** — swipe game cards left to reveal delete action; history cards show mode badge (Simple/Advanced) and live game indicator
@@ -40,7 +41,8 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 - **Data export/import** — export all game data as JSON (via Share Sheet on iOS) and import backups from the history menu
 - **Pitch dot visualization** — dots below the hero count alternate shading per batter to show at-bat boundaries at a glance
 - **Swipe-to-dismiss stats** — swipe down on any stats bottom sheet to dismiss it
-- **About screen** — accessible from the history menu; shows app version, links to website, privacy policy, feedback form, and Buy Me a Coffee
+- **In-app review prompts** — automatically prompts users to rate the app after games 3, 10, and 25 using native StoreKit (iOS) and Google Play In-App Review (Android)
+- **About screen** — accessible from the history menu; shows app version, Rate This App link, links to website, privacy policy, feedback form, and Buy Me a Coffee
 - **Fully offline** — no account, no internet, no ads. All data stays on your device via localStorage
 
 ### Game summary output
@@ -52,8 +54,9 @@ The app generates summaries matching the EDHLL Game Summary form:
 - Home/away team names and scores
 - Each pitcher: name, actual pitch count (incl. last batter), pitches thrown to last batter
 - Pitch type breakdowns per pitcher (Advanced mode): B, K̲, K, F, BIP counts with K/BB/BIP totals
+- Number of innings played and end time
 - Homeruns (over-the-fence)
-- Umpire summary (plate/base umpire, issues, comments)
+- Umpire summary (plate/base umpire, feedback, comments)
 
 ## Project structure
 
@@ -74,7 +77,9 @@ simple-pitch-counter/
 │   ├── summary-export.spec.ts      # Game summary, report generation, export
 │   ├── shareable-stats.spec.ts     # Share features, swipe-to-dismiss, image cards
 │   ├── history-config.spec.ts      # History cards, config presets, setup flow
-│   └── about-screen.spec.ts        # About screen, links, back navigation
+│   ├── about-screen.spec.ts        # About screen, links, back navigation
+│   ├── v2-features.spec.ts         # V2.3 features: name editing, button mapping, review prompts
+│   └── version-sync.spec.ts        # Version sync across Android, iOS, and app UI
 ├── .github/workflows/      # CI/CD
 │   └── test.yml            # Runs Playwright tests on push/PR to main
 ├── website/                # simplepitchcounter.com
@@ -95,7 +100,7 @@ simple-pitch-counter/
 
 ## Testing
 
-The project has **134 Playwright E2E tests** covering all app functionality:
+The project has **159 Playwright E2E tests** covering all app functionality:
 
 | Spec file | Tests | Coverage |
 |-----------|-------|----------|
@@ -107,6 +112,8 @@ The project has **134 Playwright E2E tests** covering all app functionality:
 | `shareable-stats` | 18 | Share features, swipe-to-dismiss, image card exports, K/BB/BIP boxes |
 | `history-config` | 19 | History cards, config presets, setup flow, umpire clearing |
 | `about-screen` | 8 | About screen, app info, links, back navigation |
+| `v2-features` | 23 | Name editing, button mapping, pitcher card layout, feedback wording, review prompts |
+| `version-sync` | 2 | Version string consistency across Android, iOS, and app UI |
 
 ```bash
 npm test              # Run all tests (headless)
@@ -123,17 +130,29 @@ Tests run automatically on every push and pull request to `main` via GitHub Acti
 The app is a native iOS shell wrapping a single-page web application:
 
 - **AppDelegate.swift** — creates the window and sets `ViewController` as root
-- **ViewController.swift** — configures a `WKWebView` constrained to the safe area, with persistent localStorage, portrait lock, native JS alert/confirm/prompt handling, external link handling, haptic feedback bridge (JS → native via `WKScriptMessageHandler`), dynamic status bar styling (light on game screen, dark elsewhere), and volume button capture for physical button mapping
+- **ViewController.swift** — configures a `WKWebView` constrained to the safe area, with persistent localStorage, portrait lock, native JS alert/confirm/prompt handling, external link handling, haptic feedback bridge (JS → native via `WKScriptMessageHandler`), dynamic status bar styling (light on game screen, dark elsewhere), volume button capture for physical button mapping, and StoreKit in-app review prompts
 - **index.html** — the entire app in one file: HTML structure, CSS styling, and JavaScript logic. Uses localStorage for all data persistence. Features a dark scoreboard header, two game modes (Simple/Advanced), pitch type tracking, out tracking, mercy rule enforcement, and iOS-native visual language
+
+### Android app (`android/`)
+
+The Android app mirrors the iOS architecture — a native Kotlin shell wrapping the same web application:
+
+- **MainActivity.kt** — configures an Android `WebView` with persistent localStorage, portrait lock, native JS alert/confirm/prompt handling, external link handling, haptic feedback bridge (JS → native via `@JavascriptInterface`), dynamic status bar styling with pre-API-30 fallback, volume button capture, Android back button handling, image sharing via `FileProvider`, Google Play In-App Review API prompts, and native inset injection (`--top-inset`, `--bottom-inset`, `--header-pad`) for safe area support across notch and non-notch devices
+- **Adaptive icons** — foreground/background layers supporting circle, squircle, and rounded square launcher masks
+- **index.html** — the same shared web app copied from `app/index.html` into `assets/` at build time via a Gradle `Copy` task
 
 ### Website (`website/`)
 
 A static marketing site hosted on a Synology NAS via Web Station:
 
 - Landing page with interactive phone mockup showing the Advanced mode UI
-- App Store download link and feature highlights
-- Privacy policy (required by App Store)
+- App Store and Google Play download links with feature highlights
+- Android beta signup page with PHP form handler
+- Privacy policy (required by App Store and Google Play)
 - Contact and feedback forms with PHP/SMTP backend
+- Confirmation emails sent to submitters from all three forms
+- Clean URLs via directory-based Nginx routing
+- Open Graph meta tags with branded 1200×630 images for link previews
 - Deployed at simplepitchcounter.com
 
 ## Deployment
@@ -147,11 +166,21 @@ Built and submitted via Xcode on macOS. The `app/index.html` is bundled into the
 3. Xcode → Product → Archive → Distribute to App Store Connect
 4. Build appears in TestFlight automatically
 
+### Android app
+
+Built and submitted via Android Studio. The `app/index.html` is copied into `assets/` by Gradle and loaded by the Android WebView. Version codes auto-increment from git commit count.
+
+1. Push changes to `main`, confirm CI tests pass
+2. Android Studio: pull latest, **Build → Clean Project**
+3. **Build → Generate Signed Bundle** using `upload-keystore.jks`
+4. Upload AAB to Google Play Console → Closed testing → Closed Beta
+5. Currently in closed beta — requires 12 opted-in testers for 14 days before production access
+
 ### Website
 
-Hosted on a self-hosted Synology NAS via Web Station. Deployed via SCP over the local network after any content or mockup changes.
+Hosted on a self-hosted Synology NAS via Web Station (Nginx). Deployed via SCP over the local network after any content or mockup changes. Each page is deployed to two locations for clean URL support (e.g., `android-beta.html` and `android-beta/index.html`).
 
-**Note:** `contact.php` contains SMTP credentials and is excluded from git via `.gitignore`. Connection details (host, port, SSH key) are kept outside the repo.
+**Note:** PHP files (`contact.php`, `feedback.php`, `android-beta.php`) contain SMTP/API credentials and are excluded from git via `.gitignore`. Connection details (host, port, SSH key) are kept outside the repo.
 
 ## License
 
@@ -159,4 +188,4 @@ This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENS
 
 ## Future plans
 
-- Android support
+- Google Play production release (pending 14-day closed beta tester requirement)
