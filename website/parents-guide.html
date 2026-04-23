@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="New to baseball volunteering? Here's how to track pitch counts at Little League games without knowing all the rules. A parent's honest guide to keeping kids' arms safe.">
+<link rel="canonical" href="https://simplepitchcounter.com/parents-guide/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="The Parent's Guide to Pitch Counting - You Don't Need to Know Baseball">
+<meta property="og:description" content="New to baseball volunteering? Here's how to track pitch counts at Little League games without knowing all the rules.">
+<meta property="og:image" content="https://simplepitchcounter.com/images/og-image-1200x630.png">
+<meta property="og:url" content="https://simplepitchcounter.com/parents-guide/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<title>The Parent's Guide to Pitch Counting - You Don't Need to Know Baseball</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "The Parent's Guide to Pitch Counting - You Don't Need to Know Baseball",
+  "description": "New to baseball volunteering? Here's how to track pitch counts at Little League games without knowing all the rules.",
+  "author": {
+    "@type": "Person",
+    "name": "Justin Thames"
+  },
+  "datePublished": "2026-04-23",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simple Pitch Counter",
+    "url": "https://simplepitchcounter.com"
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1c3a;
+    --cream: #f7f4ed;
+    --cream-dark: #ede9e0;
+    --red: #c8392b;
+    --gold: #e8a030;
+    --text: #0b1c3a;
+    --text-muted: #4a5568;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,28,58,0.96); backdrop-filter: blur(12px);
+    padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+    height: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .nav-logo .ball { width: 28px; height: 28px; background: #f7f4ed; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; overflow: hidden; }
+  .nav-logo .ball::before, .nav-logo .ball::after { content: ''; position: absolute; border: 1.5px solid #c8392b; border-radius: 50%; width: 60%; height: 200%; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(20deg); }
+  .nav-logo .ball::after { transform: translate(-50%, -50%) rotate(-20deg); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: rgba(247,244,237,0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
+  .nav-links a:hover { color: #f7f4ed; }
+  .nav-hamburger {
+    display: none; width: 36px; height: 36px;
+    background: rgba(255,255,255,0.1); border: none; border-radius: 8px;
+    cursor: pointer; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-hamburger svg { display: block; }
+  .nav-overlay {
+    display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+    background: rgba(11,28,58,0.98); backdrop-filter: blur(12px); z-index: 99;
+    flex-direction: column; align-items: center; justify-content: flex-start;
+    padding-top: 60px; gap: 8px;
+  }
+  .nav-overlay.open { display: flex; }
+  .nav-overlay a {
+    color: rgba(247,244,237,0.85); text-decoration: none; font-size: 1.1rem;
+    font-weight: 500; padding: 14px 40px; letter-spacing: 0.03em;
+    transition: color 0.2s; width: 100%; text-align: center;
+  }
+  .nav-overlay a:hover { color: #f7f4ed; }
+
+  .page-header {
+    padding: 130px 8% 70px;
+    background: var(--navy);
+  }
+  .page-header-eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-header-eyebrow::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--gold); }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: #f7f4ed; margin-bottom: 14px;
+  }
+  .page-header-sub { font-size: 0.9rem; color: rgba(247,244,237,0.55); font-weight: 300; }
+
+  .content { max-width: 760px; margin: 0 auto; padding: 70px 8% 100px; }
+
+  .article-section { margin-bottom: 50px; }
+  .article-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem; color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--cream-dark);
+  }
+  .article-section p {
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-muted);
+    margin-bottom: 14px; font-weight: 300;
+  }
+  .article-section p:last-child { margin-bottom: 0; }
+  .article-section a { color: var(--red); text-decoration: none; }
+  .article-section a:hover { text-decoration: underline; }
+  .article-section strong { color: var(--text); font-weight: 600; }
+  .article-section ul {
+    margin-bottom: 14px; padding-left: 0; list-style: none;
+  }
+  .article-section ul li {
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-muted);
+    padding: 4px 0 4px 20px; font-weight: 300; position: relative;
+  }
+  .article-section ul li::before {
+    content: '\2022'; position: absolute; left: 0;
+    color: var(--red); font-weight: 700;
+  }
+
+  .highlight-box {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 50px;
+  }
+  .highlight-box p {
+    color: rgba(247,244,237,0.8);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    font-weight: 300;
+    margin: 0;
+  }
+  .highlight-box p strong { color: #f7f4ed; font-weight: 600; }
+
+  .pullquote {
+    border-left: 3px solid var(--gold);
+    padding: 16px 0 16px 24px;
+    margin: 30px 0;
+  }
+  .pullquote p {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: var(--navy);
+    font-weight: 400;
+    margin: 0;
+  }
+
+  .cta-box {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a2d4d 100%);
+    border-radius: 14px;
+    padding: 36px 36px;
+    margin: 50px 0;
+    text-align: center;
+  }
+  .cta-box h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: #f7f4ed;
+    margin-bottom: 12px;
+  }
+  .cta-box p {
+    color: rgba(247,244,237,0.7);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    font-weight: 300;
+    margin-bottom: 22px;
+  }
+  .cta-box a {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.92rem;
+    transition: background 0.2s;
+  }
+  .cta-box a:hover { background: #a82e22; }
+
+  footer {
+    background: var(--navy); padding: 40px 8%;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; color: rgba(247,244,237,0.8); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: rgba(247,244,237,0.5); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: #f7f4ed; }
+  .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo"><div class="ball"></div>Simple Pitch Counter</a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#how-it-works">How it works</a>
+    <a href="privacy">Privacy</a>
+    <a href="contact">Contact</a>
+    <a href="feedback" style="color:#e8a030">Feedback</a>
+  </div>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+    <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+</nav>
+<div class="nav-overlay" id="nav-overlay">
+  <a href="/">Home</a>
+  <a href="/#features">Features</a>
+  <a href="/#how-it-works">How it works</a>
+  <a href="privacy">Privacy</a>
+  <a href="contact">Contact</a>
+  <a href="feedback" style="color:#e8a030">Feedback</a>
+</div>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">For Parents &amp; Volunteers</div>
+  <h1>You Don't Need to Know Baseball to Count Pitches</h1>
+  <p class="page-header-sub">A guide for the parent who just got volunteered to track pitch counts at Saturday's game</p>
+</div>
+
+<div class="content">
+
+  <div class="highlight-box">
+    <p><strong>If this is you, you're not alone.</strong> Every spring, thousands of parents walk up to a Little League field and get handed a clipboard or a phone with zero training. You don't need to know what a changeup is. You just need to count.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>How You Ended Up Here</h2>
+    <p>Your kid signed up for Little League. Maybe you played softball in high school, maybe you've never held a baseball glove. Either way, you're in the bleachers when the team manager walks over and says, "Hey, can you keep the pitch count today?"</p>
+    <p>And you say yes because that's what parents do.</p>
+    <p>Then you realize you're not totally sure what a pitch count even tracks, or why it matters, or what you're supposed to do with the number when the game is over. You Google it and land on a 40-page PDF of Little League regulations, or an app that wants you to log every play like you're producing an ESPN broadcast.</p>
+    <p>Neither of those things is what you need.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>What Pitch Counting Actually Is</h2>
+    <p>Here's the whole job: every time the kid on the mound throws a pitch, you tap a button. That's it.</p>
+    <p>You're not tracking whether it was a ball or a strike (though you can if you want). You're not logging batting lineups or play-by-play. You are literally counting how many times each pitcher throws the ball during live at-bats.</p>
+    <p>The reason it matters is straightforward. Little League has rules about how many pitches a kid can throw in a day, and how many days of rest they need afterward. These rules exist because young arms are still growing, and overuse causes real injuries. Torn ligaments, stress fractures, chronic shoulder problems. These aren't hypothetical risks. Pediatric sports doctors see them every season.</p>
+
+    <div class="pullquote">
+      <p>The pitch count isn't a stat. It's a safety tool. You're protecting a kid's arm.</p>
+    </div>
+
+    <p>When you keep an accurate count, the coach knows when to pull a pitcher. And after the game, the count determines how many rest days that player needs before they can pitch again. If the count is wrong, a kid could end up throwing on a day they shouldn't. That's the whole reason your job matters.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>Why Rest Days Are the Part That Matters Most</h2>
+    <p>Most people focus on the pitch limit itself. "My 10-year-old can throw 75 pitches." That's true, and it's important. But the part that actually keeps kids healthy is the rest-day schedule.</p>
+    <p>Here's how it works: after a game, you look at the final pitch count and check it against a chart. The chart tells you how many days that pitcher has to wait before throwing again.</p>
+    <p>For kids 14 and under, the thresholds are:</p>
+    <ul>
+      <li><strong>1 to 20 pitches:</strong> no rest required, they can pitch the next day</li>
+      <li><strong>21 to 35 pitches:</strong> one day of rest</li>
+      <li><strong>36 to 50 pitches:</strong> two days of rest</li>
+      <li><strong>51 to 65 pitches:</strong> three days of rest</li>
+      <li><strong>66 or more pitches:</strong> four days of rest</li>
+    </ul>
+    <p>These rest days are calendar days, not game days. If your kid pitches 45 times on Monday, the two rest days are Tuesday and Wednesday, and they can pitch again on Thursday. It doesn't matter if there's a game on Tuesday or not.</p>
+    <p>The tricky part is that a lot of leagues play two or three games a week during the season, and some play tournaments where there are multiple games in a single day. Without tracking, it's easy for a coach to accidentally use a pitcher who hasn't had enough rest. Not out of carelessness, but because everyone's juggling a roster of 12 kids and nobody wrote the numbers down.</p>
+    <p>That's exactly what your count prevents.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>The Problem with Complex Apps</h2>
+    <p>If you go looking for an app to help, you'll find ones that want you to track every single play in the game. Ball in play, fielder's choice, stolen base, wild pitch, error on the shortstop. They're designed for serious scorekeepers or travel ball parents who already know what all of that means.</p>
+    <p>For someone who just needs to count pitches and figure out rest days, those apps are overwhelming. You spend half the first inning trying to figure out the interface, and by the time you look up, you've missed three pitches. Now your count is off, and the whole point of being there is accuracy.</p>
+    <p>There's also the cognitive load problem. When an app asks you to make five decisions per pitch (type, result, runners, outs, location), you're not just counting anymore. You're scorekeeping. And if you don't already know the difference between a fielder's choice and a force out, you're going to get stuck, feel embarrassed, and probably stop using the app by the third inning.</p>
+    <p>None of that complexity is necessary for the actual safety requirement. Little League doesn't need to know if pitch number 34 was a curveball. They need to know it was pitch number 34.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>What a Simple Tool Looks Like</h2>
+    <p>The right tool for this job does three things:</p>
+    <ul>
+      <li>Counts every pitch with a single tap</li>
+      <li>Tracks how many innings each player has caught (because there are catcher-pitcher rules too)</li>
+      <li>Calculates rest days automatically so you don't have to look up a chart</li>
+    </ul>
+    <p>That's what Simple Pitch Counter does. You open it, start a game, and tap a button every time the pitcher throws. When the pitcher changes, you switch to the next one. At the end of the game, the app tells you how many days of rest each pitcher needs. You can email the summary to the coach right from the app.</p>
+    <p>There's no account to create. No login. No subscription. No ads. You don't need cell service at the field because everything runs and saves on your phone.</p>
+    <p>If you want to track pitch types (balls, strikes, different pitch categories), there's an advanced mode for that. But the simple mode is literally just a counter with a big button. If you can tap a phone screen, you can do this job.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>You're Doing More Than You Think</h2>
+    <p>It might feel like a small job. You're sitting in a camping chair, tapping your phone while everyone else watches the game. But here's what you're actually doing: you're making sure a nine-year-old doesn't blow out their elbow because nobody was paying attention to the numbers.</p>
+    <p>Youth baseball injuries from overuse are preventable. That's the whole point of pitch count rules. But rules only work if someone bothers to enforce them, and enforcement starts with someone counting.</p>
+    <p>You don't need to know the infield fly rule. You don't need to understand what an ERA is. You don't need to have played the sport. You just need to watch the pitcher and tap a button.</p>
+    <p>That's a job any parent can do. And it's a job that genuinely matters.</p>
+  </div>
+
+  <div class="cta-box">
+    <h3>Ready for Saturday's Game?</h3>
+    <p>Simple Pitch Counter is free, works offline, and takes about 10 seconds to figure out. Download it before you get to the field.</p>
+    <a href="/">Get the app</a>
+  </div>
+
+  <div class="article-section">
+    <h2>Quick Reference for Your First Game</h2>
+    <p>Here's everything you need to know in one list. Save this page on your phone if it helps.</p>
+    <ul>
+      <li><strong>Your job:</strong> tap once for every pitch thrown during a live at-bat</li>
+      <li><strong>Warm-up pitches between innings don't count</strong></li>
+      <li><strong>Track each pitcher separately</strong> because each one has their own rest-day calculation</li>
+      <li><strong>If the pitcher switches, switch in the app too</strong> so the counts stay separate</li>
+      <li><strong>After the game, check rest days</strong> and share the summary with the coach</li>
+      <li><strong>If you lose count, ask.</strong> The other team's counter usually has it. It happens, and it's better to ask than guess.</li>
+    </ul>
+    <p>For the full rest-day chart and all the specific rules, check out our <a href="pitch-count-rules">complete pitch count rules guide</a>.</p>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Simple Pitch Counter</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="pitch-count-rules">Pitch Count Rules</a>
+    <a href="parents-guide">Parent's Guide</a>
+    <a href="privacy">Privacy Policy</a>
+    <a href="contact">Contact</a>
+    <a href="feedback">Feedback</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Simple Pitch Counter. All rights reserved.</div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('nav-hamburger');
+  const overlay = document.getElementById('nav-overlay');
+  hamburger.addEventListener('click', () => overlay.classList.toggle('open'));
+  overlay.addEventListener('click', (e) => { if (e.target.tagName === 'A') overlay.classList.remove('open'); });
+</script>
+</body>
+</html>
