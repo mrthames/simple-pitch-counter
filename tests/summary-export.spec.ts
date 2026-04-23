@@ -55,8 +55,8 @@ test.describe('Game summary and export', () => {
     await page.click('.menu-btn');
     await page.click('text=Game summary');
 
-    await expect(page.locator('.form-row-lbl').filter({ hasText: 'Plate issues?' })).toBeVisible();
-    await expect(page.locator('.form-row-lbl').filter({ hasText: 'Base issues?' })).toBeVisible();
+    await expect(page.locator('.form-row-lbl').filter({ hasText: 'Feedback?' }).first()).toBeVisible();
+    await expect(page.locator('.form-row-lbl').filter({ hasText: 'Feedback?' }).nth(1)).toBeVisible();
   });
 
   test('mid-game summary hides report and end actions', async ({ page }) => {

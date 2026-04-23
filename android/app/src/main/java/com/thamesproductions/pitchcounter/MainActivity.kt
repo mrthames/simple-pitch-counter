@@ -25,6 +25,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import com.google.android.play.core.review.ReviewManagerFactory
 import java.io.File
 import java.io.FileOutputStream
 
@@ -251,6 +252,20 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun shareImage(base64Data: String) {
             runOnUiThread { this@MainActivity.shareImage(base64Data) }
+        }
+
+        @JavascriptInterface
+        fun requestReview() {
+            runOnUiThread { this@MainActivity.launchInAppReview() }
+        }
+    }
+
+    private fun launchInAppReview() {
+        val manager = ReviewManagerFactory.create(this)
+        manager.requestReviewFlow().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                manager.launchReviewFlow(this, task.result)
+            }
         }
     }
 }
