@@ -113,6 +113,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .pitch-count-badge-num{font-size:16px;font-weight:800;transition:color .3s,transform .22s cubic-bezier(.36,1.6,.5,1)}
 .pitch-count-badge-lbl{font-size:10px;color:var(--t2);font-weight:600}
 .stats-link{font-size:12px;color:var(--blue);font-weight:600;padding:4px 0;cursor:pointer}
+.edit-name-btn{font-size:14px;color:var(--t3);margin-left:6px;cursor:pointer;vertical-align:middle}
 .rest-lbl{font-size:12px;font-weight:600;margin-top:2px;min-height:18px;visibility:visible}
 .rest-lbl:empty{visibility:hidden}
 
@@ -736,17 +737,17 @@ textarea{resize:vertical;min-height:56px}
       <div class="section-header-lbl">Umpire Notes</div>
       <div class="form-card">
         <div class="form-row"><div class="form-row-lbl">Plate</div><input class="form-input" id="sum-pu-name" placeholder="Name" autocapitalize="words"></div>
-        <div class="form-row"><div class="form-row-lbl">Plate issues?</div>
+        <div class="form-row"><div class="form-row-lbl">Feedback?</div>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('pu-iss-detail').style.display='none'"><input type="radio" name="pu-iss" value="No" checked style="width:18px;height:18px"> No</label>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('pu-iss-detail').style.display='block'"><input type="radio" name="pu-iss" value="Yes" style="width:18px;height:18px"> Yes</label>
         </div>
-        <div class="form-row" id="pu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-pu-comments" placeholder="Describe issues"></div>
+        <div class="form-row" id="pu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-pu-comments" placeholder="Describe feedback"></div>
         <div class="form-row"><div class="form-row-lbl">Base</div><input class="form-input" id="sum-bu-name" placeholder="Name" autocapitalize="words"></div>
-        <div class="form-row"><div class="form-row-lbl">Base issues?</div>
+        <div class="form-row"><div class="form-row-lbl">Feedback?</div>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('bu-iss-detail').style.display='none'"><input type="radio" name="bu-iss" value="No" checked style="width:18px;height:18px"> No</label>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('bu-iss-detail').style.display='block'"><input type="radio" name="bu-iss" value="Yes" style="width:18px;height:18px"> Yes</label>
         </div>
-        <div class="form-row" id="bu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-bu-comments" placeholder="Describe issues"></div>
+        <div class="form-row" id="bu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-bu-comments" placeholder="Describe feedback"></div>
       </div>
     </div>
     <div id="sum-actions" style="display:flex;gap:8px">
@@ -824,9 +825,13 @@ textarea{resize:vertical;min-height:56px}
         <div style="font-size:15px;font-weight:600">Send Feedback</div>
         <div style="font-size:13px;color:var(--t2)">›</div>
       </a>
-      <a href="https://simplepitchcounter.com/contact.html" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;text-decoration:none;color:var(--text)">
+      <a href="https://simplepitchcounter.com/contact.html" target="_blank" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;text-decoration:none;color:var(--text);border-bottom:1px solid var(--sep)">
         <div style="font-size:15px;font-weight:600">Contact</div>
         <div style="font-size:13px;color:var(--t2)">›</div>
+      </a>
+      <a onclick="openStoreRating()" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;text-decoration:none;color:var(--text);cursor:pointer">
+        <div style="font-size:15px;font-weight:600">Rate This App</div>
+        <div style="font-size:13px;color:var(--t2)">⭐ ›</div>
       </a>
     </div>
     <a href="https://buymeacoffee.com/justinttha1" target="_blank" style="display:block;text-decoration:none;background:#FFDD00;border-radius:var(--r-lg);padding:16px;text-align:center;margin-bottom:12px">
@@ -841,6 +846,24 @@ textarea{resize:vertical;min-height:56px}
 if(!CanvasRenderingContext2D.prototype.roundRect){CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){if(typeof r==='number')r=[r,r,r,r];const[tl,tr,br,bl]=r;this.moveTo(x+tl,y);this.lineTo(x+w-tr,y);this.arcTo(x+w,y,x+w,y+tr,tr);this.lineTo(x+w,y+h-br);this.arcTo(x+w,y+h,x+w-br,y+h,br);this.lineTo(x+bl,y+h);this.arcTo(x,y+h,x,y+h-bl,bl);this.lineTo(x,y+tl);this.arcTo(x,y,x+tl,y,tl);return this;};}
 // ── Haptic ──
 function haptic(t){try{if(window.Android)window.Android.haptic(t||'medium');else window.webkit?.messageHandlers?.haptic?.postMessage(t||'medium')}catch(e){}}
+
+// ── App rating ──
+function openStoreRating(){
+  if(window.Android)window.open('https://play.google.com/store/apps/details?id=com.thamesproductions.pitchcounter');
+  else window.open('https://apps.apple.com/us/app/simple-pitch-counter/id6760922314?action=write-review');
+}
+function requestAppReview(){
+  try{
+    if(window.Android&&window.Android.requestReview)window.Android.requestReview();
+    else if(window.webkit?.messageHandlers?.requestReview)window.webkit.messageHandlers.requestReview.postMessage('');
+  }catch(e){}
+}
+function maybePromptReview(){
+  const key='spc_completed_games';
+  let count=parseInt(localStorage.getItem(key)||'0',10)+1;
+  localStorage.setItem(key,count.toString());
+  if(count===3||count===10||count===25)requestAppReview();
+}
 
 // ── Physical button mapping (JS side) ──
 const BTN_DEFAULTS_SIMPLE = { volUp:'pitch', volDown:'undo', action:'nextBatter' };
@@ -859,6 +882,8 @@ window.onPhysicalButton = function(type) {
   const action = btnMapping[type];
   if (!action || action === 'none' || !state.currentGame) return;
   if (action === 'pitch') { if(state.currentGame.mode==='advanced')return; addPitch(); haptic('medium'); }
+  else if (action === 'calledStrike') { throwPitch('CS'); haptic('medium'); }
+  else if (action === 'ball') { throwPitch('B'); haptic('medium'); }
   else if (action === 'nextBatter') { doNextBatter(); haptic('medium'); }
   else if (action === 'undo') { undoLast(); haptic('light'); }
   else if (action === 'recordOut') { recordNonPitchOut(); haptic('medium'); }
@@ -916,7 +941,7 @@ function showScreen(n){
     if(n==='setup'){initSetup();renderFieldSel();}
     if(n==='summary')initSummary();
   };
-  if(document.startViewTransition)document.startViewTransition(go);else go();
+  go();
   if(window.Android)window.Android.screenChange(n);else if(window.webkit?.messageHandlers?.screenChange)window.webkit.messageHandlers.screenChange.postMessage(n);
 }
 window.onAndroidBack=function(){
@@ -1360,7 +1385,7 @@ function renderPitcherSection(){
   const ri=ap?restInfo(ap.pitches):null;
   const rc=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
   if(ap){
-    pDisp.innerHTML=`<div class="pitcher-name">${ap.name}${ap.num?' <span class="pitcher-num">#'+ap.num+'</span>':''}</div><div class="pitch-count-badge"><div class="pitch-count-badge-num" style="color:${countColor(ap.pitches)}">${ap.pitches}</div><div class="pitch-count-badge-lbl">pitches</div></div>${g.mode==='advanced'?`<div class="stats-link" onclick="showPitcherStats()">Stats ›</div>`:''}`;
+    pDisp.innerHTML=`<div class="pitcher-name">${ap.name}${ap.num?' <span class="pitcher-num">#'+ap.num+'</span>':''}<span class="edit-name-btn" onclick="editPlayerName('pitcher')">✎</span></div><div class="pitch-count-badge"><div class="pitch-count-badge-num" style="color:${countColor(ap.pitches)}">${ap.pitches}</div><div class="pitch-count-badge-lbl">pitches</div></div>${g.mode==='advanced'?`<div class="stats-link" onclick="showPitcherStats()">Stats ›</div>`:''}`;
     // Rest label
     const rl=document.querySelector('.rest-lbl');
     if(!rl){const d=document.createElement('div');d.className='rest-lbl';pDisp.parentElement.appendChild(d);}
@@ -1396,7 +1421,7 @@ function renderCatcherSection(){
   const roster=fRoster();const ci=getCI();const cat=ci!==null?roster.catchers[ci]:null;
   const ap=activePitcher();
   const el=document.getElementById('catcher-section');
-  let h=`<div class="section-header" style="margin-bottom:10px"><div><div class="section-lbl">Catcher</div>${cat?`<div style="font-size:16px;font-weight:700;letter-spacing:-.3px;margin-top:2px">${cat.name}${cat.num?' <span style="color:var(--t3);font-weight:500">#'+cat.num+'</span>':''}</div>`:''}</div><div class="btn-sm" onclick="toggleCSelect()">${g.cSelectOpen?'Done':'Change'}</div></div>`;
+  let h=`<div class="section-header" style="margin-bottom:10px"><div><div class="section-lbl">Catcher</div>${cat?`<div style="font-size:16px;font-weight:700;letter-spacing:-.3px;margin-top:2px">${cat.name}${cat.num?' <span style="color:var(--t3);font-weight:500">#'+cat.num+'</span>':''}<span class="edit-name-btn" onclick="editPlayerName('catcher')">✎</span></div>`:''}</div><div class="btn-sm" onclick="toggleCSelect()">${g.cSelectOpen?'Done':'Change'}</div></div>`;
   if(g.cSelectOpen){
     h+=`<div class="player-picker">`;
     h+=roster.catchers.map((c,i)=>`<div class="player-row" onclick="selectCatcher(${i})"><div class="player-radio" style="background:${i===ci?'var(--blue)':'transparent'};border:2px solid ${i===ci?'var(--blue)':'var(--sep2)'}"></div><div class="player-info"><div class="player-info-name">${c.name}${c.num?' <span style="color:var(--t3)">#'+c.num+'</span>':''}</div><div class="player-info-sub">${c.innings.filter(Boolean).length} inning${c.innings.filter(Boolean).length!==1?'s':''} caught</div></div>${i===ci?'<div class="badge-active">Active</div>':''}</div>`).join('');
@@ -1423,6 +1448,27 @@ function addNewCatcherMidGame(){
   setCI(fRoster().catchers.length-1);
   saveState();renderGame();
 }
+function editPlayerName(type){
+  const g=state.currentGame;if(!g)return;
+  const roster=fRoster();
+  const player=type==='pitcher'?roster.pitchers[getPI()]:roster.catchers[getCI()];
+  if(!player)return;
+  const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
+  ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
+  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title">Edit ${type==='pitcher'?'Pitcher':'Catcher'}</div><div style="margin:12px 0"><input class="form-input" type="text" id="edit-player-name" value="${player.name}" placeholder="Name" autocapitalize="words" style="margin-bottom:8px"><input class="form-input" type="text" id="edit-player-num" value="${player.num||''}" placeholder="Number"></div><div class="modal-btns"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="savePlayerName('${type}')">Save</div></div></div>`;
+  document.body.appendChild(ov);
+  document.getElementById('edit-player-name').focus();
+}
+function savePlayerName(type){
+  const g=state.currentGame;if(!g)return;
+  const name=document.getElementById('edit-player-name')?.value.trim();
+  if(!name){alert('Name cannot be empty.');return;}
+  const num=document.getElementById('edit-player-num')?.value.trim()||'';
+  const roster=fRoster();
+  const player=type==='pitcher'?roster.pitchers[getPI()]:roster.catchers[getCI()];
+  if(player){player.name=name;player.num=num;}
+  closeModal();saveState();renderGame();
+}
 
 // ── Pitch alerts ──
 function pitchAlerts(p){
@@ -1448,8 +1494,8 @@ function renderBtnHints(){
   const showAction=hasActionButton();
   const allBtns=[{key:'action',label:'Action',needsAction:true},{key:'volUp',label:'Vol +'},{key:'volDown',label:'Vol −'}];
   const btns=allBtns.filter(b=>!b.needsAction||showAction);
-  const actionColors={pitch:'#1A6BFF',nextBatter:'#34C759',undo:'#8E8E93',recordOut:'#FF9500',none:'#48484A'};
-  const actionLabels={pitch:'+ Pitch',nextBatter:'Next Batter',undo:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:2px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo',recordOut:'+ Out',none:'—'};
+  const actionColors={pitch:'#1A6BFF',calledStrike:'#FF3B30',ball:'#1A6BFF',nextBatter:'#34C759',undo:'#8E8E93',recordOut:'#FF9500',none:'#48484A'};
+  const actionLabels={pitch:'+ Pitch',calledStrike:'Called K',ball:'Ball',nextBatter:'Next Batter',undo:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:2px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo',recordOut:'+ Out',none:'—'};
   const chips=btns.map(({key,label})=>{
     const m=btnMapping[key];if(!m||m==='none')return'';
     const col=actionColors[m]||'#8E8E93';
@@ -1661,7 +1707,7 @@ function showPitcherStats(){
 // ── Button mapping modal ──
 function getBtnMapOpts(){
   const g=state.currentGame;
-  if(g&&g.mode==='advanced')return['nextBatter','undo','recordOut','none'];
+  if(g&&g.mode==='advanced')return['calledStrike','ball','nextBatter','undo','recordOut','none'];
   return['pitch','nextBatter','undo','none'];
 }
 function getBtnRows(){
@@ -1669,8 +1715,8 @@ function getBtnRows(){
   const allBtns=[{key:'action',label:'Action Button',sub:'Top-left key (iPhone 15 Pro+)',needsAction:true},{key:'volUp',label:'Volume Up',sub:'Left side upper'},{key:'volDown',label:'Volume Down',sub:'Left side lower'}];
   const btns=allBtns.filter(b=>!b.needsAction||showAction);
   const opts=getBtnMapOpts();
-  const optLabels={pitch:'+ Pitch',nextBatter:'Next Batter',undo:'Undo',recordOut:'+ Out',none:'Off'};
-  const optColors={pitch:'var(--blue)',nextBatter:'var(--green)',undo:'#8E8E93',recordOut:'var(--amber)',none:'rgba(255,255,255,.08)'};
+  const optLabels={pitch:'+ Pitch',calledStrike:'Called Strike',ball:'Ball',nextBatter:'Next Batter',undo:'Undo',recordOut:'+ Out',none:'Off'};
+  const optColors={pitch:'var(--blue)',calledStrike:'var(--red)',ball:'var(--blue)',nextBatter:'var(--green)',undo:'#8E8E93',recordOut:'var(--amber)',none:'rgba(255,255,255,.08)'};
   return btns.map(({key,label,sub})=>`
     <div style="margin-bottom:16px">
       <div style="font-size:12px;font-weight:700;color:rgba(235,235,245,.6);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">${label}</div>
@@ -1841,6 +1887,7 @@ function endGame(){
   state.games=state.games.filter(x=>x.id!==g.id);
   state.games.unshift(g);state.currentGame=null;saveState();
   renderHistory();showScreen('history');
+  maybePromptReview();
 }
 function closeGameToHistory(){
   const g=state.currentGame;if(!g)return;
@@ -1881,7 +1928,7 @@ function renderHistory(){
               ${live?'<div class="live-badge"><div class="live-dot"></div><div class="live-txt">LIVE</div></div>':''}
               <span class="mode-badge" style="background:${modeBg};color:${modeColor}">${modeTxt}</span>
             </div>
-            <div class="hist-card-date">${g.date}</div>
+            <div class="hist-card-date">${g.date}${g.time?' · '+g.time:''}</div>
           </div>
           <div class="score-pill">
             <div class="score-pill-team"><div class="score-pill-name">${g.awayTeam}</div><div class="score-pill-num">${g.awayScore}</div></div>
@@ -1966,7 +2013,7 @@ function initSummary(){
       <div class="form-card">${used.map(p=>{
         const ri=restInfo(p.pitches);const rc=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
         return`<div class="pitcher-stat-row">
-          <div class="pitcher-stat-info"><div class="pitcher-stat-name">${p.name}${p.num?' #'+p.num:''}</div><div class="pitcher-stat-sub">${p.innings?.filter(Boolean).length||0} inn · last batter: ${p.lastBatterPitches||0}${g.mode==='advanced'?` · K:${p.ks||0} BB:${p.bbs||0}`:''}</div></div>
+          <div class="pitcher-stat-info"><div class="pitcher-stat-name">${p.name}${p.num?' #'+p.num:''}</div><div class="pitcher-stat-sub">${p.innings?.filter(Boolean).length||0} inn · last batter: ${p.lastBatterPitches||0}</div>${g.mode==='advanced'?`<div class="pitcher-stat-sub">K: ${p.ks||0} · BB: ${p.bbs||0}</div>`:''}</div>
           <div><div class="pitcher-stat-count">${p.pitches}</div><div class="pitcher-stat-rest" style="color:${rc}">${ri?ri.label:'No rest needed'}</div></div>
           ${g.mode==='advanced'?`<div class="stats-btn" onclick="showSummaryStats('${side}',${roster.pitchers.indexOf(p)})">Stats</div>`:''}
         </div>`;
@@ -2062,10 +2109,12 @@ function buildSummaryText(){
     if(!cs.length)return`${tn} catchers: None\n`;
     return cs.map(c=>`${tn}: ${c.name}${c.num?' #'+c.num:''} — ${c.innings.filter(Boolean).length} innings caught`).join('\n');
   };
-  let txt=`Game Summary\n${'─'.repeat(30)}\n${g.homeTeam} vs ${g.awayTeam}\n${g.date}${g.time?' · '+g.time:''}${g.field?' · '+g.field:''}\nFinal: ${g.homeTeam} ${g.homeScore} – ${g.awayTeam} ${g.awayScore}\n\nPitchers\n${'─'.repeat(30)}\n${pitcherLines('home')}\n${pitcherLines('away')}\n\nCatchers\n${'─'.repeat(30)}\n${catcherLines('home')}\n${catcherLines('away')}`;
+  const totalInnings=g.inning?(g.isTop?g.inning-1:g.inning):0;
+  const endTimeStr=g.endedAt?new Date(g.endedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'';
+  let txt=`Game Summary\n${'─'.repeat(30)}\n${g.homeTeam} vs ${g.awayTeam}\n${g.date}${g.time?' · '+g.time:''}${endTimeStr?' – '+endTimeStr:''}${g.field?' · '+g.field:''}\n${totalInnings} inning${totalInnings!==1?'s':''}\nFinal: ${g.homeTeam} ${g.homeScore} – ${g.awayTeam} ${g.awayScore}\n\nPitchers\n${'─'.repeat(30)}\n${pitcherLines('home')}\n${pitcherLines('away')}\n\nCatchers\n${'─'.repeat(30)}\n${catcherLines('home')}\n${catcherLines('away')}`;
   txt+=`\n\nHome Runs\n${'─'.repeat(30)}\n${g.homeTeam}: ${g.hrHome||'None'}\n${g.awayTeam}: ${g.hrAway||'None'}`;
-  txt+=`\n\nUmpires\n${'─'.repeat(30)}\nPlate: ${g.umpPlateName||'—'} (Issues: ${g.umpPlateIssue||'No'})${g.umpPlateComments?' — '+g.umpPlateComments:''}`;
-  txt+=`\nBase: ${g.umpBaseName||'—'} (Issues: ${g.umpBaseIssue||'No'})${g.umpBaseComments?' — '+g.umpBaseComments:''}`;
+  txt+=`\n\nUmpires\n${'─'.repeat(30)}\nPlate: ${g.umpPlateName||'—'} (Feedback: ${g.umpPlateIssue==='Yes'?'Yes':'None'})${g.umpPlateComments?' — '+g.umpPlateComments:''}`;
+  txt+=`\nBase: ${g.umpBaseName||'—'} (Feedback: ${g.umpBaseIssue==='Yes'?'Yes':'None'})${g.umpBaseComments?' — '+g.umpBaseComments:''}`;
   txt+=`\n\n—\nGenerated with Simple Pitch Counter\nsimplepitchcounter.com`;
   return txt;
 }

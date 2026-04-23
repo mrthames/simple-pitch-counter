@@ -2,6 +2,7 @@ import UIKit
 import WebKit
 import AVFoundation
 import MediaPlayer
+import StoreKit
 
 class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
 
@@ -36,6 +37,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         config.userContentController.add(self, name: "haptic")
         config.userContentController.add(self, name: "screenChange")
         config.userContentController.add(self, name: "shareImage")
+        config.userContentController.add(self, name: "requestReview")
 
         impactLight.prepare()
         impactMedium.prepare()
@@ -211,6 +213,10 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
 
     func userContentController(_ userContentController: WKUserContentController,
                                 didReceive message: WKScriptMessage) {
+        if message.name == "requestReview" {
+            requestAppReview()
+            return
+        }
         if message.name == "shareImage", let base64 = message.body as? String {
             shareImageFromBase64(base64)
             return
@@ -249,6 +255,14 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         ac.popoverPresentationController?.sourceView = view
         ac.popoverPresentationController?.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 0, height: 0)
         present(ac, animated: true)
+    }
+
+    // MARK: - App Store review
+
+    private func requestAppReview() {
+        if let scene = view.window?.windowScene {
+            SKStoreReviewController.requestReview(in: scene)
+        }
     }
 
     // MARK: - Error fallback
