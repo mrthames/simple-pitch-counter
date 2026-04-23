@@ -15,7 +15,10 @@
   --dark:#0b1c3a; --dark2:#142a4f; --dark-label:rgba(235,235,245,.6);
   --r:12px; --r-lg:18px; --font:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
   --android-status-bar:0px;
+  --android-nav-bar:0px;
   --top-inset:max(env(safe-area-inset-top,0px),var(--android-status-bar));
+  --bottom-inset:max(env(safe-area-inset-bottom,0px),var(--android-nav-bar));
+  --header-pad:20px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);overscroll-behavior:none;color-scheme:light only}
@@ -33,7 +36,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 /* ── Dark header (scoreboard) ── */
 .dark-header{
   background:var(--dark);
-  padding:calc(var(--top-inset) + 20px) 18px 16px;
+  padding:calc(var(--top-inset) + var(--header-pad)) 18px 16px;
   position:relative;
 }
 .inn-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px}
@@ -94,7 +97,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 /* ── Action area (light, scrollable) ── */
 .action-area{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 24px);
+  padding:12px 16px calc(var(--bottom-inset) + 24px);
 }
 
 /* ── Pitcher section ── */
@@ -243,7 +246,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 }
 .bip-sheet{
   background:var(--dark);border-radius:24px 24px 0 0;
-  padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 36px);
+  padding:20px 20px calc(var(--bottom-inset) + 36px);
   width:100%;max-width:430px;
 }
 .bip-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.2);margin:0 auto 20px}
@@ -313,7 +316,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 /* ── History screen ── */
 .history-header{
   background:var(--bg);
-  padding:calc(var(--top-inset) + 20px) 20px 12px;
+  padding:calc(var(--top-inset) + var(--header-pad)) 20px 12px;
 }
 .history-title-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
 .history-title{font-size:34px;font-weight:800;letter-spacing:-.5px}
@@ -322,7 +325,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
   font-size:15px;font-weight:700;cursor:pointer;
 }
 .history-sep{height:1px;background:var(--sep)}
-.history-list{padding:12px 20px calc(env(safe-area-inset-bottom,0px)+80px);display:flex;flex-direction:column;gap:10px}
+.history-list{padding:12px 20px calc(var(--bottom-inset)+80px);display:flex;flex-direction:column;gap:10px}
 .hist-card{background:var(--card);border-radius:18px;box-shadow:0 1px 0 rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.06);overflow:hidden}
 .hist-card-body{padding:14px 16px 10px}
 .hist-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
@@ -352,12 +355,12 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 /* ── Setup screen ── */
 .setup-nav{
   display:flex;align-items:center;justify-content:space-between;
-  padding:calc(var(--top-inset)+20px) 20px 16px;
+  padding:calc(var(--top-inset)+var(--header-pad)) 20px 16px;
   background:var(--bg);
 }
 .setup-nav-title{font-size:17px;font-weight:700}
 .setup-content{padding:0 20px;display:flex;flex-direction:column;gap:20px;
-  padding-bottom:calc(env(safe-area-inset-bottom,0px)+100px)}
+  padding-bottom:calc(var(--bottom-inset)+100px)}
 .section-header-lbl{font-size:13px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding:0 4px}
 /* Mode cards */
 .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -391,11 +394,11 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 /* ── Summary & Export ── */
 .summary-nav{
   display:flex;align-items:center;justify-content:space-between;
-  padding:calc(var(--top-inset)+20px) 20px 16px;
+  padding:calc(var(--top-inset)+var(--header-pad)) 20px 16px;
 }
 .summary-nav-title{font-size:17px;font-weight:700}
 .summary-content{padding:0 20px;display:flex;flex-direction:column;gap:16px;
-  padding-bottom:calc(env(safe-area-inset-bottom,0px)+60px)}
+  padding-bottom:calc(var(--bottom-inset)+60px)}
 .final-score-card{background:var(--dark);border-radius:18px;padding:18px 20px}
 .final-tag{font-size:11px;font-weight:700;color:var(--dark-label);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 .final-teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
@@ -419,7 +422,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
   margin-bottom:10px;
 }
 /* Config screen */
-.config-nav{padding-top:calc(var(--top-inset)+20px);padding-left:20px;padding-right:20px;padding-bottom:8px;background:var(--bg)}
+.config-nav{padding-top:calc(var(--top-inset)+var(--header-pad));padding-left:20px;padding-right:20px;padding-bottom:8px;background:var(--bg)}
 .config-item{display:flex;align-items:flex-start;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--sep)}
 .config-item:last-child{border-bottom:none}
 .config-name{font-size:14px;font-weight:600}
@@ -431,7 +434,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .trash-btn:active{background:var(--bg)}
 
 /* ── Modal overlay ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:500;padding:calc(var(--top-inset)+20px) 1.2rem calc(env(safe-area-inset-bottom,0px)+1.2rem);overflow-y:auto}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:500;padding:calc(var(--top-inset)+var(--header-pad)) 1.2rem calc(var(--bottom-inset)+1.2rem);overflow-y:auto}
 .modal-box{background:var(--card);border-radius:var(--r-lg);padding:1.3rem;width:100%;max-width:360px;position:relative;flex-shrink:0}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:.5rem}
 .modal-sub{font-size:14px;color:var(--t2);margin-bottom:1.1rem;line-height:1.5}
@@ -759,7 +762,7 @@ textarea{resize:vertical;min-height:56px}
     <div class="summary-nav-title">Export Summary</div>
     <div style="width:70px"></div>
   </div>
-  <div style="padding:0 20px;padding-bottom:calc(env(safe-area-inset-bottom,0px)+40px)">
+  <div style="padding:0 20px;padding-bottom:calc(var(--bottom-inset)+40px)">
     <div class="export-box" id="export-box"></div>
     <div style="display:flex;gap:8px">
       <div class="summary-action-btn" style="background:var(--blue)" onclick="copyExport(this)">Copy to clipboard</div>
@@ -775,7 +778,7 @@ textarea{resize:vertical;min-height:56px}
     <div style="font-size:17px;font-weight:700;margin:8px 0 4px">Configuration</div>
     <div style="font-size:13px;color:var(--t2);margin-bottom:12px">Pitch and catcher threshold presets and field list.</div>
   </div>
-  <div style="padding:0 20px;padding-bottom:calc(env(safe-area-inset-bottom,0px)+40px)">
+  <div style="padding:0 20px;padding-bottom:calc(var(--bottom-inset)+40px)">
     <div class="lbl" style="margin-bottom:6px">Presets</div>
     <div style="background:var(--card);border:1.5px solid var(--sep2);border-radius:var(--r-lg);padding:.95rem 1.05rem;margin-bottom:8px"><div id="config-list"></div></div>
     <div class="big-btn blue h54" style="margin-bottom:20px;font-size:16px" onclick="showConfigForm(null)">+ New configuration</div>
@@ -795,7 +798,7 @@ textarea{resize:vertical;min-height:56px}
     <div class="btn-sm" onclick="showScreen('history')">‹ Back</div>
     <div style="font-size:17px;font-weight:700;margin:8px 0 4px">About This App</div>
   </div>
-  <div style="padding:0 20px;padding-bottom:calc(env(safe-area-inset-bottom,0px)+40px)">
+  <div style="padding:0 20px;padding-bottom:calc(var(--bottom-inset)+40px)">
     <div style="background:var(--card);border:1.5px solid var(--sep2);border-radius:var(--r-lg);padding:1.2rem 1.1rem;margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
         <div style="width:56px;height:56px;border-radius:14px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff">#</div>

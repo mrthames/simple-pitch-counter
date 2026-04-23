@@ -75,11 +75,15 @@ class MainActivity : AppCompatActivity() {
 
             override fun onPageFinished(view: WebView, url: String) {
                 super.onPageFinished(view, url)
-                val statusBarPx = getStatusBarHeight()
-                val statusBarCss = statusBarPx / resources.displayMetrics.density
+                val density = resources.displayMetrics.density
+                val statusBarCss = getStatusBarHeight() / density
+                val navBarCss = getNavBarHeight() / density
                 view.evaluateJavascript(
                     "document.documentElement.style.setProperty('--android-status-bar','${statusBarCss}px');" +
-                    "document.documentElement.style.setProperty('--top-inset','${statusBarCss}px')",
+                    "document.documentElement.style.setProperty('--top-inset','${statusBarCss}px');" +
+                    "document.documentElement.style.setProperty('--android-nav-bar','${navBarCss}px');" +
+                    "document.documentElement.style.setProperty('--bottom-inset','${navBarCss}px');" +
+                    "document.documentElement.style.setProperty('--header-pad','8px')",
                     null
                 )
             }
@@ -177,15 +181,27 @@ class MainActivity : AppCompatActivity() {
     private fun updateStatusBar(isDark: Boolean) {
         if (isDark) {
             window.statusBarColor = 0xFF0B1C3A.toInt()
-            window.decorView.windowInsetsController?.setSystemBarsAppearance(
-                0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.decorView.windowInsetsController?.setSystemBarsAppearance(
+                    0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                window.decorView.systemUiVisibility =
+                    window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+            }
         } else {
             window.statusBarColor = 0xFFF2F2F7.toInt()
-            window.decorView.windowInsetsController?.setSystemBarsAppearance(
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.decorView.windowInsetsController?.setSystemBarsAppearance(
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                window.decorView.systemUiVisibility =
+                    window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
         }
     }
 
@@ -213,6 +229,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun getStatusBarHeight(): Int {
         val resId = resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (resId > 0) resources.getDimensionPixelSize(resId) else 0
+    }
+
+    private fun getNavBarHeight(): Int {
+        val resId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
         return if (resId > 0) resources.getDimensionPixelSize(resId) else 0
     }
 
