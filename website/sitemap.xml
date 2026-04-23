@@ -20,4 +20,12 @@
     <loc>https://simplepitchcounter.com/android-beta/</loc>
     <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://simplepitchcounter.com/pitch-count-rules/</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://simplepitchcounter.com/parents-guide/</loc>
+    <priority>0.7</priority>
+  </url>
 </urlset>
