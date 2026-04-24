@@ -143,10 +143,24 @@
   .footer-links a:hover { color: #f7f4ed; }
   .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
 
+  .related-guides { margin-top: 60px; padding-top: 40px; border-top: 2px solid var(--cream-dark); }
+  .related-guides h2 {
+    font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--navy); margin-bottom: 20px;
+  }
+  .related-guides-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .related-card {
+    background: #fff; border: 1.5px solid rgba(11,28,58,0.08); border-radius: 10px;
+    padding: 20px; text-decoration: none; transition: transform 0.15s, box-shadow 0.2s;
+  }
+  .related-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,28,58,0.07); }
+  .related-card-title { font-family: 'DM Serif Display', serif; font-size: 0.95rem; color: var(--navy); margin-bottom: 6px; }
+  .related-card-desc { font-size: 0.8rem; color: var(--text-muted); font-weight: 300; line-height: 1.5; }
+
   @media (max-width: 600px) {
     .nav-links { display: none; } .nav-hamburger { display: flex; }
     footer { flex-direction: column; text-align: center; }
     .footer-links { flex-wrap: wrap; justify-content: center; }
+    .related-guides-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -156,6 +170,7 @@
   <div class="nav-links">
     <a href="/#features">Features</a>
     <a href="/#how-it-works">How it works</a>
+    <a href="/articles">Guides</a>
     <a href="/privacy">Privacy</a>
     <a href="/contact">Contact</a>
     <a href="/feedback" style="color:#e8a030">Feedback</a>
@@ -168,7 +183,8 @@
   <a href="/">Home</a>
   <a href="/#features">Features</a>
   <a href="/#how-it-works">How it works</a>
-  <a href="/privacy">Privacy</a>
+  <a href="/articles">Guides</a>
+    <a href="/privacy">Privacy</a>
   <a href="/contact">Contact</a>
   <a href="/feedback" style="color:#e8a030">Feedback</a>
 </div>
@@ -285,6 +301,24 @@
     <p>The catcher-pitcher eligibility rules are part of Little League's official regulations and apply to all divisions. Your local league may have additional restrictions, so it's always worth checking with your league's player agent if you have questions about a specific situation.</p>
     <p>For a full breakdown of pitch count limits and rest day requirements by age, see our <a href="/pitch-count-rules">complete pitch count rules guide</a>.</p>
     <p>The official Little League rulebook is updated each year and is available through your local league or on the Little League International website.</p>
+  </div>
+
+  <div class="related-guides">
+    <h2>Related Guides</h2>
+    <div class="related-guides-grid">
+      <a href="/pitch-count-rules" class="related-card">
+        <div class="related-card-title">Pitch Count Rules 2026</div>
+        <div class="related-card-desc">Daily maximums, rest-day charts, and the finish-the-batter rule for every age group.</div>
+      </a>
+      <a href="/mercy-rule" class="related-card">
+        <div class="related-card-title">The Mercy Rule Explained</div>
+        <div class="related-card-desc">How the 10-run rule works and why shortened games don't change rest-day math.</div>
+      </a>
+      <a href="/parents-guide" class="related-card">
+        <div class="related-card-title">Parent's Guide to Pitch Counting</div>
+        <div class="related-card-desc">New to volunteering? Everything you need to know before your first game.</div>
+      </a>
+    </div>
   </div>
 
 </div>
