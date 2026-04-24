@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Guides and reference articles for youth baseball parents, coaches, and volunteers. Pitch count rules, rest days, catcher limits, and more.">
+<link rel="canonical" href="https://simplepitchcounter.com/articles/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="Youth Baseball Guides for Parents and Coaches">
+<meta property="og:description" content="Guides and reference articles for youth baseball parents, coaches, and volunteers.">
+<meta property="og:image" content="https://simplepitchcounter.com/images/og-image-1200x630.png">
+<meta property="og:url" content="https://simplepitchcounter.com/articles/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<title>Youth Baseball Guides for Parents and Coaches</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1c3a;
+    --cream: #f7f4ed;
+    --cream-dark: #ede9e0;
+    --red: #c8392b;
+    --gold: #e8a030;
+    --text: #0b1c3a;
+    --text-muted: #4a5568;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,28,58,0.96); backdrop-filter: blur(12px);
+    padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+    height: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .nav-logo .ball { width: 28px; height: 28px; background: #f7f4ed; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; overflow: hidden; }
+  .nav-logo .ball::before, .nav-logo .ball::after { content: ''; position: absolute; border: 1.5px solid #c8392b; border-radius: 50%; width: 60%; height: 200%; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(20deg); }
+  .nav-logo .ball::after { transform: translate(-50%, -50%) rotate(-20deg); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: rgba(247,244,237,0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
+  .nav-links a:hover { color: #f7f4ed; }
+  .nav-hamburger {
+    display: none; width: 36px; height: 36px;
+    background: rgba(255,255,255,0.1); border: none; border-radius: 8px;
+    cursor: pointer; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-hamburger svg { display: block; }
+  .nav-overlay {
+    display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+    background: rgba(11,28,58,0.98); backdrop-filter: blur(12px); z-index: 99;
+    flex-direction: column; align-items: center; justify-content: flex-start;
+    padding-top: 60px; gap: 8px;
+  }
+  .nav-overlay.open { display: flex; }
+  .nav-overlay a {
+    color: rgba(247,244,237,0.85); text-decoration: none; font-size: 1.1rem;
+    font-weight: 500; padding: 14px 40px; letter-spacing: 0.03em;
+    transition: color 0.2s; width: 100%; text-align: center;
+  }
+  .nav-overlay a:hover { color: #f7f4ed; }
+
+  .page-header { padding: 130px 8% 70px; background: var(--navy); }
+  .page-header-eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-header-eyebrow::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--gold); }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: #f7f4ed; margin-bottom: 14px;
+  }
+  .page-header-sub { font-size: 0.9rem; color: rgba(247,244,237,0.55); font-weight: 300; }
+
+  .articles-grid {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 70px 8% 100px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  .article-card {
+    background: #fff;
+    border: 1.5px solid rgba(11,28,58,0.08);
+    border-radius: 14px;
+    padding: 32px 28px;
+    text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+  .article-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(11,28,58,0.08);
+    border-color: rgba(11,28,58,0.15);
+  }
+  .article-card-tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .article-card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    color: var(--navy);
+    margin-bottom: 12px;
+    line-height: 1.35;
+  }
+  .article-card-desc {
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+    font-weight: 300;
+    flex: 1;
+    margin-bottom: 18px;
+  }
+  .article-card-link {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .article-card-link::after {
+    content: '\2192';
+    transition: transform 0.15s;
+  }
+  .article-card:hover .article-card-link::after {
+    transform: translateX(4px);
+  }
+
+  footer {
+    background: var(--navy); padding: 40px 8%;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; color: rgba(247,244,237,0.8); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: rgba(247,244,237,0.5); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: #f7f4ed; }
+  .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    .articles-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo"><div class="ball"></div>Simple Pitch Counter</a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#how-it-works">How it works</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/contact">Contact</a>
+    <a href="/feedback" style="color:#e8a030">Feedback</a>
+  </div>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+    <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+</nav>
+<div class="nav-overlay" id="nav-overlay">
+  <a href="/">Home</a>
+  <a href="/#features">Features</a>
+  <a href="/#how-it-works">How it works</a>
+  <a href="/privacy">Privacy</a>
+  <a href="/contact">Contact</a>
+  <a href="/feedback" style="color:#e8a030">Feedback</a>
+</div>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">Resources</div>
+  <h1>Guides for Parents and Coaches</h1>
+  <p class="page-header-sub">Everything you need to know about pitch counts, rest days, and keeping young arms safe</p>
+</div>
+
+<div class="articles-grid">
+
+  <a href="/pitch-count-rules" class="article-card">
+    <div class="article-card-tag">Rules Reference</div>
+    <div class="article-card-title">Little League Pitch Count Rules 2026</div>
+    <div class="article-card-desc">Daily pitch limits by age, required rest-day charts, catcher-pitcher restrictions, and the finish-the-batter rule.</div>
+    <div class="article-card-link">Read the guide</div>
+  </a>
+
+  <a href="/parents-guide" class="article-card">
+    <div class="article-card-tag">For Parents</div>
+    <div class="article-card-title">You Don't Need to Know Baseball to Count Pitches</div>
+    <div class="article-card-desc">A guide for the parent who just volunteered to help at the field and needs to know what pitch counting actually involves.</div>
+    <div class="article-card-link">Read the guide</div>
+  </a>
+
+  <a href="/catcher-innings-rules" class="article-card">
+    <div class="article-card-tag">Rules Reference</div>
+    <div class="article-card-title">Catcher Rules: How Many Innings Can a Kid Catch?</div>
+    <div class="article-card-desc">The catcher-pitcher eligibility rules, why both positions are tracked, and the mistakes coaches make most often.</div>
+    <div class="article-card-link">Read the guide</div>
+  </a>
+
+  <a href="/mercy-rule" class="article-card">
+    <div class="article-card-tag">Rules Reference</div>
+    <div class="article-card-title">The Mercy Rule Explained</div>
+    <div class="article-card-desc">How the 10-run rule works, why shortened games don't change rest-day math, and what varies by league.</div>
+    <div class="article-card-link">Read the guide</div>
+  </a>
+
+  <a href="/what-is-pitch-count" class="article-card">
+    <div class="article-card-tag">For Volunteers</div>
+    <div class="article-card-title">What Is a Pitch Counter?</div>
+    <div class="article-card-desc">The volunteer role that protects young arms. What you track, what you skip, and how it differs from scorekeeping.</div>
+    <div class="article-card-link">Read the guide</div>
+  </a>
+
+  <a href="/travel-ball-pitch-counts" class="article-card">
+    <div class="article-card-tag">Travel Ball</div>
+    <div class="article-card-title">Travel Ball vs. Rec League Pitch Counts</div>
+    <div class="article-card-desc">Why travel ball parents need to track on their own, and how to apply rest-day guidelines when the league doesn't require them.</div>
+    <div class="article-card-link">Read the guide</div>
+  </a>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Simple Pitch Counter</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/pitch-count-rules">Pitch Count Rules</a>
+    <a href="/parents-guide">Parent's Guide</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/contact">Contact</a>
+    <a href="/feedback">Feedback</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Simple Pitch Counter. All rights reserved.</div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('nav-hamburger');
+  const overlay = document.getElementById('nav-overlay');
+  hamburger.addEventListener('click', () => overlay.classList.toggle('open'));
+  overlay.addEventListener('click', (e) => { if (e.target.tagName === 'A') overlay.classList.remove('open'); });
+</script>
+</body>
+</html>

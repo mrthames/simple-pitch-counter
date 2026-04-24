@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Little League catcher-pitcher eligibility rules explained. Learn how many innings a kid can catch, when catchers can't pitch, and how catcher innings interact with pitch counts.">
+<link rel="canonical" href="https://simplepitchcounter.com/catcher-innings-rules/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="Little League Catcher Rules - How Many Innings Can a Kid Catch?">
+<meta property="og:description" content="Little League catcher-pitcher eligibility rules explained. Learn how many innings a kid can catch, when catchers can't pitch, and how catcher innings interact with pitch counts.">
+<meta property="og:image" content="https://simplepitchcounter.com/images/og-catcher-innings-rules.png">
+<meta property="og:url" content="https://simplepitchcounter.com/catcher-innings-rules/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<title>Little League Catcher Rules - How Many Innings Can a Kid Catch?</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Little League Catcher Rules - How Many Innings Can a Kid Catch?",
+  "description": "Little League catcher-pitcher eligibility rules explained. Learn how many innings a kid can catch, when catchers can't pitch, and how catcher innings interact with pitch counts.",
+  "author": { "@type": "Person", "name": "Justin Thames" },
+  "datePublished": "2026-04-23",
+  "publisher": { "@type": "Organization", "name": "Simple Pitch Counter", "url": "https://simplepitchcounter.com" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1c3a;
+    --cream: #f7f4ed;
+    --cream-dark: #ede9e0;
+    --red: #c8392b;
+    --gold: #e8a030;
+    --text: #0b1c3a;
+    --text-muted: #4a5568;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,28,58,0.96); backdrop-filter: blur(12px);
+    padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+    height: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .nav-logo .ball { width: 28px; height: 28px; background: #f7f4ed; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; overflow: hidden; }
+  .nav-logo .ball::before, .nav-logo .ball::after { content: ''; position: absolute; border: 1.5px solid #c8392b; border-radius: 50%; width: 60%; height: 200%; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(20deg); }
+  .nav-logo .ball::after { transform: translate(-50%, -50%) rotate(-20deg); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: rgba(247,244,237,0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
+  .nav-links a:hover { color: #f7f4ed; }
+  .nav-hamburger {
+    display: none; width: 36px; height: 36px;
+    background: rgba(255,255,255,0.1); border: none; border-radius: 8px;
+    cursor: pointer; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-hamburger svg { display: block; }
+  .nav-overlay {
+    display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+    background: rgba(11,28,58,0.98); backdrop-filter: blur(12px); z-index: 99;
+    flex-direction: column; align-items: center; justify-content: flex-start;
+    padding-top: 60px; gap: 8px;
+  }
+  .nav-overlay.open { display: flex; }
+  .nav-overlay a {
+    color: rgba(247,244,237,0.85); text-decoration: none; font-size: 1.1rem;
+    font-weight: 500; padding: 14px 40px; letter-spacing: 0.03em;
+    transition: color 0.2s; width: 100%; text-align: center;
+  }
+  .nav-overlay a:hover { color: #f7f4ed; }
+
+  .page-header { padding: 130px 8% 70px; background: var(--navy); }
+  .page-header-eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-header-eyebrow::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--gold); }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: #f7f4ed; margin-bottom: 14px;
+  }
+  .page-header-sub { font-size: 0.9rem; color: rgba(247,244,237,0.55); font-weight: 300; }
+
+  .content { max-width: 760px; margin: 0 auto; padding: 70px 8% 100px; }
+  .article-section { margin-bottom: 50px; }
+  .article-section h2 {
+    font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--navy);
+    margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--cream-dark);
+  }
+  .article-section p {
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-muted);
+    margin-bottom: 14px; font-weight: 300;
+  }
+  .article-section p:last-child { margin-bottom: 0; }
+  .article-section a { color: var(--red); text-decoration: none; }
+  .article-section a:hover { text-decoration: underline; }
+  .article-section strong { color: var(--text); font-weight: 600; }
+  .article-section ul { margin-bottom: 14px; padding-left: 0; list-style: none; }
+  .article-section ul li {
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-muted);
+    padding: 4px 0 4px 20px; font-weight: 300; position: relative;
+  }
+  .article-section ul li::before {
+    content: '\2022'; position: absolute; left: 0; color: var(--red); font-weight: 700;
+  }
+
+  .highlight-box {
+    background: var(--navy); border-radius: 12px; padding: 28px 32px; margin-bottom: 50px;
+  }
+  .highlight-box p {
+    color: rgba(247,244,237,0.8); font-size: 1.05rem; line-height: 1.7; font-weight: 300; margin: 0;
+  }
+  .highlight-box p strong { color: #f7f4ed; font-weight: 600; }
+
+  .cta-box {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a2d4d 100%);
+    border-radius: 14px; padding: 36px; margin: 50px 0; text-align: center;
+  }
+  .cta-box h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: #f7f4ed; margin-bottom: 12px; }
+  .cta-box p { color: rgba(247,244,237,0.7); font-size: 0.95rem; line-height: 1.7; font-weight: 300; margin-bottom: 22px; }
+  .cta-box a {
+    display: inline-block; background: var(--red); color: #fff; text-decoration: none;
+    padding: 12px 30px; border-radius: 8px; font-weight: 500; font-size: 0.92rem; transition: background 0.2s;
+  }
+  .cta-box a:hover { background: #a82e22; }
+
+  footer {
+    background: var(--navy); padding: 40px 8%;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; color: rgba(247,244,237,0.8); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: rgba(247,244,237,0.5); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: #f7f4ed; }
+  .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; } .nav-hamburger { display: flex; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo"><div class="ball"></div>Simple Pitch Counter</a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#how-it-works">How it works</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/contact">Contact</a>
+    <a href="/feedback" style="color:#e8a030">Feedback</a>
+  </div>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+    <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+</nav>
+<div class="nav-overlay" id="nav-overlay">
+  <a href="/">Home</a>
+  <a href="/#features">Features</a>
+  <a href="/#how-it-works">How it works</a>
+  <a href="/privacy">Privacy</a>
+  <a href="/contact">Contact</a>
+  <a href="/feedback" style="color:#e8a030">Feedback</a>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-eyebrow">Youth Baseball Rules</div>
+  <h1>Little League Catcher Rules: How Many Innings Can a Kid Catch?</h1>
+  <p class="page-header-sub">Catcher-pitcher eligibility rules, how to count catcher innings, and common mistakes that get teams in trouble</p>
+</div>
+
+<div class="content">
+
+  <div class="highlight-box">
+    <p><strong>The short answer:</strong> There's no limit on how many innings a kid can catch in Little League. But if they catch <strong>four or more innings</strong>, they cannot pitch in that same game. And if they've already pitched <strong>41 or more pitches</strong>, they can't move behind the plate. These two rules work together to protect young arms from doing double duty in the same game.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>Why Little League Tracks Catcher Innings</h2>
+    <p>Most parents understand why pitch counts exist. Throwing from the mound is hard on a young arm. But catching doesn't get the same attention, even though catchers throw the ball back to the pitcher on every single pitch.</p>
+    <p>Think about it. If the opposing team's pitcher throws 70 pitches in a game, your catcher is also throwing 70 times, plus pickoff attempts, throws to second on stolen bases, and throws back after foul balls. The catcher's arm is working almost as hard as the pitcher's arm, just from a different angle and distance.</p>
+    <p>That's why Little League created the catcher-pitcher eligibility rules. A kid who has been catching for most of a game has already put serious stress on their arm. Letting them then take the mound and throw at full effort is exactly the kind of overuse that leads to injuries in young players.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>The Two Catcher-Pitcher Rules</h2>
+    <p>Little League has two rules that limit how catching and pitching overlap within a single game. They work in opposite directions.</p>
+    <p><strong>Rule 1: Catcher to pitcher.</strong> Any player who has caught four or more innings in a game cannot pitch in that same game. Three innings of catching is fine. Four innings means no pitching, no exceptions.</p>
+    <p><strong>Rule 2: Pitcher to catcher.</strong> Any pitcher who has delivered 41 or more pitches in a game cannot then move to the catcher position for the remainder of that game. If the pitcher threw 40 or fewer pitches, they can still catch.</p>
+    <p>These rules only apply within the same game. A kid who catches a full six-inning game on Monday can pitch on Tuesday (assuming they've met any rest day requirements from pitching earlier in the week). The catcher-pitcher restrictions reset with each new game.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>How to Count Catcher Innings</h2>
+    <p>This is where people get confused. In Little League, <strong>any part of an inning counts as a full inning</strong> for catcher eligibility purposes.</p>
+    <p>If your kid catches the first two batters of an inning and then you move them to shortstop, that counts as one full inning of catching. It doesn't matter that they only caught a portion of the inning. One pitch behind the plate in an inning means that entire inning counts.</p>
+    <p>This matters because coaches sometimes try to split catching duties within an inning to stay under the four-inning limit. It doesn't work that way. If Player A catches the first out and Player B catches the last two outs, both players have been charged with one inning of catching for that inning.</p>
+    <p>Here's how the count adds up:</p>
+    <ul>
+      <li><strong>1 inning caught:</strong> Eligible to pitch</li>
+      <li><strong>2 innings caught:</strong> Eligible to pitch</li>
+      <li><strong>3 innings caught:</strong> Eligible to pitch</li>
+      <li><strong>4 innings caught:</strong> Cannot pitch in this game</li>
+      <li><strong>5 or more innings caught:</strong> Cannot pitch in this game</li>
+    </ul>
+    <p>The line is clear. Three or fewer, they can pitch. Four or more, they can't.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>A Real-World Example</h2>
+    <p>Say your kid catches the first four innings of a six-inning game. The team is up by one run heading into the fifth, and the starting pitcher is getting tired. The coach looks down the bench and thinks, "Let's put our catcher on the mound. He's got a great arm."</p>
+    <p>That's not allowed. The kid has already caught four innings, so they're ineligible to pitch for the rest of the game. The coach needs a different plan.</p>
+    <p>Now flip it around. Say your starting pitcher has thrown 55 pitches through three innings and is done on the mound. The coach wants to move them behind the plate for the remaining innings. That's also not allowed. The pitcher exceeded the 41-pitch threshold, so they can't catch in this game.</p>
+    <p>But if that same pitcher had only thrown 38 pitches through three innings? Then yes, they could move to catcher. They're under the 41-pitch limit.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>How This Interacts with Pitch Count Rest Days</h2>
+    <p>The catcher-pitcher eligibility rule is a same-game restriction. Pitch count rest days are a multi-day restriction. They're separate systems, but they can overlap in ways that trip people up.</p>
+    <p>Here's a scenario. Your kid catches five innings on Monday. On Tuesday, they're scheduled to pitch. Is that allowed? Yes, as long as they don't have rest day obligations from pitching earlier in the week. The four-inning catcher rule only blocks pitching in that same game, not future games.</p>
+    <p>But now consider this. Your kid pitches 50 pitches on Monday, which means they need three calendar days of rest before pitching again. They can't pitch again until Friday. Can they catch on Tuesday? Yes. The rest day requirement only applies to pitching, not catching. A kid on pitching rest can still play catcher.</p>
+    <p>Where it gets tricky is tournament play. If a kid catches four innings in Game 1 of a doubleheader, they can still pitch in Game 2 because it's a different game. But if they also pitched in Game 1, those pitches carry over to Game 2's daily total and rest day calculations.</p>
+    <p>You really need to track both numbers, pitch counts and catcher innings, across all games on the same day to stay compliant.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>Common Mistakes with Catcher Innings</h2>
+    <ul>
+      <li><strong>Not tracking catcher innings at all.</strong> This is the most common problem. Many teams have a designated pitch counter but nobody keeping track of how many innings each player has caught. By the fourth or fifth inning, nobody can remember who caught which innings.</li>
+      <li><strong>Assuming partial innings don't count.</strong> A kid who catches one batter in an inning has caught that full inning. Splitting catching duties within an inning does not reduce the count for either catcher.</li>
+      <li><strong>Not realizing a four-inning catcher can't pitch.</strong> Coaches who are focused on pitch counts sometimes forget about the catcher restriction entirely. They look at the lineup and see a kid who hasn't pitched yet, not realizing that kid is ineligible because of catching.</li>
+      <li><strong>Forgetting the 41-pitch pitcher-to-catcher rule.</strong> The catcher-to-pitcher rule gets more attention, but the reverse is just as binding. A pitcher who throws 41 or more pitches cannot catch in that game.</li>
+      <li><strong>Thinking the rule carries across games.</strong> The catcher-pitcher restriction is per game only. A kid who catches all six innings on Saturday can pitch on Sunday. The rule resets with each new game.</li>
+      <li><strong>Losing track during lineup changes.</strong> In youth baseball, kids move positions frequently. A player might catch the first inning, play outfield for two innings, then go back behind the plate. Every inning they spend at catcher counts, even if they weren't there consecutively.</li>
+    </ul>
+  </div>
+
+  <div class="article-section">
+    <h2>Why Both Positions Stress Young Arms</h2>
+    <p>The reason Little League restricts the pitcher-catcher combination specifically comes down to throwing volume and intensity.</p>
+    <p>A pitcher throws every pitch at high effort. The throwing motion from the mound puts maximum stress on the shoulder and elbow. That's well understood.</p>
+    <p>A catcher's throws are different but still add up. On every single pitch, the catcher receives the ball and throws it back to the pitcher. On stolen base attempts, the catcher makes a hard, quick throw to second or third. On pop-ups behind the plate, they're throwing with an awkward arm angle.</p>
+    <p>Add those together. If a pitcher throws 60 pitches in a game, the catcher has also thrown roughly 60 times just returning the ball. In a full six-inning game, a catcher might make 80 to 100 throws total.</p>
+    <p>Asking a kid to do both in the same game means their arm never gets a break. They're throwing at high intensity from the mound and then continuing to throw behind the plate, or the other way around. That cumulative load is what the rule is designed to prevent.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>What Happens If You Break the Rule</h2>
+    <p>If a team uses an ineligible pitcher (one who has already caught four or more innings in that game), the consequences depend on when the violation is caught.</p>
+    <p>If the opposing manager or umpire catches it before the ineligible pitcher throws a pitch, the player is simply removed from the mound and a different pitcher takes over. No penalty beyond the correction.</p>
+    <p>If the ineligible pitcher has already thrown pitches, it gets more serious. The game can be protested, and Little League's official rules give the local league and district authority to determine the outcome. In some cases, the game may be replayed from the point of the infraction. In others, the result stands but the team may face additional sanctions.</p>
+    <p>The best approach is to just never be in that position. Track catcher innings from the start of the game so you always know who is eligible.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>Tips for Coaches and Scorekeepers</h2>
+    <ul>
+      <li><strong>Write it down from the first pitch.</strong> Keep a simple log of which player is catching each inning. Don't rely on memory.</li>
+      <li><strong>Plan your lineup with both rules in mind.</strong> If you know you want a kid to pitch later in the game, don't start them at catcher unless you're confident you'll pull them before the fourth inning.</li>
+      <li><strong>Communicate with your coaching staff.</strong> Make sure assistant coaches know which players have caught and how many innings. Miscommunication between coaches is one of the most common ways teams accidentally break this rule.</li>
+      <li><strong>Watch the pitch count for your pitcher.</strong> If your starting pitcher is approaching 41 pitches and you think you might want them to catch later, you need to make that decision quickly. Once they cross 41, the catcher option is off the table.</li>
+      <li><strong>Use an app that tracks both.</strong> Trying to manage pitch counts, rest days, and catcher innings on paper or in your head during a game is a lot to juggle. Tools that track all three together make it much harder to miss something.</li>
+    </ul>
+  </div>
+
+  <div class="cta-box">
+    <h3>Track Catcher Innings and Pitch Counts Together</h3>
+    <p>Simple Pitch Counter tracks catcher innings alongside pitch counts automatically. When a player is ineligible to pitch because of catching, you'll know before the coach makes the call. Free on iOS and Android.</p>
+    <a href="/">Learn more</a>
+  </div>
+
+  <div class="article-section">
+    <h2>Where to Find the Official Rules</h2>
+    <p>The catcher-pitcher eligibility rules are part of Little League's official regulations and apply to all divisions. Your local league may have additional restrictions, so it's always worth checking with your league's player agent if you have questions about a specific situation.</p>
+    <p>For a full breakdown of pitch count limits and rest day requirements by age, see our <a href="/pitch-count-rules">complete pitch count rules guide</a>.</p>
+    <p>The official Little League rulebook is updated each year and is available through your local league or on the Little League International website.</p>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Simple Pitch Counter</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/pitch-count-rules">Pitch Count Rules</a>
+    <a href="/parents-guide">Parent's Guide</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/contact">Contact</a>
+    <a href="/feedback">Feedback</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Simple Pitch Counter. All rights reserved.</div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('nav-hamburger');
+  const overlay = document.getElementById('nav-overlay');
+  hamburger.addEventListener('click', () => overlay.classList.toggle('open'));
+  overlay.addEventListener('click', (e) => { if (e.target.tagName === 'A') overlay.classList.remove('open'); });
+</script>
+</body>
+</html>

@@ -28,4 +28,24 @@
     <loc>https://simplepitchcounter.com/parents-guide/</loc>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://simplepitchcounter.com/articles/</loc>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://simplepitchcounter.com/catcher-innings-rules/</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://simplepitchcounter.com/mercy-rule/</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://simplepitchcounter.com/what-is-pitch-count/</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://simplepitchcounter.com/travel-ball-pitch-counts/</loc>
+    <priority>0.7</priority>
+  </url>
 </urlset>
