@@ -202,11 +202,25 @@
   .footer-links a:hover { color: #f7f4ed; }
   .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
 
+  .related-guides { margin-top: 60px; padding-top: 40px; border-top: 2px solid var(--cream-dark); }
+  .related-guides h2 {
+    font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--navy); margin-bottom: 20px;
+  }
+  .related-guides-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .related-card {
+    background: #fff; border: 1.5px solid rgba(11,28,58,0.08); border-radius: 10px;
+    padding: 20px; text-decoration: none; transition: transform 0.15s, box-shadow 0.2s;
+  }
+  .related-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,28,58,0.07); }
+  .related-card-title { font-family: 'DM Serif Display', serif; font-size: 0.95rem; color: var(--navy); margin-bottom: 6px; }
+  .related-card-desc { font-size: 0.8rem; color: var(--text-muted); font-weight: 300; line-height: 1.5; }
+
   @media (max-width: 600px) {
     .nav-links { display: none; }
     .nav-hamburger { display: flex; }
     footer { flex-direction: column; text-align: center; }
     .footer-links { flex-wrap: wrap; justify-content: center; }
+    .related-guides-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -217,6 +231,7 @@
   <div class="nav-links">
     <a href="/#features">Features</a>
     <a href="/#how-it-works">How it works</a>
+    <a href="/articles">Guides</a>
     <a href="/privacy">Privacy</a>
     <a href="/contact">Contact</a>
     <a href="/feedback" style="color:#e8a030">Feedback</a>
@@ -229,7 +244,8 @@
   <a href="/">Home</a>
   <a href="/#features">Features</a>
   <a href="/#how-it-works">How it works</a>
-  <a href="/privacy">Privacy</a>
+  <a href="/articles">Guides</a>
+    <a href="/privacy">Privacy</a>
   <a href="/contact">Contact</a>
   <a href="/feedback" style="color:#e8a030">Feedback</a>
 </div>
@@ -348,6 +364,24 @@
     <p>Youth arm injuries from overuse are preventable. The pitch count rules exist for exactly that reason. But rules only work when someone bothers to enforce them, and enforcement starts with a parent in a camping chair doing the counting.</p>
     <p>You don't need to understand earned run averages or the infield fly rule. You need to watch the pitcher and tap. That's a job any parent can do, and it's one of the most useful things you can volunteer for at the field.</p>
     <p>For a step-by-step walkthrough of your first game as a pitch counter, check out our <a href="/parents-guide">parent's guide to pitch counting</a>.</p>
+  </div>
+
+  <div class="related-guides">
+    <h2>Related Guides</h2>
+    <div class="related-guides-grid">
+      <a href="/parents-guide" class="related-card">
+        <div class="related-card-title">Parent's Guide to Pitch Counting</div>
+        <div class="related-card-desc">The full story on volunteering at the field, written for parents new to baseball.</div>
+      </a>
+      <a href="/pitch-count-rules" class="related-card">
+        <div class="related-card-title">Pitch Count Rules 2026</div>
+        <div class="related-card-desc">Daily maximums, rest-day charts, and the finish-the-batter rule for every age group.</div>
+      </a>
+      <a href="/catcher-innings-rules" class="related-card">
+        <div class="related-card-title">Catcher Innings Rules</div>
+        <div class="related-card-desc">How the catcher-pitcher eligibility restrictions work and why both positions are tracked.</div>
+      </a>
+    </div>
   </div>
 
 </div>
