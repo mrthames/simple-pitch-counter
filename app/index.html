@@ -1707,9 +1707,7 @@ function showPitcherStats(){
 
 // ── Button mapping modal ──
 function getBtnMapOpts(){
-  const g=state.currentGame;
-  if(g&&g.mode==='advanced')return['calledStrike','ball','nextBatter','undo','recordOut','none'];
-  return['pitch','nextBatter','undo','none'];
+  return['pitch','calledStrike','ball','nextBatter','undo','recordOut','none'];
 }
 function getBtnRows(){
   const showAction=hasActionButton();
