@@ -532,3 +532,138 @@ test.describe('Button mapping per mode (#79)', () => {
     await expect(overlay).not.toContainText('+ Out');
   });
 });
+
+test.describe('Scoreboard improvements (#87-#92)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('scoreboard team labels are aligned with cells', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    const hdr = page.locator('.inn-sb-hdr').first();
+    const cell = page.locator('.inn-sb-cell').first();
+    await expect(hdr).toBeVisible();
+    await expect(cell).toBeVisible();
+    const hdrBox = await hdr.boundingBox();
+    const cellBox = await cell.boundingBox();
+    expect(hdrBox).not.toBeNull();
+    expect(cellBox).not.toBeNull();
+    expect(hdrBox!.height).toBeGreaterThan(0);
+    expect(cellBox!.height).toBeGreaterThan(0);
+  });
+
+  test('Stats link is next to PITCHER label not pitcher name', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    const sectionLbl = page.locator('.section-lbl', { hasText: 'Pitcher' });
+    await expect(sectionLbl.locator('.stats-link')).toBeVisible();
+    await expect(page.locator('#pitcher-name-display .stats-link')).toHaveCount(0);
+  });
+
+  test('Stats link next to PITCHER label in advanced mode', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    const sectionLbl = page.locator('.section-lbl', { hasText: 'Pitcher' });
+    await expect(sectionLbl.locator('.stats-link')).toBeVisible();
+    await expect(page.locator('#pitcher-name-display .stats-link')).toHaveCount(0);
+  });
+
+  test('9-inning game prompts end when not tied', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Give away team a 1-run lead
+    await page.click('.sb-adj >> nth=1');
+    // Play through 9 innings (18 half-innings)
+    for (let i = 0; i < 18; i++) {
+      await page.click('.end-half-btn');
+      await page.click('.modal-btn.amber');
+    }
+    // Should see game complete modal
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await expect(page.locator('.modal-box')).toContainText('Game complete');
+  });
+
+  test('9-inning tied game allows extra innings', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Play through 9 innings (18 half-innings), score stays 0-0
+    for (let i = 0; i < 18; i++) {
+      await page.click('.end-half-btn');
+      await page.click('.modal-btn.amber');
+    }
+    // Should NOT see game complete modal since tied 0-0
+    await page.waitForTimeout(500);
+    await expect(page.locator('.modal-overlay')).toHaveCount(0);
+    await expect(page.locator('#inn-pill')).toContainText('10');
+  });
+
+  test('9-inning modal Continue allows extra innings', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.sb-adj >> nth=1');
+    for (let i = 0; i < 18; i++) {
+      await page.click('.end-half-btn');
+      await page.click('.modal-btn.amber');
+    }
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await page.locator('.modal-btn', { hasText: 'Continue' }).click();
+    await expect(page.locator('#inn-pill')).toContainText('10');
+  });
+
+  test('editable inning cell updates score', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.sb-adj >> nth=1'); // away +1
+    // End TOP 1
+    await page.click('.end-half-btn');
+    await page.click('.modal-btn.amber');
+    // End BOT 1
+    await page.click('.end-half-btn');
+    await page.click('.modal-btn.amber');
+    // Now in TOP 2. Inning 1 cells are editable.
+    page.on('dialog', async dialog => {
+      await dialog.accept('3');
+    });
+    // Click the away team cell for inning 1 — has onclick="editInningCell(0,'top')"
+    await page.locator('#inn-scoreboard .inn-sb-cell[onclick*="editInningCell"]').first().click();
+    // Away score should now be 3
+    await expect(page.locator('#sb-away-score')).toContainText('3');
+  });
+
+  test('history card shows inning scoreboard instead of score pill', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 5);
+    await page.click('.sb-adj >> nth=1'); // away +1
+    // End half
+    await page.click('.end-half-btn');
+    await page.click('.modal-btn.amber');
+    // End game
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+    await page.click('.modal-btn.red');
+    await expect(page.locator('#screen-history')).toHaveClass(/active/);
+    // Should have history scoreboard, not score-pill
+    await expect(page.locator('.hist-scoreboard')).toHaveCount(1);
+    await expect(page.locator('.hist-scoreboard')).toContainText('R');
+  });
+
+  test('share card includes inning scoreboard', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 3);
+    await page.click('.sb-adj >> nth=1');
+    await page.click('.end-half-btn');
+    await page.click('.modal-btn.amber');
+    await page.click('.end-half-btn');
+    await page.click('.modal-btn.amber');
+    // End game
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+    await page.click('.modal-btn.red');
+    await expect(page.locator('#screen-history')).toHaveClass(/active/);
+    // Open stats and share
+    await page.click('text=View stats');
+    await page.waitForSelector('#saved-stats-overlay .stats-sheet');
+    const downloadPromise = page.waitForEvent('download', { timeout: 5000 }).catch(() => null);
+    await page.locator('#saved-stats-overlay .stats-sheet').getByText('Share', { exact: true }).click();
+    const download = await downloadPromise;
+    expect(download).not.toBeNull();
+    if (download) {
+      expect(download.suggestedFilename()).toBe('game-stats.png');
+    }
+  });
+});

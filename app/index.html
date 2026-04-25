@@ -98,9 +98,9 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .inn-scoreboard{display:flex;gap:2px;margin-top:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .inn-scoreboard::-webkit-scrollbar{display:none}
 .inn-sb-col{display:flex;flex-direction:column;align-items:center;min-width:24px;flex-shrink:0}
-.inn-sb-col.lbl{min-width:32px}
-.inn-sb-hdr{font-size:9px;font-weight:700;color:rgba(235,235,245,.35);letter-spacing:.3px;padding:0 2px 2px;text-transform:uppercase}
-.inn-sb-cell{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);padding:1px 2px;text-align:center;min-width:24px;line-height:15px}
+.inn-sb-col.lbl{min-width:32px;align-items:flex-start}
+.inn-sb-hdr{font-size:9px;font-weight:700;color:rgba(235,235,245,.35);letter-spacing:.3px;padding:0 2px 2px;text-transform:uppercase;height:15px;display:flex;align-items:flex-end}
+.inn-sb-cell{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);padding:1px 2px;text-align:center;min-width:24px;line-height:15px;height:17px;display:flex;align-items:center;justify-content:center}
 .inn-sb-cell.current{color:#fff;font-weight:800}
 .inn-sb-cell.total{color:#fff;font-weight:800;font-size:12px}
 
@@ -351,6 +351,13 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .score-pill-name{font-size:10px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
 .score-pill-num{font-size:22px;font-weight:800;line-height:1.2}
 .score-pill-dash{font-size:16px;color:var(--t3)}
+.hist-scoreboard{display:flex;gap:1px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:6px 0 2px;padding:4px 0}
+.hist-scoreboard::-webkit-scrollbar{display:none}
+.hist-sb-col{display:flex;flex-direction:column;align-items:center;min-width:20px;flex-shrink:0}
+.hist-sb-col.lbl{min-width:28px;align-items:flex-start}
+.hist-sb-hdr{font-size:8px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase;height:14px;display:flex;align-items:flex-end}
+.hist-sb-cell{font-size:10px;font-weight:600;color:var(--text);padding:1px 2px;text-align:center;min-width:20px;line-height:14px;height:16px;display:flex;align-items:center;justify-content:center}
+.hist-sb-cell.total{font-weight:800;font-size:11px}
 .rest-section{border-top:1px solid var(--sep);padding:10px 16px}
 .rest-section-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t2);margin-bottom:7px}
 .rest-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
@@ -639,7 +646,7 @@ textarea{resize:vertical;min-height:56px}
     <!-- Pitcher section -->
     <div class="section-header" id="pitcher-section-header">
       <div>
-        <div class="section-lbl">Pitcher</div>
+        <div class="section-lbl" style="display:flex;align-items:center;gap:8px">Pitcher <span class="stats-link" onclick="showStatsQuick()">Stats ›</span></div>
         <div id="pitcher-name-display" class="pitcher-name-row"></div>
       </div>
       <div class="btn-sm" id="p-change-btn" onclick="togglePSelect()">Change</div>
@@ -1179,6 +1186,12 @@ function endHalfInning(){
   g.balls=0;g.strikes=0;g.outs=0;g.atBatLog=[];g.halfInningRuns=0;
   g.pSelectOpen=false;g.cSelectOpen=false;
   haptic('success');saveState();renderGame();window.scrollTo(0,0);
+  if(g.inning>9&&g.isTop&&g.homeScore!==g.awayScore){
+    showModal('Game complete',`${g.inning-1} innings played. ${g.homeScore>g.awayScore?g.homeTeam:g.awayTeam} wins ${Math.max(g.homeScore,g.awayScore)}–${Math.min(g.homeScore,g.awayScore)}.`,[
+      {label:'Continue playing',fn:'closeModal()'},
+      {label:'End game',fn:'closeModal();confirmEndGame()',cls:'red'},
+    ]);
+  }
 }
 function confirmEndHalf(){
   const g=state.currentGame;if(!g)return;
@@ -1305,11 +1318,33 @@ function renderInningScoreboard(g){
     const topCls=isCur&&g.isTop?' current':'';
     const botCls=isCur&&!g.isTop?' current':'';
     const showBot=i<g.inning-1||(i===g.inning-1&&!g.isTop);
-    html+=`<div class="inn-sb-col"><div class="inn-sb-hdr"${isCur?' style="color:rgba(235,235,245,.7)"':''}>${i+1}</div><div class="inn-sb-cell${topCls}">${topVal}</div><div class="inn-sb-cell${botCls}">${showBot?botVal:'—'}</div></div>`;
+    const topDone=i<g.inning-1||(i===g.inning-1&&!g.isTop);
+    const botDone=i<g.inning-1;
+    const topClick=topDone?` onclick="editInningCell(${i},'top')" style="cursor:pointer;text-decoration:underline;text-decoration-color:rgba(255,255,255,.15);text-underline-offset:2px"`:'';
+    const botClick=botDone?` onclick="editInningCell(${i},'bot')" style="cursor:pointer;text-decoration:underline;text-decoration-color:rgba(255,255,255,.15);text-underline-offset:2px"`:'';
+    html+=`<div class="inn-sb-col"><div class="inn-sb-hdr"${isCur?' style="color:rgba(235,235,245,.7)"':''}>${i+1}</div><div class="inn-sb-cell${topCls}"${topClick}>${topVal}</div><div class="inn-sb-cell${botCls}"${showBot?botClick:''}>${showBot?botVal:'—'}</div></div>`;
   }
   html+='<div class="inn-sb-col lbl" style="border-left:1px solid rgba(255,255,255,.12);padding-left:4px;margin-left:2px"><div class="inn-sb-hdr">R</div><div class="inn-sb-cell total">'+g.awayScore+'</div><div class="inn-sb-cell total">'+g.homeScore+'</div></div>';
   el.innerHTML=html;
   if(el.scrollWidth>el.clientWidth)el.scrollLeft=el.scrollWidth;
+}
+function editInningCell(innIdx,half){
+  const g=state.currentGame;if(!g)return;
+  if(!g.inningRuns||!g.inningRuns[innIdx])return;
+  const team=half==='top'?g.awayTeam:g.homeTeam;
+  const cur=g.inningRuns[innIdx][half];
+  const input=prompt(`${team} runs in inning ${innIdx+1} (${half==='top'?'top':'bottom'}):`,String(cur));
+  if(input===null)return;
+  const val=parseInt(input,10);
+  if(isNaN(val)||val<0)return;
+  pushSnap();
+  g.inningRuns[innIdx][half]=val;
+  let away=0,home=0;
+  g.inningRuns.forEach(r=>{away+=(r.top||0);home+=(r.bot||0);});
+  if(g.isTop)away+=(g.halfInningRuns||0);
+  else home+=(g.halfInningRuns||0);
+  g.awayScore=away;g.homeScore=home;
+  saveState();renderGame();
 }
 function renderGame(){
   const g=state.currentGame;if(!g)return;
@@ -1422,7 +1457,7 @@ function renderPitcherSection(){
   const ri=ap?restInfo(ap.pitches):null;
   const rc=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
   if(ap){
-    pDisp.innerHTML=`<div class="pitcher-name">${ap.name}${ap.num?' <span class="pitcher-num">#'+ap.num+'</span>':''}</div><div class="pitch-count-badge"><div class="pitch-count-badge-num" style="color:${countColor(ap.pitches)}">${ap.pitches}</div><div class="pitch-count-badge-lbl">pitches</div></div><div class="stats-link" onclick="showStatsQuick()">Stats ›</div>`;
+    pDisp.innerHTML=`<div class="pitcher-name">${ap.name}${ap.num?' <span class="pitcher-num">#'+ap.num+'</span>':''}</div><div class="pitch-count-badge"><div class="pitch-count-badge-num" style="color:${countColor(ap.pitches)}">${ap.pitches}</div><div class="pitch-count-badge-lbl">pitches</div></div>`;
     // Rest label
     const rl=document.querySelector('.rest-lbl');
     if(!rl){const d=document.createElement('div');d.className='rest-lbl';pDisp.parentElement.appendChild(d);}
@@ -1673,7 +1708,33 @@ function renderPitcherListCardToCanvas(gameData){
     ctx.fillStyle='rgba(235,235,245,.5)';ctx.font='500 20px -apple-system,system-ui,sans-serif';
     ctx.fillText(`${g.date||''}${g.time?' · '+g.time:''}`,pad,y+=30);
     ctx.fillText(`Final: ${g.homeTeam} ${g.homeScore} – ${g.awayTeam} ${g.awayScore}`,pad,y+=26);
-    y+=20;
+    y+=16;
+    const iRuns=g.inningRuns||[];
+    if(iRuns.length>0){
+      const colW=Math.min(44,Math.floor((W-pad*2-60-50)/(iRuns.length+1)));
+      const lblW=50;const rowH=22;const hdrH=18;
+      const sbX=pad;
+      ctx.fillStyle='rgba(235,235,245,.35)';ctx.font='bold 11px -apple-system,system-ui,sans-serif';
+      ctx.fillText(g.awayTeam.substring(0,3).toUpperCase(),sbX,y+hdrH+rowH-4);
+      ctx.fillText(g.homeTeam.substring(0,3).toUpperCase(),sbX,y+hdrH+rowH*2-4);
+      for(let ii=0;ii<iRuns.length;ii++){
+        const cx=sbX+lblW+ii*colW;
+        ctx.fillStyle='rgba(235,235,245,.35)';ctx.font='bold 11px -apple-system,system-ui,sans-serif';
+        const hTxt=String(ii+1);const hw=ctx.measureText(hTxt).width;ctx.fillText(hTxt,cx+colW/2-hw/2,y+hdrH-4);
+        ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='600 13px -apple-system,system-ui,sans-serif';
+        const tTxt=String(iRuns[ii].top||0);const tw2=ctx.measureText(tTxt).width;ctx.fillText(tTxt,cx+colW/2-tw2/2,y+hdrH+rowH-4);
+        const bTxt=String(iRuns[ii].bot||0);const bw=ctx.measureText(bTxt).width;ctx.fillText(bTxt,cx+colW/2-bw/2,y+hdrH+rowH*2-4);
+      }
+      const rx=sbX+lblW+iRuns.length*colW+8;
+      ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(rx-4,y,1,hdrH+rowH*2);
+      ctx.fillStyle='rgba(235,235,245,.35)';ctx.font='bold 11px -apple-system,system-ui,sans-serif';
+      const rLbl='R';const rLw=ctx.measureText(rLbl).width;ctx.fillText(rLbl,rx+12-rLw/2,y+hdrH-4);
+      ctx.fillStyle='#fff';ctx.font='bold 14px -apple-system,system-ui,sans-serif';
+      const asTxt=String(g.awayScore);const asw=ctx.measureText(asTxt).width;ctx.fillText(asTxt,rx+12-asw/2,y+hdrH+rowH-4);
+      const hsTxt=String(g.homeScore);const hsw=ctx.measureText(hsTxt).width;ctx.fillText(hsTxt,rx+12-hsw/2,y+hdrH+rowH*2-4);
+      y+=hdrH+rowH*2+12;
+    }
+    y+=8;
     allP.forEach(p=>{
       const s=pitcherDerivedStats(p);const ri2=restInfo(p.pitches);
       const rc=!ri2||ri2.days===0?'#34C759':ri2.days===1?'#FF9500':'#FF3B30';
@@ -1938,6 +1999,16 @@ function closeGameToHistory(){
 }
 
 // ── History ──
+function renderHistoryScoreboard(g){
+  const runs=g.inningRuns||[];
+  if(!runs.length)return`<div class="score-pill"><div class="score-pill-team"><div class="score-pill-name">${g.awayTeam}</div><div class="score-pill-num">${g.awayScore}</div></div><div class="score-pill-dash">—</div><div class="score-pill-team"><div class="score-pill-name">${g.homeTeam}</div><div class="score-pill-num">${g.homeScore}</div></div></div>`;
+  let h='<div class="hist-scoreboard"><div class="hist-sb-col lbl"><div class="hist-sb-hdr"></div><div class="hist-sb-cell" style="color:var(--t3);font-size:9px">'+g.awayTeam.substring(0,3).toUpperCase()+'</div><div class="hist-sb-cell" style="color:var(--t3);font-size:9px">'+g.homeTeam.substring(0,3).toUpperCase()+'</div></div>';
+  for(let i=0;i<runs.length;i++){
+    h+=`<div class="hist-sb-col"><div class="hist-sb-hdr">${i+1}</div><div class="hist-sb-cell">${runs[i].top||0}</div><div class="hist-sb-cell">${runs[i].bot||0}</div></div>`;
+  }
+  h+='<div class="hist-sb-col lbl" style="border-left:1px solid var(--sep);padding-left:3px;margin-left:2px"><div class="hist-sb-hdr">R</div><div class="hist-sb-cell total">'+g.awayScore+'</div><div class="hist-sb-cell total">'+g.homeScore+'</div></div></div>';
+  return h;
+}
 function renderHistory(){
   const c=document.getElementById('history-list');
   if(!state.games?.length){
@@ -1970,11 +2041,7 @@ function renderHistory(){
             </div>
             <div class="hist-card-date">${g.date}${g.time?' · '+g.time:''}</div>
           </div>
-          <div class="score-pill">
-            <div class="score-pill-team"><div class="score-pill-name">${g.awayTeam}</div><div class="score-pill-num">${g.awayScore}</div></div>
-            <div class="score-pill-dash">—</div>
-            <div class="score-pill-team"><div class="score-pill-name">${g.homeTeam}</div><div class="score-pill-num">${g.homeScore}</div></div>
-          </div>
+          ${renderHistoryScoreboard(g)}
         </div>
         ${allRest.length?`<div class="rest-section"><div class="rest-section-lbl">Rest required</div>${allRest.map(r=>`<div class="rest-row"><div class="rest-name">${r.name}${r.num?' <span style="color:var(--t3)">#'+r.num+'</span>':''} <span class="rest-sub">· ${r.pitches} pitches</span></div><div class="rest-chip" style="background:${r.days>=2?'var(--red-bg)':'var(--amber-bg)'};color:${r.days>=2?'var(--red)':'var(--amber)'}">${r.days}d rest</div></div>`).join('')}</div>`:''}
         <div class="hist-card-actions">
