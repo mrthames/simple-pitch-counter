@@ -23,7 +23,7 @@ test.describe('Thresholds and alerts', () => {
   test('approaching limit alert shows near max', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     await addSimplePitches(page, 47);
-    await expect(page.locator('#simple-alerts')).toContainText('approaching');
+    await expect(page.locator('#simple-alerts')).toContainText('Approaching');
   });
 
   test('over limit alert shows at max', async ({ page }) => {
@@ -77,7 +77,7 @@ test.describe('Thresholds and alerts', () => {
     await startGame(page, { mode: 'simple', homeCatcher: 'Mike C.' });
     await addSimplePitches(page, 41);
 
-    await expect(page.locator('#simple-alerts')).toContainText('cannot catch remainder');
+    await expect(page.locator('#simple-alerts')).toContainText('Cannot catch remainder');
   });
 
   test('pitcher cant catch alert does not appear in catcher section', async ({ page }) => {
