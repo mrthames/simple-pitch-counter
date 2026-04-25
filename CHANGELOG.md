@@ -4,6 +4,52 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-04-25] V2.4 — Scoreboard improvements and game logic
+
+**Files:** `index.html`, `.gitignore`
+**Issues:** #87, #88, #89, #90, #91, #92
+
+### New features
+- **Inning scoreboard** — live inning-by-inning scoreboard in the game header showing team abbreviations, per-inning runs, and R total column
+- **Editable inning cells** — tap past inning cells to correct scores; team totals recalculate automatically with undo support
+- **9-inning auto end-game** — prompts to end the game after 9 innings when the score is not tied; "Continue playing" allows extra innings when tied
+- **Inning scoreboard in history** — game history cards show the full inning-by-inning scoreboard instead of basic score pill
+- **Inning scoreboard on share card** — pitcher list share/export image includes the inning scoreboard below the score line
+
+### Improvements
+- **Scoreboard alignment** — team name labels now vertically align with number rows via explicit height/flex rules
+- **Stats link position** — moved "Stats ›" from the pitcher name row to next to the "PITCHER" section label for better discoverability in both modes
+- **Android asset tracking** — `android/app/src/main/assets/index.html` is now tracked in git instead of gitignored, ensuring `git pull` delivers the latest app to Android Studio builds
+
+### Testing
+- Added 9 new E2E tests for scoreboard improvements (159 → 183 total tests, but see V2.4a below)
+
+---
+
+## [2026-04-23] V2.4a — Bug fixes, pitcher stats list, and inning scoreboard
+
+**Files:** `index.html`, `ViewController.swift`, `build.gradle.kts`, `project.pbxproj`
+**Issues:** #79, #80, #81, #82, #83, #84, #85
+
+### New features
+- **Pitcher stats list** — "Stats ›" now opens a pitcher list first with pitch counts and rest info; tap any pitcher to drill into individual stats with back navigation
+- **Inning scoreboard** — live inning-by-inning scoreboard added to the game view with team abbreviations and R total column
+
+### Improvements
+- **Button mapping per mode** — simple mode shows only Pitch/Undo/Next Batter options; advanced mode shows Called Strike/Ball/Undo/Next Batter/Out (no generic "Pitch")
+- **Alert messages** — removed redundant pitch count from approaching/over/can't-catch alerts since the count is already visible in the header
+- **Summary dividers** — shortened export dividers to fit on an iPhone screen without line wrapping
+- **Umpire name capitalization** — auto-capitalizes first letter after spaces in umpire name fields on both setup and summary screens
+- **Pitcher card layout** — advanced mode pitcher cards in game summary show K/BB totals on a separate line
+- **Umpire feedback wording** — "Plate issues?" and "Base issues?" renamed to "Feedback?" with updated placeholders
+- **Volume button reliability** — iOS volume button capture hardened with UISlider recovery mechanism
+
+### Testing & versioning
+- Added 15 new E2E tests for issues #79-#85 (134 → 159 total tests, then 24 more added for existing features = 183 total)
+- Version bumped to 2.4 across iOS, Android, and app UI
+
+---
+
 ## [2026-04-23] V2.3 — Quality-of-life features and native review prompts
 
 **Files:** `index.html`, `ViewController.swift`, `MainActivity.kt`, `build.gradle.kts`, `project.pbxproj`
