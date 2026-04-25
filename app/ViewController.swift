@@ -18,6 +18,7 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
     // Volume button tracking
     private var prevVolume: Float = 0.5
     private var volumeKVOActive = false
+    private var volumeView: MPVolumeView?
     private weak var systemVolumeSlider: UISlider?
     // Debounce: ignore rapid repeat presses within 0.25s
     private var lastVolumeFire: TimeInterval = 0
@@ -88,11 +89,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
                             context: nil)
         volumeKVOActive = true
 
-        let volumeView = MPVolumeView(frame: CGRect(x: -100, y: -100, width: 1, height: 1))
-        volumeView.alpha = 0.001
-        volumeView.isUserInteractionEnabled = false
-        view.addSubview(volumeView)
-        systemVolumeSlider = volumeView.subviews.first(where: { $0 is UISlider }) as? UISlider
+        let vv = MPVolumeView(frame: CGRect(x: -100, y: -100, width: 1, height: 1))
+        vv.alpha = 0.001
+        vv.isUserInteractionEnabled = false
+        view.addSubview(vv)
+        volumeView = vv
+        systemVolumeSlider = vv.subviews.first(where: { $0 is UISlider }) as? UISlider
     }
 
     override func observeValue(forKeyPath keyPath: String?,
@@ -120,6 +122,9 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         prevVolume = newVol
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            if self.systemVolumeSlider == nil, let vv = self.volumeView {
+                self.systemVolumeSlider = vv.subviews.first(where: { $0 is UISlider }) as? UISlider
+            }
             self.systemVolumeSlider?.value = 0.5
             self.prevVolume = 0.5
         }

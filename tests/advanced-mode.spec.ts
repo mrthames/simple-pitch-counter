@@ -209,7 +209,7 @@ test.describe('Advanced mode', () => {
 
     // Open quick stats via hamburger menu
     await page.click('.menu-btn');
-    await page.click('text=Quick stats');
+    await page.click('text=Pitcher stats');
     await page.waitForSelector('.stats-sheet', { timeout: 3000 });
 
     const statsText = await page.locator('.stats-sheet').textContent();
@@ -224,8 +224,10 @@ test.describe('Advanced mode', () => {
     await throwPitches(page, 'SS', 3);
     await waitForFlashToClear(page);
 
-    // Open individual pitcher stats
+    // Open pitcher list then click into individual stats
     await page.locator('.stats-link').click();
+    await page.waitForSelector('.stats-sheet', { timeout: 3000 });
+    await page.locator('.stats-sheet').getByText('Jake M.').click();
     await page.waitForSelector('.stats-sheet', { timeout: 3000 });
 
     const statsText = await page.locator('.stats-sheet').textContent();

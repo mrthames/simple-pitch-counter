@@ -13,6 +13,8 @@ test.describe('Shareable stats cards', () => {
 
     await page.locator('.stats-link').click();
     await page.waitForSelector('.stats-sheet');
+    await page.locator('.stats-sheet').getByText('Jake M.').click();
+    await page.waitForSelector('.stats-sheet');
     await expect(page.locator('.stats-sheet')).toContainText('Share');
   });
 
@@ -21,7 +23,7 @@ test.describe('Shareable stats cards', () => {
     await addSimplePitches(page, 5);
 
     await page.click('.menu-btn');
-    await page.click('text=Quick stats');
+    await page.click('text=Pitcher stats');
     await page.waitForSelector('.stats-sheet');
     await expect(page.locator('.stats-sheet')).toContainText('Share');
     await expect(page.locator('.stats-sheet')).toContainText('Close');
@@ -36,7 +38,7 @@ test.describe('Shareable stats cards', () => {
     await page.waitForTimeout(200);
 
     await page.click('.menu-btn');
-    await page.click('text=Quick stats');
+    await page.click('text=Pitcher stats');
     await page.waitForSelector('.stats-sheet');
     await expect(page.locator('.stats-sheet')).toContainText('Last batter: 5');
   });
@@ -84,6 +86,8 @@ test.describe('Shareable stats cards', () => {
 
     await page.locator('.stats-link').click();
     await page.waitForSelector('.stats-sheet');
+    await page.locator('.stats-sheet').getByText('Jake M.').click();
+    await page.waitForSelector('.stats-sheet');
 
     const downloadPromise = page.waitForEvent('download', { timeout: 5000 }).catch(() => null);
     await page.locator('.stats-sheet').getByText('Share', { exact: true }).click();
@@ -99,7 +103,7 @@ test.describe('Shareable stats cards', () => {
     await addSimplePitches(page, 5);
 
     await page.click('.menu-btn');
-    await page.click('text=Quick stats');
+    await page.click('text=Pitcher stats');
     await page.waitForSelector('.stats-sheet');
 
     const downloadPromise = page.waitForEvent('download', { timeout: 5000 }).catch(() => null);
@@ -117,6 +121,8 @@ test.describe('Shareable stats cards', () => {
     await throwPitches(page, 'CS', 2);
 
     await page.locator('.stats-link').click();
+    await page.waitForSelector('.stats-sheet');
+    await page.locator('.stats-sheet').getByText('Jake M.').click();
     await page.waitForSelector('.stats-sheet');
     await expect(page.locator('.stats-sheet')).toContainText('Share');
     await expect(page.locator('.stats-sheet')).toContainText('Pitch Breakdown');
@@ -173,7 +179,7 @@ test.describe('Shareable stats cards', () => {
     await addSimplePitches(page, 5);
 
     await page.click('.menu-btn');
-    await page.click('text=Quick stats');
+    await page.click('text=Pitcher stats');
     await page.waitForSelector('.stats-sheet');
 
     const sheet = page.locator('.stats-sheet');
@@ -194,7 +200,7 @@ test.describe('Shareable stats cards', () => {
     await addSimplePitches(page, 5);
 
     await page.click('.menu-btn');
-    await page.click('text=Quick stats');
+    await page.click('text=Pitcher stats');
     await page.waitForSelector('.stats-sheet');
 
     const sheet = page.locator('.stats-sheet');
@@ -302,6 +308,8 @@ test.describe('Shareable stats cards', () => {
     await throwPitches(page, 'B', 2);
 
     await page.locator('.stats-link').click();
+    await page.waitForSelector('.stats-sheet');
+    await page.locator('.stats-sheet').getByText('Jake M.').click();
     await page.waitForSelector('.stats-sheet');
     const sheet = page.locator('.stats-sheet');
     await expect(sheet.locator('.stats-summary-row')).toBeVisible();

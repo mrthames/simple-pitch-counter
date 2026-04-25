@@ -331,3 +331,204 @@ test.describe('Auto review prompt', () => {
     expect(count).toBe('3');
   });
 });
+
+test.describe('Pitcher stats list (#80)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('stats link visible in both simple and advanced modes', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 3);
+    await expect(page.locator('.stats-link')).toBeVisible();
+  });
+
+  test('stats link opens pitcher list first', async ({ page }) => {
+    await startGame(page, { mode: 'advanced', homeCatcher: 'Mike C.', awayCatcher: 'Dan R.' });
+    await throwPitches(page, 'B', 3);
+
+    await page.locator('.stats-link').click();
+    await page.waitForSelector('.stats-sheet');
+    await expect(page.locator('.stats-sheet')).toContainText('Pitcher Stats');
+    await expect(page.locator('.stats-sheet')).toContainText('Jake M.');
+    await expect(page.locator('.stats-sheet')).toContainText('Sam T.');
+  });
+
+  test('clicking pitcher in list opens detail stats', async ({ page }) => {
+    await startGame(page, { mode: 'advanced', homeCatcher: 'Mike C.', awayCatcher: 'Dan R.' });
+    await throwPitches(page, 'CS', 3);
+    await waitForFlashToClear(page);
+
+    await page.locator('.stats-link').click();
+    await page.waitForSelector('.stats-sheet');
+    await page.locator('.stats-sheet').getByText('Jake M.').click();
+    await page.waitForSelector('.stats-sheet');
+
+    await expect(page.locator('.stats-sheet')).toContainText('P (Pitches)');
+    await expect(page.locator('.stats-sheet')).toContainText('All Pitchers');
+  });
+
+  test('detail stats back button returns to pitcher list', async ({ page }) => {
+    await startGame(page, { mode: 'advanced', homeCatcher: 'Mike C.', awayCatcher: 'Dan R.' });
+    await throwPitches(page, 'B', 2);
+
+    await page.locator('.stats-link').click();
+    await page.waitForSelector('.stats-sheet');
+    await page.locator('.stats-sheet').getByText('Jake M.').click();
+    await page.waitForSelector('.stats-sheet');
+
+    await page.locator('.stats-sheet').getByText('All Pitchers').click();
+    await page.waitForSelector('.stats-sheet');
+    await expect(page.locator('.stats-sheet')).toContainText('Pitcher Stats');
+  });
+});
+
+test.describe('Inning scoreboard (#81)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('inning scoreboard visible in game view', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await expect(page.locator('#inn-scoreboard')).toBeVisible();
+  });
+
+  test('scoreboard shows team abbreviations and R column', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
+    const sb = page.locator('#inn-scoreboard');
+    await expect(sb).toContainText('TIG');
+    await expect(sb).toContainText('LIO');
+    await expect(sb).toContainText('R');
+  });
+
+  test('scoreboard tracks runs across innings', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
+
+    // Score 2 runs in TOP 1 (away batting)
+    await page.click('.sb-adj >> nth=1'); // away +
+    await page.click('.sb-adj >> nth=1');
+
+    // End half
+    await page.click('.end-half-btn');
+    await page.click('.modal-btn.amber');
+
+    // Check scoreboard shows 2 in TOP 1
+    const sb = page.locator('#inn-scoreboard');
+    const text = await sb.textContent();
+    expect(text).toContain('2');
+  });
+});
+
+test.describe('Alert messages (#82)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('approaching limit alert does not repeat pitch count', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 47);
+    const alertText = await page.locator('#simple-alerts').textContent();
+    expect(alertText).not.toMatch(/47 pitches/);
+    expect(alertText).toContain('Approaching');
+  });
+
+  test('cant catch alert does not repeat pitch count', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeCatcher: 'Mike C.' });
+    await addSimplePitches(page, 41);
+    const alertText = await page.locator('#simple-alerts').textContent();
+    expect(alertText).not.toMatch(/41 pitches/);
+    expect(alertText).toContain('Cannot catch');
+  });
+
+  test('over limit alert does not repeat pitch count', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 51);
+    const alertText = await page.locator('#simple-alerts').textContent();
+    expect(alertText).not.toMatch(/51 pitches —/);
+    expect(alertText).toContain('over the 50-pitch limit');
+  });
+});
+
+test.describe('Summary dividers (#84)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('export dividers are short', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeTeam: 'Tigers', awayTeam: 'Lions' });
+    await addSimplePitches(page, 5);
+
+    await page.click('.menu-btn');
+    await page.click('text=End game');
+    await page.click('.modal-btn.red');
+
+    await page.click('text=Summary');
+    await page.click('text=Share');
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+
+    const modalText = await page.locator('.modal-box').textContent();
+    expect(modalText).not.toContain('──────────────────────────────');
+    expect(modalText).toContain('────────');
+  });
+});
+
+test.describe('Umpire name capitalization (#85)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('umpire name auto-capitalizes after space on setup', async ({ page }) => {
+    await page.click('.new-game-btn');
+    await page.waitForSelector('#screen-setup.active');
+
+    await page.fill('#s-ump-plate', 'john smith');
+    const val = await page.locator('#s-ump-plate').inputValue();
+    expect(val).toBe('John Smith');
+  });
+
+  test('umpire name auto-capitalizes after space on summary', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.click('text=Game summary');
+
+    await page.fill('#sum-pu-name', 'jane doe');
+    const val = await page.locator('#sum-pu-name').inputValue();
+    expect(val).toBe('Jane Doe');
+  });
+});
+
+test.describe('Button mapping per mode (#79)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('advanced mode mapping excludes pitch option', async ({ page }) => {
+    await startGame(page, { mode: 'advanced', homeCatcher: 'Mike C.', awayCatcher: 'Dan R.' });
+    await page.click('.menu-btn');
+    await page.locator('#game-hbg-menu .hbg-item', { hasText: 'Button mapping' }).click();
+    await page.waitForSelector('#btn-map-overlay', { timeout: 3000 });
+
+    const overlay = page.locator('#btn-map-overlay');
+    await expect(overlay).not.toContainText('+ Pitch');
+    await expect(overlay).toContainText('Called Strike');
+    await expect(overlay).toContainText('Ball');
+  });
+
+  test('simple mode mapping excludes advanced options', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#game-hbg-menu .hbg-item', { hasText: 'Button mapping' }).click();
+    await page.waitForSelector('#btn-map-overlay', { timeout: 3000 });
+
+    const overlay = page.locator('#btn-map-overlay');
+    await expect(overlay).toContainText('+ Pitch');
+    await expect(overlay).not.toContainText('Called Strike');
+    await expect(overlay).not.toContainText('+ Out');
+  });
+});
