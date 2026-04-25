@@ -25,7 +25,11 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 - **Mercy rule auto-prompt** — when runs scored in a half inning reach the configured mercy limit, a modal prompts to end the half or continue playing; tracks runs from either team
 - **Advanced pitch tracking** — tracks balls, strikes, and outs automatically; records pitch-by-pitch sequences per at-bat with visual chips; auto-advances count on walks, strikeouts, and balls in play
 - **Ball in play outcomes** — when a ball is put in play, a bottom sheet prompts for Safe/Out with automatic out tracking and side-retired detection
-- **Shareable stats cards** — generate and share pitcher stats as image cards (PNG) with K/BB/BIP hero boxes, pitch breakdowns, and rest info; works from live game, game summary, and history views
+- **Inning scoreboard** — live inning-by-inning scoreboard in the game view with team abbreviations and R column; also displayed in game history cards and on shared stats card exports
+- **Editable inning cells** — tap past inning cells to correct scores; team totals recalculate automatically
+- **9-inning auto-end** — prompts to end the game after 9 innings when the score is not tied; allows extra innings when tied
+- **Pitcher stats list** — "Stats ›" link opens a pitcher list first, then drill into individual pitcher detail with back navigation
+- **Shareable stats cards** — generate and share pitcher stats as image cards (PNG) with K/BB/BIP hero boxes, pitch breakdowns, inning scoreboard, and rest info; works from live game, game summary, and history views
 - **Live pitcher stats** — dark-themed bottom sheet showing K, BB, BIP totals and a full pitch type breakdown with percentage bars
 - **Configurable league rules** — set pitch limits, rest-day thresholds, and catcher inning rules per division (e.g., Minors 8, Minors 9/10, Majors)
 - **Threshold awareness** — alerts when a pitcher approaches or crosses a rest-day threshold, with support for the "finish the batter" rule
@@ -34,8 +38,8 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 - **In-game name editing** — edit a pitcher or catcher's name and number mid-game from the Change picker without interrupting the game
 - **Game summaries** — generates a formatted summary with pitcher data, scores, homeruns, pitch type breakdowns, innings count, end time, and umpire feedback, ready to email
 - **Dark scoreboard header** — persistent dark-themed header with live score, inning/half indicator, and out tracking dots
-- **Score and inning tracking** — built-in scoreboard with inning management
-- **Swipe-to-delete history** — swipe game cards left to reveal delete action; history cards show mode badge (Simple/Advanced) and live game indicator
+- **Score and inning tracking** — built-in scoreboard with inning management and inning-by-inning run tracking
+- **Swipe-to-delete history** — swipe game cards left to reveal delete action; history cards show mode badge (Simple/Advanced), live game indicator, and full inning scoreboard
 - **Game history** — review past games, pitcher rest requirements, and stats
 - **Result flash animations** — full-screen animated overlays for strikeouts, walks, outs, safe calls, and side retired
 - **Data export/import** — export all game data as JSON (via Share Sheet on iOS) and import backups from the history menu
@@ -68,7 +72,12 @@ simple-pitch-counter/
 │   ├── ViewController.swift # WKWebView config, haptics, and volume button capture
 │   ├── V1/                 # Archived V1 app files
 │   └── Assets.xcassets/    # App icons and colors
-├── tests/                  # Playwright E2E tests
+├── android/                # Android app
+│   └── app/src/main/
+│       ├── java/.../MainActivity.kt  # WebView config, haptics, volume buttons
+│       ├── assets/index.html         # Shared web app (tracked in git)
+│       └── res/                      # Adaptive icons and resources
+├── tests/                  # Playwright E2E tests (183 tests)
 │   ├── helpers.ts          # Shared test utilities (startGame, addPitches, etc.)
 │   ├── core-game-flow.spec.ts      # Game lifecycle, scoring, outs, undo
 │   ├── advanced-mode.spec.ts       # Pitch types, BSO count, BIP, auto-advance
@@ -78,7 +87,7 @@ simple-pitch-counter/
 │   ├── shareable-stats.spec.ts     # Share features, swipe-to-dismiss, image cards
 │   ├── history-config.spec.ts      # History cards, config presets, setup flow
 │   ├── about-screen.spec.ts        # About screen, links, back navigation
-│   ├── v2-features.spec.ts         # V2.3 features: name editing, button mapping, review prompts
+│   ├── v2-features.spec.ts         # V2.4 features: name editing, button mapping, scoreboard improvements
 │   └── version-sync.spec.ts        # Version sync across Android, iOS, and app UI
 ├── .github/workflows/      # CI/CD
 │   └── test.yml            # Runs Playwright tests on push/PR to main
@@ -100,7 +109,7 @@ simple-pitch-counter/
 
 ## Testing
 
-The project has **159 Playwright E2E tests** covering all app functionality:
+The project has **183 Playwright E2E tests** covering all app functionality:
 
 | Spec file | Tests | Coverage |
 |-----------|-------|----------|
@@ -112,7 +121,7 @@ The project has **159 Playwright E2E tests** covering all app functionality:
 | `shareable-stats` | 18 | Share features, swipe-to-dismiss, image card exports, K/BB/BIP boxes |
 | `history-config` | 19 | History cards, config presets, setup flow, umpire clearing |
 | `about-screen` | 8 | About screen, app info, links, back navigation |
-| `v2-features` | 23 | Name editing, button mapping, pitcher card layout, feedback wording, review prompts |
+| `v2-features` | 47 | Name editing, button mapping, pitcher stats list, inning scoreboard, editable cells, 9-inning auto-end, share card scoreboard, history scoreboard, review prompts |
 | `version-sync` | 2 | Version string consistency across Android, iOS, and app UI |
 
 ```bash
@@ -139,7 +148,7 @@ The Android app mirrors the iOS architecture — a native Kotlin shell wrapping 
 
 - **MainActivity.kt** — configures an Android `WebView` with persistent localStorage, portrait lock, native JS alert/confirm/prompt handling, external link handling, haptic feedback bridge (JS → native via `@JavascriptInterface`), dynamic status bar styling with pre-API-30 fallback, volume button capture, Android back button handling, image sharing via `FileProvider`, Google Play In-App Review API prompts, and native inset injection (`--top-inset`, `--bottom-inset`, `--header-pad`) for safe area support across notch and non-notch devices
 - **Adaptive icons** — foreground/background layers supporting circle, squircle, and rounded square launcher masks
-- **index.html** — the same shared web app copied from `app/index.html` into `assets/` at build time via a Gradle `Copy` task
+- **index.html** — the same shared web app as iOS, tracked in git at `android/app/src/main/assets/index.html` and kept in sync with `app/index.html`
 
 ### Website (`website/`)
 
@@ -168,10 +177,10 @@ Built and submitted via Xcode on macOS. The `app/index.html` is bundled into the
 
 ### Android app
 
-Built and submitted via Android Studio. The `app/index.html` is copied into `assets/` by Gradle and loaded by the Android WebView. Version codes auto-increment from git commit count.
+Built and submitted via Android Studio. The `android/app/src/main/assets/index.html` is tracked in git alongside the iOS copy and loaded by the Android WebView. Version codes auto-increment from git commit count.
 
 1. Push changes to `main`, confirm CI tests pass
-2. Android Studio: pull latest, **Build → Clean Project**
+2. Android Studio: pull latest (`git pull`), **Build → Clean Project**
 3. **Build → Generate Signed Bundle** using `upload-keystore.jks`
 4. Upload AAB to Google Play Console → Closed testing → Closed Beta
 5. Currently in closed beta — requires 12 opted-in testers for 14 days before production access

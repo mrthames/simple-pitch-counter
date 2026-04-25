@@ -29,7 +29,6 @@ xcuserdata/
 android/.gradle/
 android/.idea/
 android/app/build/
-android/app/src/main/assets/index.html
 android/local.properties
 *.jks
 keystore.properties
