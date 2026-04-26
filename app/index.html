@@ -2313,6 +2313,7 @@ function showSummaryStats(side,idx){
     <div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K (Strikeouts)</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB (Walks)</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP (In Play)</div></div></div>
     ${statLineHtml(p)}
     ${barsHtml}
+    ${g.mode==='advanced'?`<div style="margin-top:16px;font-size:9px;color:rgba(235,235,245,.3);line-height:1.8">B = Ball · CS = Called Strike · SS = Swing Strike · F = Foul · BIP = Ball in Play</div>`:''}
     <div style="display:flex;gap:8px;margin-top:16px">
       <div onclick="shareStatsCard(window._sumStatsPitcher,window._sumStatsGame)" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Share</div>
       <div onclick="document.getElementById('sum-stats-overlay').remove()" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Close</div>
@@ -2409,6 +2410,7 @@ function openSavedStats(gi){
       <div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K (Strikeouts)</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB (Walks)</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP (In Play)</div></div></div>
       ${statLineHtml(p)}
       ${barsHtml}
+      ${g.mode==='advanced'?`<div style="margin-top:16px;font-size:9px;color:rgba(235,235,245,.3);line-height:1.8">B = Ball · CS = Called Strike · SS = Swing Strike · F = Foul · BIP = Ball in Play</div>`:''}
       <div onclick="shareStatsCard(window._svPitchers[${svIdx}].p,window._svPitchers[${svIdx}].g)" style="margin-top:10px;width:100%;height:40px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:600;color:rgba(235,235,245,.6)">Share pitcher stats ↗</div>
     </div>`;
     return`<div style="background:rgba(255,255,255,.06);border-radius:14px;padding:14px;margin-bottom:8px">
