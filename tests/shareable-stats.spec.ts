@@ -253,9 +253,9 @@ test.describe('Shareable stats cards', () => {
     await page.locator('#screen-summary .stats-btn').first().click();
     await page.waitForSelector('#sum-stats-overlay .stats-sheet');
     await expect(page.locator('#sum-stats-overlay .stats-summary-row')).toBeVisible();
-    await expect(page.locator('#sum-stats-overlay .stats-summary-lbl', { hasText: 'K' })).toBeVisible();
-    await expect(page.locator('#sum-stats-overlay .stats-summary-lbl', { hasText: 'BB' })).toBeVisible();
-    await expect(page.locator('#sum-stats-overlay .stats-summary-lbl', { hasText: 'BIP' })).toBeVisible();
+    await expect(page.locator('#sum-stats-overlay .stats-summary-lbl', { hasText: /^K\b/ })).toBeVisible();
+    await expect(page.locator('#sum-stats-overlay .stats-summary-lbl', { hasText: /^BB\b/ })).toBeVisible();
+    await expect(page.locator('#sum-stats-overlay .stats-summary-lbl', { hasText: /^BIP\b/ })).toBeVisible();
   });
 
   test('summary stats drawer has Share button', async ({ page }) => {
@@ -313,9 +313,9 @@ test.describe('Shareable stats cards', () => {
     await page.waitForSelector('.stats-sheet');
     const sheet = page.locator('.stats-sheet');
     await expect(sheet.locator('.stats-summary-row')).toBeVisible();
-    await expect(sheet.locator('.stats-summary-lbl', { hasText: 'K' })).toBeVisible();
-    await expect(sheet.locator('.stats-summary-lbl', { hasText: 'BB' })).toBeVisible();
-    await expect(sheet.locator('.stats-summary-lbl', { hasText: 'BIP' })).toBeVisible();
+    await expect(sheet.locator('.stats-summary-lbl', { hasText: /^K\b/ })).toBeVisible();
+    await expect(sheet.locator('.stats-summary-lbl', { hasText: /^BB\b/ })).toBeVisible();
+    await expect(sheet.locator('.stats-summary-lbl', { hasText: /^BIP\b/ })).toBeVisible();
   });
 
   test('history detail expanded pitcher shows K BB BIP boxes', async ({ page }) => {
@@ -334,6 +334,6 @@ test.describe('Shareable stats cards', () => {
     await pitcherRow.click();
 
     await expect(page.locator('#saved-stats-overlay .stats-summary-row')).toBeVisible();
-    await expect(page.locator('#saved-stats-overlay .stats-summary-lbl', { hasText: 'K' })).toBeVisible();
+    await expect(page.locator('#saved-stats-overlay .stats-summary-lbl', { hasText: /^K\b/ })).toBeVisible();
   });
 });
