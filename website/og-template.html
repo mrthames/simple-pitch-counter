@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px; height: 630px;
+    background: #0b1c3a;
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .card {
+    width: 100%; height: 100%;
+    padding: 80px 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(232,160,48,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(100px, -100px);
+  }
+  .tag {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #e8a030;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .tag::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 2px;
+    background: #e8a030;
+  }
+  .title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 52px;
+    color: #f7f4ed;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    max-width: 900px;
+  }
+  .subtitle {
+    font-size: 20px;
+    color: rgba(247,244,237,0.55);
+    font-weight: 300;
+    line-height: 1.5;
+    max-width: 700px;
+  }
+  .brand {
+    position: absolute;
+    bottom: 60px;
+    left: 90px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-ball {
+    width: 32px; height: 32px;
+    background: #f7f4ed;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+  }
+  .brand-ball::before, .brand-ball::after {
+    content: '';
+    position: absolute;
+    border: 2px solid #c8392b;
+    border-radius: 50%;
+    width: 60%; height: 200%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(20deg);
+  }
+  .brand-ball::after { transform: translate(-50%, -50%) rotate(-20deg); }
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: rgba(247,244,237,0.6);
+  }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="tag" id="tag">Rules Reference</div>
+  <div class="title" id="title">Title Here</div>
+  <div class="subtitle" id="subtitle">Subtitle here</div>
+  <div class="brand">
+    <div class="brand-ball"></div>
+    <div class="brand-name">Simple Pitch Counter</div>
+  </div>
+</div>
+</body>
+</html>

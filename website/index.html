@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Simple Pitch Counter — the free app for tracking baseball and softball pitch counts, rest-day rules, and catcher innings during little league and youth games. iOS and Android.">
 <link rel="canonical" href="https://simplepitchcounter.com/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:title" content="Simple Pitch Counter — Baseball & Softball Pitch Tracking">
@@ -375,6 +376,14 @@
   .pc-inn-pip.filled { background: #1A6BFF; }
   .pc-catcher-count { font-size: 28px; font-weight: 900; color: #000; letter-spacing: -1px; text-align: right; }
   .pc-catcher-of { font-size: 11px; font-weight: 600; color: rgba(60,60,67,.6); text-align: right; }
+
+  .pc-inn-sb { display: flex; gap: 2px; margin-top: 10px; }
+  .pc-inn-sb-col { display: flex; flex-direction: column; align-items: center; min-width: 22px; }
+  .pc-inn-sb-col.lbl { min-width: 28px; align-items: flex-start; }
+  .pc-inn-sb-hdr { font-size: 9px; font-weight: 700; color: rgba(235,235,245,.35); letter-spacing: .3px; text-transform: uppercase; height: 14px; display: flex; align-items: flex-end; justify-content: center; }
+  .pc-inn-sb-cell { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.7); padding: 1px 2px; text-align: center; min-width: 22px; line-height: 14px; height: 16px; display: flex; align-items: center; justify-content: center; }
+  .pc-inn-sb-cell.current { color: #fff; font-weight: 800; }
+  .pc-inn-sb-cell.total { color: #fff; font-weight: 800; font-size: 12px; }
 
   /* ── FEATURES ── */
   .features {
@@ -976,10 +985,37 @@
               </div>
             </div>
           </div>
+          <div class="pc-inn-sb">
+            <div class="pc-inn-sb-col lbl">
+              <div class="pc-inn-sb-hdr"></div>
+              <div class="pc-inn-sb-cell" style="color:rgba(235,235,245,.4);font-size:10px">AWY</div>
+              <div class="pc-inn-sb-cell" style="color:rgba(235,235,245,.4);font-size:10px">HME</div>
+            </div>
+            <div class="pc-inn-sb-col">
+              <div class="pc-inn-sb-hdr">1</div>
+              <div class="pc-inn-sb-cell">1</div>
+              <div class="pc-inn-sb-cell">2</div>
+            </div>
+            <div class="pc-inn-sb-col">
+              <div class="pc-inn-sb-hdr">2</div>
+              <div class="pc-inn-sb-cell">1</div>
+              <div class="pc-inn-sb-cell">2</div>
+            </div>
+            <div class="pc-inn-sb-col">
+              <div class="pc-inn-sb-hdr" style="color:rgba(235,235,245,.7)">3</div>
+              <div class="pc-inn-sb-cell current">0</div>
+              <div class="pc-inn-sb-cell">—</div>
+            </div>
+            <div class="pc-inn-sb-col" style="border-left:1px solid rgba(255,255,255,.12);padding-left:4px;margin-left:2px;min-width:26px">
+              <div class="pc-inn-sb-hdr">R</div>
+              <div class="pc-inn-sb-cell total">2</div>
+              <div class="pc-inn-sb-cell total">4</div>
+            </div>
+          </div>
         </div>
         <!-- Light action area -->
         <div class="pc-action-area">
-          <div class="pc-section-lbl">Pitcher</div>
+          <div class="pc-section-lbl" style="display:flex;justify-content:space-between;align-items:center">Pitcher <span class="pc-stats-link" style="margin:0">Stats ›</span></div>
           <div class="pc-pitcher-row">
             <div style="display:flex;align-items:center;gap:5px">
               <div class="pc-pitcher-name">Jake M. <span class="pc-pitcher-num">#12</span></div>
@@ -990,7 +1026,6 @@
             </div>
             <div class="pc-change-btn">Change</div>
           </div>
-          <div class="pc-stats-link">Stats ›</div>
           <!-- Count card -->
           <div class="pc-count-card">
             <div class="pc-count-row">
