@@ -192,8 +192,8 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
   cursor:pointer;
 }
 .pitch-btn:active{transform:scale(.96)}
-.pitch-btn.row1{height:62px}
-.pitch-btn.row2{height:54px}
+.pitch-btn.pt-row1{height:62px}
+.pitch-btn.pt-row2{height:54px}
 .pt-glyph{font-size:26px;font-weight:900;line-height:1}
 .pt-name{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 /* Per pitch-type colors */
@@ -347,6 +347,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .live-badge{display:flex;align-items:center;gap:4px;background:rgba(255,59,48,.08);border-radius:6px;padding:2px 7px}
 .live-dot{width:6px;height:6px;border-radius:3px;background:var(--red)}
 .live-txt{font-size:11px;font-weight:700;color:var(--red)}
+.hist-clock{font-variant-numeric:tabular-nums}
 .mode-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.4px}
 .hist-card-date{font-size:13px;color:var(--t2)}
 .score-pill{display:inline-flex;align-items:center;gap:10px;background:var(--bg);border-radius:10px;padding:6px 14px}
@@ -678,13 +679,13 @@ textarea{resize:vertical;min-height:56px}
       <div id="adv-alerts"></div>
       <div class="pitch-grid">
         <div class="pitch-row">
-          <button class="pitch-btn pt-B row1" onclick="throwPitch('B')"><span class="pt-glyph">B</span><span class="pt-name">Ball</span></button>
-          <button class="pitch-btn pt-CS row1" onclick="throwPitch('CS')"><span class="pt-glyph"><svg width="26" height="26" viewBox="0 0 128 128" fill="currentColor"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z" transform="scale(-1,1) translate(-128,0)"/></svg></span><span class="pt-name">Called K</span></button>
-          <button class="pitch-btn pt-SS row1" onclick="throwPitch('SS')"><span class="pt-glyph"><svg width="26" height="26" viewBox="0 0 128 128" fill="currentColor"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z"/></svg></span><span class="pt-name">Swing K</span></button>
+          <button class="pitch-btn pt-B pt-row1" onclick="throwPitch('B')"><span class="pt-glyph">B</span><span class="pt-name">Ball</span></button>
+          <button class="pitch-btn pt-CS pt-row1" onclick="throwPitch('CS')"><span class="pt-glyph"><svg width="26" height="26" viewBox="0 0 128 128" fill="currentColor"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z" transform="scale(-1,1) translate(-128,0)"/></svg></span><span class="pt-name">Called K</span></button>
+          <button class="pitch-btn pt-SS pt-row1" onclick="throwPitch('SS')"><span class="pt-glyph"><svg width="26" height="26" viewBox="0 0 128 128" fill="currentColor"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z"/></svg></span><span class="pt-name">Swing K</span></button>
         </div>
         <div class="pitch-row">
-          <button class="pitch-btn pt-F row2" onclick="throwPitch('F')"><span class="pt-glyph">F</span><span class="pt-name">Foul</span></button>
-          <button class="pitch-btn pt-BIP row2" onclick="throwPitch('BIP')"><span class="pt-glyph" style="display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 496.926 496.926" fill="currentColor"><path d="M227.831,233.153c-17.891,32.025-36.395,65.14-44.667,77.982c-6.072,9.438-28.018,41.875-98.063,142.75c-5.737-1.33-11.915,1.004-15.673,6.473c-2.228,3.242-3.05,7.145-2.333,11.008c0.717,3.854,2.907,7.199,6.139,9.428l19.699,13.541c2.467,1.691,5.345,2.592,8.329,2.592h0.01c4.838,0,9.362-2.383,12.431-6.848c3.471-5.049,3.347-11.59,0.115-16.467c13.091-19.258,83.299-122.496,98.13-142.711c9.018-12.316,33.287-41.424,56.744-69.566c19.298-23.151,37.514-45.021,46.244-56.314c19.106-24.729,50.213-66.909,50.624-67.454l58.379-84.943c11.839-17.222,3.979-30.208-2.036-34.817L400.052,2.792C399.583,2.505,395.299,0,389.188,0c-5.871,0-14.487,2.343-22.156,13.512L308.558,98.58c-0.277,0.44-28.506,44.6-44.753,71.298C256.375,182.061,242.51,206.875,227.831,233.153z"/></svg></span><span class="pt-name">In Play</span></button>
+          <button class="pitch-btn pt-F pt-row2" onclick="throwPitch('F')"><span class="pt-glyph">F</span><span class="pt-name">Foul</span></button>
+          <button class="pitch-btn pt-BIP pt-row2" onclick="throwPitch('BIP')"><span class="pt-glyph" style="display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 496.926 496.926" fill="currentColor"><path d="M227.831,233.153c-17.891,32.025-36.395,65.14-44.667,77.982c-6.072,9.438-28.018,41.875-98.063,142.75c-5.737-1.33-11.915,1.004-15.673,6.473c-2.228,3.242-3.05,7.145-2.333,11.008c0.717,3.854,2.907,7.199,6.139,9.428l19.699,13.541c2.467,1.691,5.345,2.592,8.329,2.592h0.01c4.838,0,9.362-2.383,12.431-6.848c3.471-5.049,3.347-11.59,0.115-16.467c13.091-19.258,83.299-122.496,98.13-142.711c9.018-12.316,33.287-41.424,56.744-69.566c19.298-23.151,37.514-45.021,46.244-56.314c19.106-24.729,50.213-66.909,50.624-67.454l58.379-84.943c11.839-17.222,3.979-30.208-2.036-34.817L400.052,2.792C399.583,2.505,395.299,0,389.188,0c-5.871,0-14.487,2.343-22.156,13.512L308.558,98.58c-0.277,0.44-28.506,44.6-44.753,71.298C256.375,182.061,242.51,206.875,227.831,233.153z"/></svg></span><span class="pt-name">In Play</span></button>
         </div>
       </div>
       <div class="adv-secondary">
@@ -961,6 +962,7 @@ function applyActiveConfig(){
 // ── Navigation ──
 function showScreen(n){
   const go=()=>{
+    stopHistClockInterval();
     document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='';});
     const el=document.getElementById('screen-'+n);
     el.classList.add('active');
@@ -1726,7 +1728,13 @@ function renderStatsCardToCanvas(pitcher,gameData){
         y+=36;
       });
     }
-    y+=16;ctx.fillStyle='rgba(235,235,245,.3)';ctx.font='500 16px -apple-system,system-ui,sans-serif';
+    y+=16;ctx.fillStyle='rgba(235,235,245,.2)';ctx.font='400 13px -apple-system,system-ui,sans-serif';
+    const legend=isAdv?'K=Strikeout · BB=Walk · BIP=Ball in Play · B=Ball · CS=Called Strike · SS=Swing Strike · F=Foul':'K=Strikeout · BB=Walk · BIP=Ball in Play · IP=Innings · BF=Batters Faced';
+    const lw=ctx.measureText(legend).width;
+    if(lw>W-pad*2){const l1=isAdv?'K=Strikeout · BB=Walk · BIP=Ball in Play · B=Ball':'K=Strikeout · BB=Walk · BIP=Ball in Play';const l2=isAdv?'CS=Called Strike · SS=Swing Strike · F=Foul · IP=Innings · BF=Batters Faced':'IP=Innings · BF=Batters Faced';ctx.fillText(l1,pad,y+=16);ctx.fillText(l2,pad,y+=18);}
+    else{ctx.fillText(legend,pad,y+=16);}
+    if(!isAdv){const l2='IP=Innings · BF=Batters Faced · P=Pitches';ctx.fillText(l2,pad,y+=18);}
+    y+=12;ctx.fillStyle='rgba(235,235,245,.3)';ctx.font='500 16px -apple-system,system-ui,sans-serif';
     const tag='Simple Pitch Counter';const tagW=ctx.measureText(tag).width;ctx.fillText(tag,(W-tagW)/2,y+=20);
     y+=pad;
   };
@@ -1818,8 +1826,9 @@ function showPitcherStatsDetail(side,idx){
   const ri=restInfo(p.pitches);
   const restColor=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
   const restText=ri?ri.label:'No pitches';
+  const isAdv=g.mode==='advanced';
   let barsHtml='';
-  if(g&&g.mode==='advanced'){
+  if(isAdv){
     barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>`+types.map(k=>{
       const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;
       return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;
@@ -1833,7 +1842,8 @@ function showPitcherStatsDetail(side,idx){
     <div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP</div></div></div>
     ${statLineHtml(p)}
     ${barsHtml}
-    <div style="display:flex;gap:8px;margin-top:16px">
+    <div style="margin-top:16px;font-size:9px;color:rgba(235,235,245,.3);line-height:1.5">${isAdv?'K = Strikeout · BB = Walk · BIP = Ball in Play · B = Ball · CS = Called Strike · SS = Swing Strike · F = Foul · ':'K = Strikeout · BB = Walk · BIP = Ball in Play · '}IP = Innings · BF = Batters Faced · P = Pitches</div>
+    <div style="display:flex;gap:8px;margin-top:12px">
       <div onclick="shareStatsCard(window._sharedPitcher)" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Share</div>
       <div onclick="document.getElementById('stats-sheet-overlay').remove();showStatsQuick()" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">‹ All Pitchers</div>
     </div>
@@ -2148,7 +2158,7 @@ function renderHistory(){
           <div class="hist-card-top">
             <div class="hist-card-teams">
               <span>${g.awayTeam} vs ${g.homeTeam}</span>
-              ${live?'<div class="live-badge"><div class="live-dot"></div><div class="live-txt">LIVE</div></div>':''}
+              ${live?(g.clockEnabled?`<div class="live-badge"><div class="live-dot"></div><div class="live-txt hist-clock" data-clock-idx="${gi}">${fmtClock(getClockElapsed(g))}</div></div>`:'<div class="live-badge"><div class="live-dot"></div><div class="live-txt">LIVE</div></div>'):''}
               <span class="mode-badge" style="background:${modeBg};color:${modeColor}">${modeTxt}</span>
             </div>
             <div class="hist-card-date">${g.date}${g.time?' · '+g.time:''}</div>
@@ -2166,7 +2176,22 @@ function renderHistory(){
     </div>`;
   }).join('');
   requestAnimationFrame(()=>initSwipe());
+  startHistClockInterval();
 }
+let histClockInterval=null;
+function startHistClockInterval(){
+  stopHistClockInterval();
+  const hasLiveClock=document.querySelector('.hist-clock');
+  if(!hasLiveClock)return;
+  histClockInterval=setInterval(()=>{
+    document.querySelectorAll('.hist-clock').forEach(el=>{
+      const gi=parseInt(el.dataset.clockIdx);
+      const g=state.games[gi];if(!g||!g.clockEnabled)return;
+      el.textContent=fmtClock(getClockElapsed(g));
+    });
+  },1000);
+}
+function stopHistClockInterval(){if(histClockInterval){clearInterval(histClockInterval);histClockInterval=null;}}
 function toggleHistCard(id,btn){
   const el=document.getElementById(id);if(!el)return;
   const show=el.style.display==='none';
