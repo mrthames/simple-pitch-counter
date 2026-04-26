@@ -342,8 +342,11 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .history-list{padding:12px 20px calc(var(--bottom-inset)+80px);display:flex;flex-direction:column;gap:10px}
 .hist-card{background:var(--card);border-radius:18px;box-shadow:0 1px 0 rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.06);overflow:hidden}
 .hist-card-body{padding:14px 16px 10px}
-.hist-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.hist-card-teams{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:700}
+.hist-card-top{margin-bottom:8px}
+.hist-card-row1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hist-card-teams{font-size:15px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-card-badges{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.hist-card-row2{display:flex;align-items:center;justify-content:space-between;margin-top:3px}
 .live-badge{display:flex;align-items:center;gap:4px;background:rgba(255,59,48,.08);border-radius:6px;padding:2px 7px}
 .live-dot{width:6px;height:6px;border-radius:3px;background:var(--red)}
 .live-txt{font-size:11px;font-weight:700;color:var(--red)}
@@ -2156,10 +2159,12 @@ function renderHistory(){
       <div class="swipe-card-inner hist-card">
         <div class="hist-card-body">
           <div class="hist-card-top">
-            <div class="hist-card-teams">
-              <span>${g.awayTeam} vs ${g.homeTeam}</span>
-              ${live?(g.clockEnabled?`<div class="live-badge"><div class="live-dot"></div><div class="live-txt hist-clock" data-clock-idx="${gi}">${fmtClock(getClockElapsed(g))}</div></div>`:'<div class="live-badge"><div class="live-dot"></div><div class="live-txt">LIVE</div></div>'):''}
-              <span class="mode-badge" style="background:${modeBg};color:${modeColor}">${modeTxt}</span>
+            <div class="hist-card-row1">
+              <div class="hist-card-teams">${g.awayTeam} vs ${g.homeTeam}</div>
+              <div class="hist-card-badges">
+                ${live?(g.clockEnabled?`<div class="live-badge"><div class="live-dot"></div><div class="live-txt hist-clock" data-clock-idx="${gi}">${fmtClock(getClockElapsed(g))}</div></div>`:'<div class="live-badge"><div class="live-dot"></div><div class="live-txt">LIVE</div></div>'):''}
+                <span class="mode-badge" style="background:${modeBg};color:${modeColor}">${modeTxt}</span>
+              </div>
             </div>
             <div class="hist-card-date">${g.date}${g.time?' · '+g.time:''}</div>
           </div>
