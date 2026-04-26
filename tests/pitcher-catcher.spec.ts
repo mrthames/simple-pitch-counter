@@ -23,8 +23,7 @@ test.describe('Pitcher and catcher management', () => {
     await page.fill('#new-p-name', 'Relief P.');
     await page.locator('#pitcher-select-list .add-player-form .btn-sm').click();
 
-    // Picker stays open after add — click the new pitcher row directly
-    await page.locator('#pitcher-select-list .player-row').filter({ hasText: 'Relief P.' }).click();
+    // Picker auto-closes after add and new pitcher is selected
     await expect(page.locator('.pitcher-name')).toContainText('Relief P.');
     await expect(page.locator('.pitch-count-badge-num').first()).toHaveText('0');
   });
@@ -37,9 +36,10 @@ test.describe('Pitcher and catcher management', () => {
     await page.waitForSelector('#pitcher-select-list[style*="block"]');
     await page.fill('#new-p-name', 'Relief P.');
     await page.locator('#pitcher-select-list .add-player-form .btn-sm').click();
-    await page.locator('#pitcher-select-list .player-row').filter({ hasText: 'Relief P.' }).click();
 
-    // Picker stays open after selectPitcher — original pitcher row still visible
+    // Picker auto-closes after add — reopen to verify original pitcher count
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
     const originalRow = page.locator('#pitcher-select-list .player-row').filter({ hasText: 'Jake M.' });
     await expect(originalRow).toContainText('8 pitches');
   });
@@ -52,10 +52,8 @@ test.describe('Pitcher and catcher management', () => {
     await page.waitForSelector('#pitcher-select-list[style*="block"]');
     await page.fill('#new-p-name', 'Relief P.');
     await page.locator('#pitcher-select-list .add-player-form .btn-sm').click();
-    await page.locator('#pitcher-select-list .player-row').filter({ hasText: 'Relief P.' }).click();
 
-    // Close picker, add pitches to Relief P., then switch back
-    await page.click('#p-change-btn');
+    // Picker auto-closes, Relief P. selected — add pitches then switch back
     await addSimplePitches(page, 3);
 
     await page.click('#p-change-btn');
@@ -78,13 +76,13 @@ test.describe('Pitcher and catcher management', () => {
     await page.fill('#new-c-name', 'New Catcher');
     await catcherSection.locator('.btn-sm').filter({ hasText: 'Add' }).click();
 
-    await page.locator('#catcher-section .player-row').filter({ hasText: 'New Catcher' }).click();
+    // Picker auto-closes after add and new catcher is selected
     await expect(catcherSection).toContainText('New Catcher');
   });
 
-  test('no catcher shows placeholder when none set', async ({ page }) => {
+  test('default catcher created when none provided at setup', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
-    await expect(page.locator('#catcher-section')).toContainText('No catcher added');
+    await expect(page.locator('#catcher-section')).toContainText('Catcher 1');
   });
 
   test('pitcher stats sheet shows in advanced mode', async ({ page }) => {

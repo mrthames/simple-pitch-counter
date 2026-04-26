@@ -92,7 +92,10 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
   transition:background .1s;cursor:pointer;flex-shrink:0;
 }
 .sb-adj:active{background:rgba(255,255,255,.22)}
-.sb-divider{font-size:24px;color:rgba(255,255,255,.2);padding:0 10px;align-self:flex-end;padding-bottom:5px}
+.sb-divider{font-size:24px;color:rgba(255,255,255,.2);padding:0 10px;align-self:flex-end;padding-bottom:5px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.game-clock{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;white-space:nowrap;font-variant-numeric:tabular-nums}
+.game-clock.running{color:rgba(255,255,255,.85)}
+.game-clock.paused{color:rgba(255,165,0,.8)}
 
 /* ── Inning scoreboard ── */
 .inn-scoreboard{display:flex;gap:2px;margin-top:10px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -470,7 +473,8 @@ input[type=text],input[type=number],input[type=date],input[type=time],textarea,s
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,.12)}
 textarea{resize:vertical;min-height:56px}
 .lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--t2);margin-bottom:5px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end}
+.row2 .lbl{min-height:28px;display:flex;align-items:flex-end}
 
 /* ── Empty state ── */
 .empty-state{text-align:center;padding:2rem 1rem;color:var(--t2);font-size:14px}
@@ -612,6 +616,7 @@ textarea{resize:vertical;min-height:56px}
             <button class="hbg-item" onclick="closeGameMenu();showStatsQuick()">Pitcher stats</button>
             <button class="hbg-item" onclick="closeGameMenu();state._expGame=null;state._expGameIdx=null;showScreen('summary')">Game summary</button>
             <button class="hbg-item" onclick="closeGameMenu();showButtonMappingModal()">Button mapping</button>
+            <button class="hbg-item" id="clock-toggle-btn" onclick="closeGameMenu();toggleClockEnabled()">Enable game clock</button>
             <button class="hbg-item" onclick="closeGameMenu();closeGameToHistory()">Close</button>
             <div style="border-top:0.5px solid var(--sep);margin:5px 0"></div>
             <button class="hbg-item danger" onclick="closeGameMenu();confirmEndGame()">End game</button>
@@ -628,7 +633,7 @@ textarea{resize:vertical;min-height:56px}
           <div class="sb-adj" onclick="adjScore('away',1)">+</div>
         </div>
       </div>
-      <div class="sb-divider">—</div>
+      <div class="sb-divider"><span>—</span><div id="game-clock" class="game-clock" style="display:none" onclick="toggleGameClock()"></div></div>
       <div class="sb-team home">
         <div class="sb-name" id="sb-home-name">Home</div>
         <div class="sb-score-row">
@@ -891,8 +896,8 @@ function maybePromptReview(){
 }
 
 // ── Physical button mapping (JS side) ──
-const BTN_DEFAULTS_SIMPLE = { volUp:'pitch', volDown:'undo', action:'nextBatter' };
-const BTN_DEFAULTS_ADVANCED = { volUp:'nextBatter', volDown:'undo', action:'recordOut' };
+const BTN_DEFAULTS_SIMPLE = { volUp:'pitch', volDown:'nextBatter', action:'undo' };
+const BTN_DEFAULTS_ADVANCED = { volUp:'calledStrike', volDown:'ball', action:'undo' };
 let btnMapping = { ...BTN_DEFAULTS_SIMPLE };
 function hasActionButton(){return false;}
 function applyModeDefaults(){
@@ -1033,12 +1038,13 @@ function cancelSetup(){showScreen('history');}
 function fmtTime12(t){if(!t)return'';const[h,m]=t.split(':').map(Number);return`${h%12||12}:${m.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
 function mkPitcher(nm,nu){return{name:nm,num:nu||'',pitches:0,innings:[],history:[],batterBreaks:[],currentBatterPitches:0,done:false,lastBatterPitches:0,pitchTypes:{B:0,CS:0,SS:0,F:0,BIP:0},ks:0,bbs:0,bips:0};}
 function startGame(){
-  const hpn=document.getElementById('hp-name').value.trim();
-  const apn=document.getElementById('ap-name').value.trim();
-  if(!hpn&&!apn){alert('Add at least one pitcher to start.');return;}
+  const hpn=document.getElementById('hp-name').value.trim()||'Pitcher 1';
+  const apn=document.getElementById('ap-name').value.trim()||'Pitcher 1';
+  const hcn=document.getElementById('hc-name').value.trim()||'Catcher 1';
+  const acn=document.getElementById('ac-name').value.trim()||'Catcher 1';
   const mkRoster=(pName,pNum,cName,cNum)=>({
-    pitchers:pName?[mkPitcher(pName,pNum)]:[],
-    catchers:cName?[{name:cName,num:cNum||'',innings:[]}]:[],
+    pitchers:[mkPitcher(pName,pNum)],
+    catchers:[{name:cName,num:cNum||'',innings:[]}],
   });
   const dateVal=document.getElementById('s-date').value;
   const dispDate=dateVal?new Date(dateVal+'T12:00:00').toLocaleDateString():new Date().toLocaleDateString();
@@ -1051,8 +1057,8 @@ function startGame(){
     mode:selectedMode,
     inning:1,isTop:true,homeScore:0,awayScore:0,
     balls:0,strikes:0,outs:0,atBatLog:[],halfInningRuns:0,inningRuns:[],
-    home:mkRoster(document.getElementById('hp-name').value.trim(),document.getElementById('hp-num').value.trim(),document.getElementById('hc-name').value.trim(),document.getElementById('hc-num').value.trim()),
-    away:mkRoster(document.getElementById('ap-name').value.trim(),document.getElementById('ap-num').value.trim(),document.getElementById('ac-name').value.trim(),document.getElementById('ac-num').value.trim()),
+    home:mkRoster(hpn,document.getElementById('hp-num').value.trim(),hcn,document.getElementById('hc-num').value.trim()),
+    away:mkRoster(apn,document.getElementById('ap-num').value.trim(),acn,document.getElementById('ac-num').value.trim()),
     homeActivePIdx:0,homeActiveCIdx:null,awayActivePIdx:0,awayActiveCIdx:null,
     pSelectOpen:false,cSelectOpen:false,
     snapshots:[],
@@ -1343,7 +1349,7 @@ function renderInningScoreboard(g){
     const botClick=botDone?` onclick="editInningCell(${i},'bot')" style="cursor:pointer;text-decoration:underline;text-decoration-color:rgba(255,255,255,.15);text-underline-offset:2px"`:'';
     html+=`<div class="inn-sb-col"><div class="inn-sb-hdr"${isCur?' style="color:rgba(235,235,245,.7)"':''}>${i+1}</div><div class="inn-sb-cell${topCls}"${topClick}>${topVal}</div><div class="inn-sb-cell${botCls}"${showBot?botClick:''}>${showBot?botVal:'—'}</div></div>`;
   }
-  html+='<div class="inn-sb-col lbl" style="border-left:1px solid rgba(255,255,255,.12);padding-left:4px;margin-left:2px"><div class="inn-sb-hdr">R</div><div class="inn-sb-cell total">'+g.awayScore+'</div><div class="inn-sb-cell total">'+g.homeScore+'</div></div>';
+  html+='<div class="inn-sb-col" style="border-left:1px solid rgba(255,255,255,.12);padding-left:4px;margin-left:2px;min-width:28px"><div class="inn-sb-hdr">R</div><div class="inn-sb-cell total">'+g.awayScore+'</div><div class="inn-sb-cell total">'+g.homeScore+'</div></div>';
   el.innerHTML=html;
   if(el.scrollWidth>el.clientWidth)el.scrollLeft=el.scrollWidth;
 }
@@ -1395,6 +1401,11 @@ function renderGame(){
   renderCatcherSection();
   // Btn hints
   renderBtnHints();
+  // Game clock
+  const clockBtn=document.getElementById('clock-toggle-btn');
+  if(clockBtn)clockBtn.textContent=g.clockEnabled?'Disable game clock':'Enable game clock';
+  updateClockDisplay();
+  resumeClockIfRunning();
 }
 
 // ── Render advanced ──
@@ -1504,6 +1515,7 @@ function addNewPitcherMidGame(){
   const nu=document.getElementById('new-p-num')?.value.trim()||'';
   fRoster().pitchers.push(mkPitcher(n,nu));
   setPI(fRoster().pitchers.length-1);
+  const g=state.currentGame;if(g)g.pSelectOpen=false;
   saveState();renderGame();
 }
 
@@ -1538,6 +1550,7 @@ function addNewCatcherMidGame(){
   const nu=document.getElementById('new-c-num')?.value.trim()||'';
   fRoster().catchers.push({name:n,num:nu,innings:[]});
   setCI(fRoster().catchers.length-1);
+  const g=state.currentGame;if(g)g.cSelectOpen=false;
   saveState();renderGame();
 }
 function editPlayerName(type,idx){
@@ -1594,7 +1607,7 @@ function renderBtnHints(){
   const allBtns=[{key:'action',label:'Action',needsAction:true},{key:'volUp',label:'Vol +'},{key:'volDown',label:'Vol −'}];
   const btns=allBtns.filter(b=>!b.needsAction||showAction);
   const actionColors={pitch:'#1A6BFF',calledStrike:'#FF3B30',ball:'#1A6BFF',nextBatter:'#34C759',undo:'#8E8E93',recordOut:'#FF9500',none:'#48484A'};
-  const actionLabels={pitch:'+ Pitch',calledStrike:'Called K',ball:'Ball',nextBatter:'Next Batter',undo:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:2px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo',recordOut:'+ Out',none:'—'};
+  const actionLabels={pitch:'+ Pitch',calledStrike:'<svg width="10" height="10" viewBox="0 0 128 128" fill="currentColor" style="vertical-align:-1px"><path d="M110.55 117.41L76.92 63.69l29.73-44.82c.45-.69.5-1.57.1-2.3a2.222 2.222 0 0 0-1.97-1.18H80.34c-.74 0-1.45.38-1.86 1L51.49 57.08V17.64c0-1.24-1.01-2.24-2.24-2.24h-21.9c-1.24 0-2.24 1-2.24 2.24V118.6c0 1.24 1 2.24 2.24 2.24h21.9c1.23 0 2.24-1 2.24-2.24V70.55l30.82 49.24c.41.65 1.13 1.05 1.9 1.05h24.44c.81 0 1.57-.44 1.96-1.16c.39-.71.37-1.58-.06-2.27z" transform="scale(-1,1) translate(-128,0)"/></svg> Strike',ball:'Ball',nextBatter:'Next Batter',undo:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:2px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo',recordOut:'+ Out',none:'—'};
   const chips=btns.map(({key,label})=>{
     const m=btnMapping[key];if(!m||m==='none')return'';
     const col=actionColors[m]||'#8E8E93';
@@ -1884,6 +1897,67 @@ document.addEventListener('click',e=>{
   if(hm&&!hm.contains(e.target))closeHistoryMenu();
 });
 
+// ── Game clock ──
+let clockInterval=null;
+function toggleClockEnabled(){
+  const g=state.currentGame;if(!g)return;
+  if(!g.clockEnabled){
+    g.clockEnabled=true;g.clockElapsed=0;g.clockStartedAt=null;g.clockRunning=false;
+  }else{
+    g.clockEnabled=false;g.clockElapsed=0;g.clockStartedAt=null;g.clockRunning=false;
+    stopClockInterval();
+  }
+  saveState();renderGame();updateClockDisplay();
+}
+function toggleGameClock(){
+  const g=state.currentGame;if(!g||!g.clockEnabled)return;
+  if(!g.clockRunning&&!g.clockStartedAt){
+    g.clockStartedAt=Date.now();g.clockRunning=true;
+    startClockInterval();
+  }else if(g.clockRunning){
+    g.clockElapsed=getClockElapsed(g);g.clockStartedAt=null;g.clockRunning=false;
+    stopClockInterval();
+  }else{
+    g.clockStartedAt=Date.now();g.clockRunning=true;
+    startClockInterval();
+  }
+  saveState();updateClockDisplay();
+}
+function getClockElapsed(g){
+  const base=g.clockElapsed||0;
+  if(g.clockRunning&&g.clockStartedAt)return base+(Date.now()-g.clockStartedAt);
+  return base;
+}
+function fmtClock(ms){
+  const s=Math.floor(ms/1000);const m=Math.floor(s/60);const sec=s%60;
+  return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+}
+function updateClockDisplay(){
+  const el=document.getElementById('game-clock');if(!el)return;
+  const g=state.currentGame;
+  if(!g||!g.clockEnabled){el.style.display='none';return;}
+  el.style.display='block';
+  const elapsed=getClockElapsed(g);
+  el.textContent=fmtClock(elapsed);
+  el.className='game-clock'+(g.clockRunning?' running':g.clockElapsed>0?' paused':'');
+}
+function startClockInterval(){
+  stopClockInterval();
+  clockInterval=setInterval(updateClockDisplay,1000);
+}
+function stopClockInterval(){
+  if(clockInterval){clearInterval(clockInterval);clockInterval=null;}
+}
+function stopGameClock(){
+  const g=state.currentGame;if(!g||!g.clockEnabled||!g.clockRunning)return;
+  g.clockElapsed=getClockElapsed(g);g.clockStartedAt=null;g.clockRunning=false;
+  stopClockInterval();saveState();updateClockDisplay();
+}
+function resumeClockIfRunning(){
+  const g=state.currentGame;if(!g||!g.clockEnabled||!g.clockRunning)return;
+  startClockInterval();
+}
+
 // ── Data export / import ──
 function exportAllGames(){
   const data=JSON.stringify({games:state.games||[],configs:state.configs||[]},null,2);
@@ -2010,6 +2084,8 @@ function endGame(){
   const sumActive=document.querySelector('#screen-summary.active');
   if(state.currentGame&&sumActive)collectSummaryData();
   const g=state.currentGame;if(!g)return;
+  if(g.clockEnabled&&g.clockRunning){g.clockElapsed=getClockElapsed(g);g.clockStartedAt=null;g.clockRunning=false;}
+  stopClockInterval();
   g.endedAt=new Date().toISOString();
   if(!state.games)state.games=[];
   state.games=state.games.filter(x=>x.id!==g.id);
@@ -2019,6 +2095,7 @@ function endGame(){
 }
 function closeGameToHistory(){
   const g=state.currentGame;if(!g)return;
+  stopClockInterval();
   if(!state.games)state.games=[];
   state.games=state.games.filter(x=>x.id!==g.id);
   state.games.unshift(g);state.currentGame=null;
@@ -2036,7 +2113,7 @@ function renderHistoryScoreboard(g){
     const botVal=i<maxInn-1||g.endedAt?r.bot||0:(r.bot||'—');
     h+=`<div class="hist-sb-col"><div class="hist-sb-hdr">${i+1}</div><div class="hist-sb-cell">${topVal}</div><div class="hist-sb-cell">${botVal}</div></div>`;
   }
-  h+='<div class="hist-sb-col lbl" style="border-left:1px solid var(--sep);padding-left:3px;margin-left:2px"><div class="hist-sb-hdr">R</div><div class="hist-sb-cell total">'+g.awayScore+'</div><div class="hist-sb-cell total">'+g.homeScore+'</div></div></div>';
+  h+='<div class="hist-sb-col" style="border-left:1px solid var(--sep);padding-left:3px;margin-left:2px;min-width:24px"><div class="hist-sb-hdr">R</div><div class="hist-sb-cell total">'+g.awayScore+'</div><div class="hist-sb-cell total">'+g.homeScore+'</div></div></div>';
   return h;
 }
 function renderHistory(){
