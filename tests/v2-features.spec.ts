@@ -1338,8 +1338,8 @@ test.describe('Batch fixes (#121-#123)', () => {
     await expect(bipBtn).toHaveCSS('display', 'flex');
   });
 
-  // #122: Acronym legend on stats view
-  test('#122: individual pitcher stats shows acronym legend', async ({ page }) => {
+  // #122/#127: Inline stat descriptions and graph legend
+  test('#122: individual pitcher stats shows inline descriptions', async ({ page }) => {
     await startGame(page, { mode: 'advanced' });
     await throwPitches(page, 'B', 2);
     await page.locator('.stats-link').click();
@@ -1347,14 +1347,19 @@ test.describe('Batch fixes (#121-#123)', () => {
     await page.locator('.stats-sheet').getByText('Jake M.').click();
     await page.waitForSelector('.stats-sheet', { timeout: 3000 });
     const text = await page.locator('.stats-sheet').textContent();
-    expect(text).toContain('K = Strikeout');
-    expect(text).toContain('BB = Walk');
-    expect(text).toContain('BIP = Ball in Play');
-    expect(text).toContain('CS = Called Strike');
-    expect(text).toContain('IP = Innings');
+    expect(text).toContain('K (Strikeouts)');
+    expect(text).toContain('BB (Walks)');
+    expect(text).toContain('BIP (In Play)');
+    expect(text).toContain('K/BB (Strikeout to Walk)');
+    expect(text).toContain('P/IP (Pitches per Inning)');
+    expect(text).toContain('P/BF (Pitches per Batter)');
+    expect(text).toContain('B = Ball');
+    expect(text).toContain('Called Strike');
+    expect(text).toContain('Swing Strike');
+    expect(text).toContain('Ball in Play');
   });
 
-  test('#122: simple mode stats legend omits pitch type acronyms', async ({ page }) => {
+  test('#122: simple mode stats has inline descriptions but no graph legend', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     await addSimplePitches(page, 3);
     await page.locator('.stats-link').click();
@@ -1362,9 +1367,9 @@ test.describe('Batch fixes (#121-#123)', () => {
     await page.locator('.stats-sheet').getByText('Jake M.').click();
     await page.waitForSelector('.stats-sheet', { timeout: 3000 });
     const text = await page.locator('.stats-sheet').textContent();
-    expect(text).toContain('K = Strikeout');
-    expect(text).toContain('BB = Walk');
-    expect(text).not.toContain('CS = Called Strike');
+    expect(text).toContain('K (Strikeouts)');
+    expect(text).toContain('BB (Walks)');
+    expect(text).not.toContain('B = Ball');
   });
 
   // #123: Live clock on history card
