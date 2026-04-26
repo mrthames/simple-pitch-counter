@@ -1311,3 +1311,91 @@ test.describe('Batch fixes (#105-#111)', () => {
     expect(text).not.toBe('00:00');
   });
 });
+
+test.describe('Batch fixes (#121-#123)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  // #121: Pitch button centering
+  test('#121: pitch buttons use pt-row2 class', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    const foulBtn = page.locator('.pitch-btn.pt-F');
+    await expect(foulBtn).toHaveClass(/pt-row2/);
+    const bipBtn = page.locator('.pitch-btn.pt-BIP');
+    await expect(bipBtn).toHaveClass(/pt-row2/);
+    // Verify the old standalone row2 class is not present (would cause grid override)
+    const foulClass = await foulBtn.getAttribute('class');
+    expect(foulClass).not.toMatch(/ row2 |^row2 | row2$/);
+  });
+
+  test('#121: pitch buttons have flex display for centering', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    const foulBtn = page.locator('.pitch-btn.pt-F');
+    await expect(foulBtn).toHaveCSS('display', 'flex');
+    const bipBtn = page.locator('.pitch-btn.pt-BIP');
+    await expect(bipBtn).toHaveCSS('display', 'flex');
+  });
+
+  // #122: Acronym legend on stats view
+  test('#122: individual pitcher stats shows acronym legend', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    await throwPitches(page, 'B', 2);
+    await page.locator('.stats-link').click();
+    await page.waitForSelector('.stats-sheet', { timeout: 3000 });
+    await page.locator('.stats-sheet').getByText('Jake M.').click();
+    await page.waitForSelector('.stats-sheet', { timeout: 3000 });
+    const text = await page.locator('.stats-sheet').textContent();
+    expect(text).toContain('K = Strikeout');
+    expect(text).toContain('BB = Walk');
+    expect(text).toContain('BIP = Ball in Play');
+    expect(text).toContain('CS = Called Strike');
+    expect(text).toContain('IP = Innings');
+  });
+
+  test('#122: simple mode stats legend omits pitch type acronyms', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 3);
+    await page.locator('.stats-link').click();
+    await page.waitForSelector('.stats-sheet', { timeout: 3000 });
+    await page.locator('.stats-sheet').getByText('Jake M.').click();
+    await page.waitForSelector('.stats-sheet', { timeout: 3000 });
+    const text = await page.locator('.stats-sheet').textContent();
+    expect(text).toContain('K = Strikeout');
+    expect(text).toContain('BB = Walk');
+    expect(text).not.toContain('CS = Called Strike');
+  });
+
+  // #123: Live clock on history card
+  test('#123: history card shows clock when clock enabled on live game', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Enable and start clock
+    await page.evaluate(() => { (window as any).toggleClockEnabled(); });
+    await page.locator('#game-clock').click();
+    await page.waitForTimeout(1100);
+    // Close to history
+    await page.click('.menu-btn');
+    await page.locator('#game-hbg-menu .hbg-item').filter({ hasText: 'Close' }).click();
+    await page.waitForSelector('#screen-history.active');
+    // Should show clock instead of LIVE text
+    const badge = page.locator('.live-badge');
+    await expect(badge).toBeVisible();
+    const clockEl = badge.locator('.hist-clock');
+    await expect(clockEl).toBeVisible();
+    const clockText = await clockEl.textContent();
+    expect(clockText).toMatch(/\d+:\d+/);
+  });
+
+  test('#123: history card shows LIVE when clock not enabled', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Close to history without enabling clock
+    await page.click('.menu-btn');
+    await page.locator('#game-hbg-menu .hbg-item').filter({ hasText: 'Close' }).click();
+    await page.waitForSelector('#screen-history.active');
+    // Should show standard LIVE badge
+    const badge = page.locator('.live-badge');
+    await expect(badge).toBeVisible();
+    await expect(badge).toContainText('LIVE');
+  });
+});
