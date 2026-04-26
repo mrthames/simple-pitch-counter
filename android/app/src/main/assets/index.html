@@ -1665,8 +1665,6 @@ function statLineHtml(p){
     ${mkStat('P (Pitches)',p.pitches)}
     ${mkStat('IP (Innings Pitched)',s.ip)}
     ${mkStat('BF (Batters Faced)',s.bf)}
-    ${mkStat('K (Strikeouts)',s.ks)}
-    ${mkStat('BB (Walks)',s.bbs)}
     ${mkStat('K/BB (Strikeout to Walk)',s.kbb)}
     ${mkStat('P/IP (Pitches per Inning)',s.pip)}
     ${mkStat('P/BF (Pitches per Batter)',s.pbf)}
@@ -1705,7 +1703,7 @@ function renderStatsCardToCanvas(pitcher,gameData){
       const lw=ctx.measureText(h.lbl).width;ctx.fillText(h.lbl,hx+heroW/2-lw/2,y+56);
     });
     y+=heroH+16;
-    const stats=[['P (Pitches)',total],['IP (Innings Pitched)',s.ip],['BF (Batters Faced)',s.bf],['K (Strikeouts)',s.ks],['BB (Walks)',s.bbs],['K/BB (Strikeout to Walk)',s.kbb],['P/IP (Pitches per Inning)',s.pip],['P/BF (Pitches per Batter)',s.pbf]];
+    const stats=[['P (Pitches)',total],['IP (Innings Pitched)',s.ip],['BF (Batters Faced)',s.bf],['K/BB (Strikeout to Walk)',s.kbb],['P/IP (Pitches per Inning)',s.pip],['P/BF (Pitches per Batter)',s.pbf]];
     stats.forEach(([lbl,val])=>{
       ctx.fillStyle='rgba(235,235,245,.06)';ctx.fillRect(pad,y,W-pad*2,1);
       ctx.fillStyle='rgba(235,235,245,.6)';ctx.font='500 22px -apple-system,system-ui,sans-serif';
@@ -1731,7 +1729,7 @@ function renderStatsCardToCanvas(pitcher,gameData){
         y+=36;
       });
     }
-    if(isAdv){y+=16;ctx.fillStyle='rgba(235,235,245,.2)';ctx.font='400 13px -apple-system,system-ui,sans-serif';ctx.fillText('B=Ball · K̸=Called Strike · K=Swing Strike · F=Foul · •=Ball in Play',pad,y+=16);}
+    if(isAdv){y+=16;ctx.fillStyle='rgba(235,235,245,.2)';ctx.font='400 13px -apple-system,system-ui,sans-serif';ctx.fillText('B = Ball · CS = Called Strike · SS = Swing Strike · F = Foul · BIP = Ball in Play',pad,y+=16);}
     y+=12;ctx.fillStyle='rgba(235,235,245,.3)';ctx.font='500 16px -apple-system,system-ui,sans-serif';
     const tag='Simple Pitch Counter';const tagW=ctx.measureText(tag).width;ctx.fillText(tag,(W-tagW)/2,y+=20);
     y+=pad;
@@ -1840,7 +1838,7 @@ function showPitcherStatsDetail(side,idx){
     <div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K (Strikeouts)</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB (Walks)</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP (In Play)</div></div></div>
     ${statLineHtml(p)}
     ${barsHtml}
-    ${isAdv?`<div style="margin-top:16px;font-size:9px;color:rgba(235,235,245,.3);line-height:1.8">B = Ball · ${PT_TYPES.CS.label} = Called Strike · ${PT_TYPES.SS.label} = Swing Strike · F = Foul · ${PT_TYPES.BIP.label} = Ball in Play</div>`:''}
+    ${isAdv?`<div style="margin-top:16px;font-size:9px;color:rgba(235,235,245,.3);line-height:1.8">B = Ball · CS = Called Strike · SS = Swing Strike · F = Foul · BIP = Ball in Play</div>`:''}
     <div style="display:flex;gap:8px;margin-top:12px">
       <div onclick="shareStatsCard(window._sharedPitcher)" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">Share</div>
       <div onclick="document.getElementById('stats-sheet-overlay').remove();showStatsQuick()" style="flex:1;height:50px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;font-weight:600;color:#fff">‹ All Pitchers</div>
