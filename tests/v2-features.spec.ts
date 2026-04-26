@@ -1139,6 +1139,21 @@ test.describe('Batch fixes (#105-#111)', () => {
     expect(hintsHtml).toContain('Strike');
   });
 
+  test('#107: resuming game loads correct mode mapping', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Change simple mapping via JS
+    await page.evaluate(() => { (window as any).setBtnMapping('volUp', 'undo'); });
+    // Close to history (keeps as live game)
+    await page.click('.menu-btn');
+    await page.locator('#game-hbg-menu .hbg-item').filter({ hasText: 'Close' }).click();
+    await page.waitForSelector('#screen-history.active');
+    // Resume the game — should reload simple mapping with our change
+    await page.locator('.hist-action-btn', { hasText: 'Resume' }).click();
+    await page.waitForSelector('#screen-game.active');
+    const hintsHtml = await page.locator('.btn-hints').innerHTML();
+    expect(hintsHtml).toContain('Undo');
+  });
+
   // #108: Button hint backwards K SVG
   test('#108: calledStrike hint uses backwards K SVG', async ({ page }) => {
     await startGame(page, { mode: 'advanced' });

@@ -2178,6 +2178,7 @@ function resumeGame(gi){
   const g=state.games[gi];state.currentGame=g;state.games.splice(gi,1);
   const cfg=state.configs.find(c=>c.id===g.configId);
   if(cfg){PITCH_MAX=cfg.pitchMax;C_INN_LIM=cfg.catcherInnMax;MERCY_RUNS=cfg.mercyRuns||0;PITCH_C_LIM=cfg.pitchCatchLim||0;MERCY_GAME=cfg.mercyGame||0;MAX_INN=cfg.maxInnings||9;}
+  applyModeDefaults();
   saveState();renderGame();showScreen('game');
 }
 function confirmDelGame(i){
