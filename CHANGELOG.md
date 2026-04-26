@@ -4,6 +4,49 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-04-26] V2.41 — Pitch acronym labels, game clock, batch bug fixes, and marketing refresh
+
+**Files:** `index.html`, `ViewController.swift`, `build.gradle.kts`, `project.pbxproj`, `website/index.html`, `marketing/screenshots.html`, `marketing/capture.mjs`
+**Issues:** #94–#103, #105–#111, #112–#118, #119–#127
+
+### New features
+- **Game clock** — live elapsed time clock starts when a game begins, visible during gameplay and on history cards; toggleable from the hamburger menu; auto-stops when the game ends; persists across app reloads
+- **Text acronym pitch labels** — pitch breakdown bars across all views (live stats, game summary, summary overlay, history detail) now use clear text labels (B, CS, SS, F, BIP) instead of SVG icons
+- **Pitch breakdown legend** — advanced mode stats views show a legend: "B = Ball · CS = Called Strike · SS = Swing Strike · F = Foul · BIP = Ball in Play" on live stats, summary overlay, and history detail
+- **Inline stat descriptions** — stat rows (P, IP, BF, K/BB, P/IP, P/BF) include inline descriptions explaining each metric
+- **Removed redundant K/BB rows** — strikeouts and walks removed from stat rows since they already appear as hero boxes
+
+### Bug fixes (issues #94–#127)
+- Fixed pitch buttons not highlighting on tap
+- Fixed stats overlay not scrolling on smaller screens
+- Fixed undo sometimes skipping the previous pitch type
+- Fixed catcher inning count not updating after pitcher change
+- Fixed summary export missing pitcher rest day info
+- Fixed game setup not saving field selection
+- Fixed mercy rule modal appearing at wrong threshold
+- Fixed at-bat count resetting incorrectly on undo
+- Fixed button mapping not reloading on game resume
+- Fixed history card badges wrapping team names
+- Fixed shareable stats card pitch breakdown showing SVG markup instead of text
+- Unified button mapping options across simple and advanced modes
+
+### Website updates
+- Updated hero and button mapping phone mockups to match V2.41 app design (inning scoreboard, inline Stats link, catcher section)
+- Added SVG baseball favicon to all 12 pages
+- Removed old favicon.ico fallback
+
+### Marketing
+- Updated marketing slides from 7 to 8 (added league configuration, replaced live scoreboard with advanced game mode)
+- All 8 slides now include composited simulator screenshots inside phone frames
+- Created seed data script (`app/seed-screenshots.js`) for generating realistic simulator screenshots
+
+### Testing & versioning
+- Added 48 new E2E tests (183 → 231 total)
+- v2-features spec grew from 47 to 95 tests covering batch fixes, game clock, and acronym labels
+- Version bumped to 2.41 (build 129) across iOS, Android, and app UI
+
+---
+
 ## [2026-04-25] V2.4 — Scoreboard improvements and game logic
 
 **Files:** `index.html`, `.gitignore`

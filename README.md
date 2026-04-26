@@ -5,10 +5,12 @@ A pitch counter app for youth baseball and softball coaches, built for the dugou
 This is also a portfolio project by **Justin Thames** demonstrating AI-native product development — from concept and product requirements through design, development, testing, and App Store release, built end-to-end with AI as a core collaborator.
 
 <p align="center">
-  <img src="marketing/finals/03-simple-and-advanced.jpg" width="180" alt="Simple and Advanced modes" />
-  <img src="marketing/finals/06-game-history.png" width="180" alt="Game history" />
+  <img src="marketing/finals/01-advanced-pitch-tracking.png" width="180" alt="Button mapping" />
+  <img src="marketing/finals/02-simple-mode.png" width="180" alt="Simple mode" />
+  <img src="marketing/finals/04-advanced-game-mode.png" width="180" alt="Advanced game mode" />
   <img src="marketing/finals/05-pitcher-stats.png" width="180" alt="Pitcher stats" />
-  <img src="marketing/finals/07-game-summaries.png" width="180" alt="Game summaries" />
+  <img src="marketing/finals/06-game-history.png" width="180" alt="Game history" />
+  <img src="marketing/finals/08-league-config.png" width="180" alt="League configuration" />
 </p>
 
 **App Store:** [Simple Pitch Counter on iOS](https://apps.apple.com/us/app/simple-pitch-counter/id6760922314)
@@ -47,6 +49,8 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 - **Swipe-to-dismiss stats** — swipe down on any stats bottom sheet to dismiss it
 - **In-app review prompts** — automatically prompts users to rate the app after games 3, 10, and 25 using native StoreKit (iOS) and Google Play In-App Review (Android)
 - **About screen** — accessible from the history menu; shows app version, Rate This App link, links to website, privacy policy, feedback form, and Buy Me a Coffee
+- **Game clock** — live elapsed time clock starts when a game begins, visible during gameplay and saved to history cards; toggleable from the menu
+- **Text acronym pitch labels** — pitch breakdown bars use clear text labels (B, CS, SS, F, BIP) across all views with a legend for advanced mode
 - **Fully offline** — no account, no internet, no ads. All data stays on your device via localStorage
 
 ### Game summary output
@@ -77,7 +81,7 @@ simple-pitch-counter/
 │       ├── java/.../MainActivity.kt  # WebView config, haptics, volume buttons
 │       ├── assets/index.html         # Shared web app (tracked in git)
 │       └── res/                      # Adaptive icons and resources
-├── tests/                  # Playwright E2E tests (183 tests)
+├── tests/                  # Playwright E2E tests (231 tests)
 │   ├── helpers.ts          # Shared test utilities (startGame, addPitches, etc.)
 │   ├── core-game-flow.spec.ts      # Game lifecycle, scoring, outs, undo
 │   ├── advanced-mode.spec.ts       # Pitch types, BSO count, BIP, auto-advance
@@ -87,18 +91,27 @@ simple-pitch-counter/
 │   ├── shareable-stats.spec.ts     # Share features, swipe-to-dismiss, image cards
 │   ├── history-config.spec.ts      # History cards, config presets, setup flow
 │   ├── about-screen.spec.ts        # About screen, links, back navigation
-│   ├── v2-features.spec.ts         # V2.4 features: name editing, button mapping, scoreboard improvements
+│   ├── v2-features.spec.ts         # V2 features: name editing, button mapping, scoreboard, game clock, acronym labels, batch fixes
 │   └── version-sync.spec.ts        # Version sync across Android, iOS, and app UI
 ├── .github/workflows/      # CI/CD
 │   └── test.yml            # Runs Playwright tests on push/PR to main
-├── website/                # simplepitchcounter.com
+├── website/                # simplepitchcounter.com (12 pages)
 │   ├── index.html          # Landing page with interactive phone mockup
 │   ├── privacy.html        # Privacy policy
 │   ├── contact.html        # Contact form
 │   ├── feedback.html       # Feedback form
-│   └── contact.php         # PHP backend (not tracked — contains credentials)
+│   ├── android-beta.html   # Android beta signup
+│   ├── articles.html       # Guides index
+│   ├── pitch-count-rules.html      # Pitch count rules reference
+│   ├── parents-guide.html          # Parent's guide to pitch counting
+│   ├── catcher-innings-rules.html  # Catcher innings rules
+│   ├── travel-ball-pitch-counts.html # Travel ball pitch counts
+│   ├── mercy-rule.html             # Mercy rule explainer
+│   ├── what-is-pitch-count.html    # What is a pitch count
+│   ├── favicon.svg         # Baseball emoji favicon
+│   └── *.php               # PHP backends (not tracked — contain credentials)
 ├── marketing/              # App Store screenshot assets
-│   ├── screenshots.html    # Screenshot background templates (7 slides)
+│   ├── screenshots.html    # Screenshot background templates (8 slides)
 │   ├── capture.mjs         # Playwright script to render slide PNGs
 │   └── sample-data.js      # Realistic sample data for simulator screenshots
 ├── docs/                   # Product and portfolio documentation
@@ -109,7 +122,7 @@ simple-pitch-counter/
 
 ## Testing
 
-The project has **183 Playwright E2E tests** covering all app functionality:
+The project has **231 Playwright E2E tests** covering all app functionality:
 
 | Spec file | Tests | Coverage |
 |-----------|-------|----------|
@@ -121,7 +134,7 @@ The project has **183 Playwright E2E tests** covering all app functionality:
 | `shareable-stats` | 18 | Share features, swipe-to-dismiss, image card exports, K/BB/BIP boxes |
 | `history-config` | 19 | History cards, config presets, setup flow, umpire clearing |
 | `about-screen` | 8 | About screen, app info, links, back navigation |
-| `v2-features` | 47 | Name editing, button mapping, pitcher stats list, inning scoreboard, editable cells, 9-inning auto-end, share card scoreboard, history scoreboard, review prompts |
+| `v2-features` | 95 | Name editing, button mapping, pitcher stats list, inning scoreboard, editable cells, 9-inning auto-end, share card scoreboard, history scoreboard, review prompts, batch bug fixes, game clock, acronym labels |
 | `version-sync` | 2 | Version string consistency across Android, iOS, and app UI |
 
 ```bash
@@ -152,16 +165,19 @@ The Android app mirrors the iOS architecture — a native Kotlin shell wrapping 
 
 ### Website (`website/`)
 
-A static marketing site hosted on a Synology NAS via Web Station:
+A static marketing site (12 pages) hosted on a Synology NAS via Web Station:
 
-- Landing page with interactive phone mockup showing the Advanced mode UI
+- Landing page with interactive phone mockups showing the Advanced mode UI
 - App Store and Google Play download links with feature highlights
 - Android beta signup page with PHP form handler
+- 6 SEO content pages: pitch count rules, parent's guide, catcher innings rules, travel ball pitch counts, mercy rule, and what is a pitch count
+- Articles index page linking all guides
 - Privacy policy (required by App Store and Google Play)
 - Contact and feedback forms with PHP/SMTP backend
 - Confirmation emails sent to submitters from all three forms
 - Clean URLs via directory-based Nginx routing
 - Open Graph meta tags with branded 1200×630 images for link previews
+- SVG baseball favicon across all pages
 - Deployed at simplepitchcounter.com
 
 ## Deployment

@@ -108,6 +108,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
   text-transform:uppercase;letter-spacing:3px;white-space:nowrap;
   z-index:5;
 }
+
+/* ── Per-slide phone screen images ── */
+#slide-1 .iphone-screen{background:url(screen-01-buttons.png) center/cover no-repeat}
+#slide-2 .iphone-screen{background:url(screen-02-simple.png) center/cover no-repeat}
+#slide-3-combo .iphone.back .iphone-screen{background:url(screen-04-advanced.png) center/cover no-repeat}
+#slide-3-combo .iphone.front .iphone-screen{background:url(screen-02-simple.png) center/cover no-repeat}
+#slide-4 .iphone-screen{background:url(screen-04-advanced.png) center/cover no-repeat}
+#slide-5 .iphone-screen{background:url(screen-05-stats.png) center/cover no-repeat}
+#slide-6 .iphone-screen{background:url(screen-06-history.png) center/cover no-repeat}
+#slide-7 .iphone-screen{background:url(screen-07-summary.png) center/cover no-repeat}
+#slide-8 .iphone-screen{background:url(screen-08-config.png) center/cover no-repeat}
 </style>
 </head>
 <body>
@@ -134,32 +145,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
     <div class="slide-sub">Map volume buttons to Strike and Ball — hands-free pitch tracking</div>
   </div>
   <div class="phone-wrap">
-    <div class="phone-glow" style="left:65%"></div>
-    <div class="iphone" style="transform:scale(1.7) translateX(140px);transform-origin:top center">
+    <div class="phone-glow"></div>
+    <div class="iphone">
       <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
       <div class="iphone-screen"></div>
     </div>
-  </div>
-
-  <!-- Heading -->
-  <div class="callout-heading" style="right:935px;top:730px">Custom Actions</div>
-
-  <!-- Vol Up → Strike -->
-  <div class="callout" style="right:740px;top:810px">
-    <div class="callout-text" style="align-items:flex-end">
-      <div class="callout-name">Vol +</div>
-      <div class="callout-map" style="color:#FF3B30">Strike</div>
-    </div>
-    <div class="callout-line" style="width:140px;margin-left:20px"></div>
-  </div>
-
-  <!-- Vol Down → Ball -->
-  <div class="callout" style="right:740px;top:900px">
-    <div class="callout-text" style="align-items:flex-end">
-      <div class="callout-name">Vol &minus;</div>
-      <div class="callout-map" style="color:#1A6BFF">Ball</div>
-    </div>
-    <div class="callout-line" style="width:140px;margin-left:20px"></div>
   </div>
 </div>
 
@@ -202,12 +192,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- SLIDE 4: Live Scoreboard                                      -->
+<!-- SLIDE 4: Advanced Game Mode                                   -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div class="slide" id="slide-4">
   <div class="headline-area">
-    <div class="slide-headline">LIVE<br><span class="amber">SCOREBOARD</span></div>
-    <div class="slide-sub">Score, inning, outs, and catcher tracking — always at a glance</div>
+    <div class="slide-headline">FULL<br><span class="green">ADVANCED</span></div>
+    <div class="slide-sub">Track every pitch type — balls, strikes, fouls, and balls in play</div>
   </div>
   <div class="phone-wrap">
     <div class="phone-glow"></div>
@@ -259,6 +249,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
   <div class="headline-area">
     <div class="slide-headline">GAME<br><span class="amber">SUMMARIES</span></div>
     <div class="slide-sub">Generate post-game reports ready to share with your league</div>
+  </div>
+  <div class="phone-wrap">
+    <div class="phone-glow"></div>
+    <div class="iphone">
+      <div class="hw-action"></div><div class="hw-vol-up"></div><div class="hw-vol-dn"></div><div class="hw-power"></div>
+      <div class="iphone-screen"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SLIDE 8: League Configuration                                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="slide-8">
+  <div class="headline-area">
+    <div class="slide-headline">YOUR LEAGUE<br><span class="green">YOUR RULES</span></div>
+    <div class="slide-sub">Set pitch limits, rest thresholds, and catcher rules — save and reuse every game</div>
   </div>
   <div class="phone-wrap">
     <div class="phone-glow"></div>

@@ -9,10 +9,11 @@ const slides = [
   { id: 'slide-1', name: '01-advanced-pitch-tracking' },
   { id: 'slide-2', name: '02-simple-mode' },
   { id: 'slide-3-combo', name: '03-simple-and-advanced' },
-  { id: 'slide-4', name: '04-live-scoreboard' },
+  { id: 'slide-4', name: '04-advanced-game-mode' },
   { id: 'slide-5', name: '05-pitcher-stats' },
   { id: 'slide-6', name: '06-game-history' },
   { id: 'slide-7', name: '07-game-summaries' },
+  { id: 'slide-8', name: '08-league-config' },
 ];
 
 (async () => {
