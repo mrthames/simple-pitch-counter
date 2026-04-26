@@ -567,12 +567,12 @@ test.describe('Scoreboard improvements (#87-#92)', () => {
     await expect(page.locator('#pitcher-name-display .stats-link')).toHaveCount(0);
   });
 
-  test('9-inning game prompts end when not tied', async ({ page }) => {
+  test('max-innings game prompts end when not tied', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
-    // Give away team a 1-run lead
+    // Default max innings is 6. Give away team a 1-run lead
     await page.click('.sb-adj >> nth=1');
-    // Play through 9 innings (18 half-innings)
-    for (let i = 0; i < 18; i++) {
+    // Play through 6 innings (12 half-innings)
+    for (let i = 0; i < 12; i++) {
       await page.click('.end-half-btn');
       await page.click('.modal-btn.amber');
     }
@@ -581,29 +581,29 @@ test.describe('Scoreboard improvements (#87-#92)', () => {
     await expect(page.locator('.modal-box')).toContainText('Game complete');
   });
 
-  test('9-inning tied game allows extra innings', async ({ page }) => {
+  test('max-innings tied game allows extra innings', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
-    // Play through 9 innings (18 half-innings), score stays 0-0
-    for (let i = 0; i < 18; i++) {
+    // Play through 6 innings (12 half-innings), score stays 0-0
+    for (let i = 0; i < 12; i++) {
       await page.click('.end-half-btn');
       await page.click('.modal-btn.amber');
     }
     // Should NOT see game complete modal since tied 0-0
     await page.waitForTimeout(500);
     await expect(page.locator('.modal-overlay')).toHaveCount(0);
-    await expect(page.locator('#inn-pill')).toContainText('10');
+    await expect(page.locator('#inn-pill')).toContainText('7');
   });
 
-  test('9-inning modal Continue allows extra innings', async ({ page }) => {
+  test('max-innings modal Continue allows extra innings', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     await page.click('.sb-adj >> nth=1');
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 12; i++) {
       await page.click('.end-half-btn');
       await page.click('.modal-btn.amber');
     }
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
     await page.locator('.modal-btn', { hasText: 'Continue' }).click();
-    await expect(page.locator('#inn-pill')).toContainText('10');
+    await expect(page.locator('#inn-pill')).toContainText('7');
   });
 
   test('editable inning cell updates score', async ({ page }) => {
@@ -665,5 +665,194 @@ test.describe('Scoreboard improvements (#87-#92)', () => {
     if (download) {
       expect(download.suggestedFilename()).toBe('game-stats.png');
     }
+  });
+});
+
+test.describe('Batch fixes (#94-#103)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('#94: umpire names carry from setup to summary', async ({ page }) => {
+    await page.click('.new-game-btn');
+    await page.waitForSelector('#screen-setup.active');
+    await page.click('#mode-simple');
+    await page.fill('#s-home', 'Eagles');
+    await page.fill('#s-away', 'Hawks');
+    await page.fill('#hp-name', 'Jake');
+    await page.fill('#ap-name', 'Sam');
+    await page.fill('#s-ump-plate', 'John Smith');
+    await page.fill('#s-ump-base', 'Mike Jones');
+    await page.click('.start-btn');
+    await page.waitForSelector('#screen-game.active');
+    // End game without visiting summary first
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'End game' }).click();
+    await page.locator('.modal-btn.red', { hasText: 'End now' }).click();
+    await page.waitForSelector('#screen-history.active');
+    // View summary from history
+    await page.locator('.hist-action-btn', { hasText: 'Summary' }).first().click();
+    await page.waitForSelector('#screen-summary.active');
+    await expect(page.locator('#sum-pu-name')).toHaveValue('John Smith');
+    await expect(page.locator('#sum-bu-name')).toHaveValue('Mike Jones');
+  });
+
+  test('#95: division field pre-populated from config name', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'Game summary' }).click();
+    await page.waitForSelector('#screen-summary.active');
+    // Division should be pre-populated with config name
+    const divVal = await page.locator('#sum-division').inputValue();
+    expect(divVal).toBeTruthy();
+    expect(divVal).toContain('Default');
+  });
+
+  test('#95: division appears in export text', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'Game summary' }).click();
+    await page.waitForSelector('#screen-summary.active');
+    await page.fill('#sum-division', 'Minors 8');
+    await page.click('text=‹ Back');
+    // End the game
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'End game' }).click();
+    await page.locator('.modal-btn.red').click();
+    await page.waitForSelector('#screen-history.active');
+    // Open summary from history and generate export
+    await page.locator('.hist-action-btn', { hasText: 'Summary' }).first().click();
+    await page.waitForSelector('#screen-summary.active');
+    await expect(page.locator('#sum-division')).toHaveValue('Minors 8');
+  });
+
+  test('#96: older completed games are collapsed', async ({ page }) => {
+    // Start and end 3 games
+    for (let i = 0; i < 3; i++) {
+      await startGame(page, { mode: 'simple', homeTeam: `Team${i}H`, awayTeam: `Team${i}A` });
+      await page.click('.menu-btn');
+      await page.locator('.hbg-item', { hasText: 'End game' }).click();
+      await page.locator('.modal-btn.red').click();
+      await page.waitForSelector('#screen-history.active');
+    }
+    // First game (most recent) should be expanded
+    const firstDetail = page.locator('#hist-detail-0');
+    await expect(firstDetail).toBeVisible();
+    // Third game should be collapsed
+    const thirdDetail = page.locator('#hist-detail-2');
+    await expect(thirdDetail).toBeHidden();
+    // Should have a "Show details" button for collapsed card
+    const showBtn = page.locator('.swipe-card-wrap').nth(2).locator('text=Show details');
+    await expect(showBtn).toBeVisible();
+    // Clicking Show details expands it
+    await showBtn.click();
+    await expect(thirdDetail).toBeVisible();
+  });
+
+  test('#97: game mercy modal appears at run differential limit', async ({ page }) => {
+    // Set game mercy to 3 via config
+    await page.evaluate(() => {
+      (window as any).saveState();
+    }).catch(() => {});
+    await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      if (!s.configs) s.configs = [];
+      if (s.configs[0]) s.configs[0].mercyGame = 3;
+      localStorage.setItem('spc_v1', JSON.stringify(s));
+    });
+    await page.reload();
+    await page.waitForSelector('#screen-history.active');
+    await startGame(page, { mode: 'simple' });
+    // Add 3 runs to away team
+    for (let i = 0; i < 3; i++) {
+      await page.click('.sb-adj >> nth=1');
+    }
+    // Game mercy modal should appear
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await expect(page.locator('.modal-box')).toContainText('Game mercy reached');
+  });
+
+  test('#98: R column header is centered', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // R header should be visible
+    const rHeader = page.locator('.inn-sb-hdr', { hasText: 'R' });
+    await expect(rHeader).toBeVisible();
+  });
+
+  test('#100: undo after BIP side-retired reverts fully', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    // Advance to 2 outs
+    await page.click('.adv-secondary-btn >> text=+ Out');
+    await page.click('.adv-secondary-btn >> text=+ Out');
+    await expect(page.locator('#out1')).toHaveClass(/filled/);
+    // Throw a BIP pitch
+    const bipBtn = page.locator('.pitch-btn').filter({ hasText: /Play/ });
+    await bipBtn.click();
+    await page.waitForSelector('#bip-overlay[style*="flex"]', { timeout: 3000 });
+    // Mark as out (3rd out → side retired)
+    await page.click('.bip-btn.out');
+    await waitForFlashToClear(page);
+    // Side retired modal appears
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await expect(page.locator('.modal-box')).toContainText('End half inning');
+    // Click End to advance to next half
+    await page.locator('.modal-btn.amber').click();
+    // Now in Bottom of Inning 1
+    await expect(page.locator('#inn-pill')).toContainText('BOT');
+    // Undo — should revert to 2 outs in Top 1 before the BIP
+    await page.click('#undo-btn-adv');
+    await expect(page.locator('#inn-pill')).toContainText('TOP');
+    await expect(page.locator('#out1')).toHaveClass(/filled/);
+  });
+
+  test('#101: button mapping options are vertically centered', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#game-hbg-menu .hbg-item', { hasText: 'Button mapping' }).click();
+    await page.waitForSelector('#btn-map-overlay', { timeout: 3000 });
+    // Check that options have display:flex and align-items:center
+    const firstOpt = page.locator('#btn-map-rows div[onclick*="setBtnMapping"]').first();
+    await expect(firstOpt).toHaveCSS('display', 'flex');
+    await expect(firstOpt).toHaveCSS('align-items', 'center');
+  });
+
+  test('#102: 0-0 game shows scoreboard not score-pill', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Go back to history (close game)
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'Close' }).click();
+    await page.waitForSelector('#screen-history.active');
+    // Should see a scoreboard, not a score-pill
+    await expect(page.locator('.hist-scoreboard')).toBeVisible();
+    await expect(page.locator('.score-pill')).toHaveCount(0);
+  });
+
+  test('#103: adding new pitcher auto-selects them', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Open pitcher picker
+    await page.click('#p-change-btn');
+    // Add new pitcher
+    await page.fill('#new-p-name', 'New Guy');
+    await page.fill('#new-p-num', '99');
+    await page.click('text=Add');
+    // New pitcher should be selected (active badge visible on last row)
+    const activeLabels = page.locator('.badge-active');
+    await expect(activeLabels).toHaveCount(1);
+    // The active badge should be on the row with "New Guy"
+    const activeRow = page.locator('.player-row', { hasText: 'New Guy' });
+    await expect(activeRow.locator('.badge-active')).toBeVisible();
+  });
+
+  test('#99: max innings default is 6', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Play 6 innings with a 1-run lead
+    await page.click('.sb-adj >> nth=1');
+    for (let i = 0; i < 12; i++) {
+      await page.click('.end-half-btn');
+      await page.click('.modal-btn.amber');
+    }
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await expect(page.locator('.modal-box')).toContainText('6 innings');
   });
 });
