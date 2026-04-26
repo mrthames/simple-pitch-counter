@@ -1827,7 +1827,7 @@ function showPitcherStatsDetail(side,idx){
   if(isAdv){
     barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>`+types.map(k=>{
       const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;
-      return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;
+      return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${k}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;
     }).join('');
   }
   ov.innerHTML=`<div class="stats-sheet">
@@ -2030,7 +2030,7 @@ function showStatsQuick(){
     let barsHtml='';
     if(g.mode==='advanced'){
       const total=p.pitches||0;const denom=total||1;
-      barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin:12px 0 10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
+      barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin:12px 0 10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${k}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
     }
     const detailHtml=`<div id="${pid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
       ${statLineHtml(p)}
@@ -2303,7 +2303,7 @@ function showSummaryStats(side,idx){
   ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
   let barsHtml='';
   if(g.mode==='advanced'){
-    barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
+    barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${k}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
   }
   window._sumStatsPitcher=p;window._sumStatsGame=g;
   ov.innerHTML=`<div class="stats-sheet"><div class="stats-handle"></div>
@@ -2403,7 +2403,7 @@ function openSavedStats(gi){
     let barsHtml='';
     if(g.mode==='advanced'){
       const total=p.pitches||0;const denom=total||1;
-      barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin:12px 0 10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${pt.label}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
+      barsHtml=`<div style="font-size:11px;font-weight:700;color:rgba(235,235,245,.45);text-transform:uppercase;letter-spacing:.7px;margin:12px 0 10px">Pitch Breakdown</div>`+types.map(k=>{const pt=PT_TYPES[k];const v=(p.pitchTypes||{})[k]||0;const pct=denom?Math.round(v/denom*100):0;return`<div class="stats-bar-row"><div class="stats-bar-chip" style="background:${pt.bg};color:${pt.color}">${k}</div><div class="stats-bar"><div class="stats-bar-fill" style="background:${pt.color};width:${pct}%"></div></div><div class="stats-bar-count">${v}</div><div class="stats-bar-pct">${pct}%</div></div>`;}).join('');
     }
     const detailHtml=`<div id="${pid}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.1)">
       <div class="stats-summary-row"><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--red)">${p.ks||0}</div><div class="stats-summary-lbl">K (Strikeouts)</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--blue)">${p.bbs||0}</div><div class="stats-summary-lbl">BB (Walks)</div></div><div class="stats-summary-box"><div class="stats-summary-num" style="color:var(--green)">${p.bips||0}</div><div class="stats-summary-lbl">BIP (In Play)</div></div></div>
