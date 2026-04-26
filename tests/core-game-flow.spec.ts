@@ -18,13 +18,15 @@ test.describe('Core game flow', () => {
     await expect(page.locator('.setup-nav-title')).toHaveText('New Game');
   });
 
-  test('cannot start game without a pitcher', async ({ page }) => {
+  test('starting game without pitcher names defaults to Pitcher 1', async ({ page }) => {
     await page.click('.new-game-btn');
-    page.on('dialog', dialog => dialog.accept());
+    await page.waitForSelector('#screen-setup.active');
+    await page.click('#mode-simple');
     await page.fill('#hp-name', '');
     await page.fill('#ap-name', '');
     await page.click('.start-btn');
-    await expect(page.locator('#screen-setup')).toHaveClass(/active/);
+    await expect(page.locator('#screen-game')).toHaveClass(/active/);
+    await expect(page.locator('.pitcher-name')).toContainText('Pitcher 1');
   });
 
   test('start game in simple mode and add pitches', async ({ page }) => {

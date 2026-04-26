@@ -828,18 +828,17 @@ test.describe('Batch fixes (#94-#103)', () => {
     await expect(page.locator('.score-pill')).toHaveCount(0);
   });
 
-  test('#103: adding new pitcher auto-selects them', async ({ page }) => {
+  test('#103: adding new pitcher auto-selects and closes picker', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
-    // Open pitcher picker
     await page.click('#p-change-btn');
-    // Add new pitcher
     await page.fill('#new-p-name', 'New Guy');
     await page.fill('#new-p-num', '99');
     await page.click('text=Add');
-    // New pitcher should be selected (active badge visible on last row)
-    const activeLabels = page.locator('.badge-active');
-    await expect(activeLabels).toHaveCount(1);
-    // The active badge should be on the row with "New Guy"
+    // Picker auto-closes and new pitcher is the active pitcher
+    await expect(page.locator('.pitcher-name')).toContainText('New Guy');
+    // Reopen picker to verify active badge
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
     const activeRow = page.locator('.player-row', { hasText: 'New Guy' });
     await expect(activeRow.locator('.badge-active')).toBeVisible();
   });
@@ -1054,18 +1053,15 @@ test.describe('Batch fixes (#94-#103)', () => {
     await expect(page.locator('#inn-pill')).toContainText('7');
   });
 
-  test('#103: adding new catcher auto-selects them', async ({ page }) => {
+  test('#103: adding new catcher auto-selects and closes picker', async ({ page }) => {
     await startGame(page, { mode: 'simple', homeCatcher: 'CatcherA' });
-    // Open catcher picker
     const catcherChange = page.locator('#catcher-section .btn-sm', { hasText: 'Change' });
     await catcherChange.click();
-    // Add new catcher
     await page.fill('#new-c-name', 'New Catcher');
     await page.fill('#new-c-num', '7');
     await page.locator('#catcher-section').locator('text=Add').click();
-    // New catcher should be selected
-    const activeRow = page.locator('.player-row', { hasText: 'New Catcher' });
-    await expect(activeRow.locator('.badge-active')).toBeVisible();
+    // Picker auto-closes and new catcher is active
+    await expect(page.locator('#catcher-section')).toContainText('New Catcher');
   });
 
   test('#100: undo after non-pitch out side-retired reverts fully', async ({ page }) => {
@@ -1085,5 +1081,218 @@ test.describe('Batch fixes (#94-#103)', () => {
     // Undo should go back to TOP 1 with 2 outs
     await page.locator('#undo-btn-simple').click();
     await expect(page.locator('#inn-pill')).toContainText('TOP');
+  });
+});
+
+test.describe('Batch fixes (#105-#111)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  // #105: R column alignment
+  test('#105: R column in game scoreboard does not use lbl class', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 1);
+    const rCol = page.locator('.inn-scoreboard .inn-sb-col').last();
+    await expect(rCol).not.toHaveClass(/lbl/);
+    const rHeader = rCol.locator('.inn-sb-hdr');
+    await expect(rHeader).toHaveText('R');
+  });
+
+  test('#105: R column in history scoreboard does not use lbl class', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 1);
+    // End the game
+    await page.click('.menu-btn');
+    await page.locator('#game-hbg-menu .hbg-item').filter({ hasText: 'End game' }).click();
+    await page.locator('.modal-btn.red').click();
+    await page.waitForSelector('#screen-history.active');
+    const rCol = page.locator('.hist-scoreboard .hist-sb-col').last();
+    await expect(rCol).not.toHaveClass(/lbl/);
+  });
+
+  // #106: Config form alignment
+  test('#106: config form rows use align-items end', async ({ page }) => {
+    // Navigate to config from history hamburger menu
+    await page.locator('.hist-menu-btn').click();
+    await page.locator('#history-hbg-menu .hbg-item').filter({ hasText: 'Configuration' }).click();
+    await page.waitForSelector('#screen-config.active');
+    // Click edit on the default config
+    await page.locator('.config-item .btn-xs').filter({ hasText: 'Edit' }).first().click();
+    const row2 = page.locator('.row2').first();
+    await expect(row2).toHaveCSS('align-items', 'end');
+  });
+
+  // #107: Per-mode button mapping defaults
+  test('#107: simple mode defaults volume up to pitch', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Check btn-hints for "pitch" mapping (simple defaults to volUp=pitch)
+    const hintsHtml = await page.locator('.btn-hints').innerHTML();
+    expect(hintsHtml.toLowerCase()).toContain('pitch');
+  });
+
+  test('#107: advanced mode defaults volume up to calledStrike', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    // Check btn-hints for calledStrike mapping (advanced defaults to volUp=calledStrike)
+    const hintsHtml = await page.locator('.btn-hints').innerHTML();
+    expect(hintsHtml).toContain('Strike');
+  });
+
+  // #108: Button hint backwards K SVG
+  test('#108: calledStrike hint uses backwards K SVG', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    const hintArea = page.locator('.btn-hints');
+    const hintHtml = await hintArea.innerHTML();
+    expect(hintHtml).toContain('scale(-1,1)');
+  });
+
+  // #109: Auto-close picker after adding player
+  test('#109: pitcher picker closes after adding new pitcher', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.fill('#new-p-name', 'Test P.');
+    await page.locator('#pitcher-select-list .add-player-form .btn-sm').click();
+    // Picker should be closed
+    await expect(page.locator('#pitcher-select-list')).not.toHaveAttribute('style', /block/);
+    await expect(page.locator('.pitcher-name')).toContainText('Test P.');
+  });
+
+  test('#109: catcher picker closes after adding new catcher', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeCatcher: 'CatcherA' });
+    const catcherSection = page.locator('#catcher-section');
+    await catcherSection.locator('.btn-sm').filter({ hasText: 'Change' }).click();
+    await page.fill('#new-c-name', 'Test C.');
+    await catcherSection.locator('text=Add').click();
+    // Picker should be closed and new catcher selected
+    await expect(catcherSection).toContainText('Test C.');
+  });
+
+  // #110: Start game without names
+  test('#110: game starts with default pitcher name when blank', async ({ page }) => {
+    await page.click('.new-game-btn');
+    await page.waitForSelector('#screen-setup.active');
+    await page.click('#mode-simple');
+    await page.fill('#hp-name', '');
+    await page.fill('#ap-name', '');
+    await page.click('.start-btn');
+    await expect(page.locator('#screen-game')).toHaveClass(/active/);
+    await expect(page.locator('.pitcher-name')).toContainText('Pitcher 1');
+  });
+
+  test('#110: game starts with default catcher name when blank', async ({ page }) => {
+    await page.click('.new-game-btn');
+    await page.waitForSelector('#screen-setup.active');
+    await page.click('#mode-simple');
+    await page.fill('#hp-name', 'Jake');
+    await page.fill('#ap-name', 'Sam');
+    await page.click('.start-btn');
+    await expect(page.locator('#screen-game')).toHaveClass(/active/);
+    await expect(page.locator('#catcher-section')).toContainText('Catcher 1');
+  });
+
+  // #111: Game clock
+  test('#111: game clock toggle appears in hamburger menu', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await expect(page.locator('#clock-toggle-btn')).toContainText('Enable game clock');
+  });
+
+  test('#111: enabling game clock shows 00:00', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    const clock = page.locator('#game-clock');
+    await expect(clock).toBeVisible();
+    await expect(clock).toHaveText('00:00');
+  });
+
+  test('#111: clicking clock starts it running', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    const clock = page.locator('#game-clock');
+    await clock.click();
+    await expect(clock).toHaveClass(/running/);
+    // Wait and verify clock advances
+    await page.waitForTimeout(1100);
+    const text = await clock.textContent();
+    expect(text).not.toBe('00:00');
+  });
+
+  test('#111: clicking running clock pauses it', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    const clock = page.locator('#game-clock');
+    await clock.click(); // start
+    await page.waitForTimeout(1100);
+    await clock.click(); // pause
+    await expect(clock).toHaveClass(/paused/);
+    const pausedTime = await clock.textContent();
+    await page.waitForTimeout(1100);
+    // Time should not advance while paused
+    await expect(clock).toHaveText(pausedTime!);
+  });
+
+  test('#111: disabling game clock hides it', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Enable via direct JS since menu toggle is tricky in tests
+    await page.evaluate(() => { (window as any).toggleClockEnabled(); });
+    await expect(page.locator('#game-clock')).toBeVisible();
+    // Disable
+    await page.evaluate(() => { (window as any).toggleClockEnabled(); });
+    await expect(page.locator('#game-clock')).not.toBeVisible();
+  });
+
+  test('#111: menu label toggles between enable/disable', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await expect(page.locator('#clock-toggle-btn')).toContainText('Enable game clock');
+    await page.locator('#clock-toggle-btn').click();
+    await page.click('.menu-btn');
+    await expect(page.locator('#clock-toggle-btn')).toContainText('Disable game clock');
+  });
+
+  test('#111: end game stops clock automatically', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Enable and start clock
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    await page.locator('#game-clock').click();
+    await page.waitForTimeout(1100);
+    // End the game
+    await page.click('.menu-btn');
+    await page.waitForSelector('#game-hbg-menu.open');
+    await page.locator('#game-hbg-menu .hbg-item').filter({ hasText: 'End game' }).click();
+    await page.locator('.modal-btn.red').click();
+    await page.waitForSelector('#screen-history.active');
+    // Reopen game from history to verify clock stopped
+    const gameState = await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      return s.games?.[0];
+    });
+    expect(gameState.clockRunning).toBe(false);
+    expect(gameState.clockElapsed).toBeGreaterThan(0);
+  });
+
+  test('#111: clock persists across app reloads', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Enable and start clock
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    await page.locator('#game-clock').click();
+    await page.waitForTimeout(1200);
+    // Reload the page
+    await page.reload();
+    await page.waitForSelector('#screen-game.active');
+    const clock = page.locator('#game-clock');
+    await expect(clock).toBeVisible();
+    await expect(clock).toHaveClass(/running/);
+    // Should show accumulated time (at least 1 second)
+    await page.waitForTimeout(500);
+    const text = await clock.textContent();
+    expect(text).not.toBe('00:00');
   });
 });
