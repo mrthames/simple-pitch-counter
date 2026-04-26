@@ -6,7 +6,6 @@
 <meta name="description" content="Simple Pitch Counter — the free app for tracking baseball and softball pitch counts, rest-day rules, and catcher innings during little league and youth games. iOS and Android.">
 <link rel="canonical" href="https://simplepitchcounter.com/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:title" content="Simple Pitch Counter — Baseball & Softball Pitch Tracking">
 <meta property="og:description" content="Track pitch counts, rest-day rules, and game summaries for youth baseball and softball. Free, no ads, no accounts.">
@@ -1314,6 +1313,35 @@
                 <span>+ Out</span>
                 <span>Next batter ›</span>
               </div>
+              <div class="pc-alert warn">
+                <div class="pc-alert-dot"></div>
+                <span>Approaching 50 pitch limit, 13 remain.</span>
+              </div>
+              <!-- Catcher section (matches hero) -->
+              <div class="pc-catcher-section">
+                <div class="pc-catcher-header">
+                  <div>
+                    <div class="pc-section-lbl">Catcher</div>
+                    <div class="pc-catcher-name">Mike C. <span style="color:rgba(60,60,67,.35);font-weight:500">#8</span></div>
+                  </div>
+                  <div class="pc-change-btn">Change</div>
+                </div>
+                <div class="pc-catcher-card">
+                  <div>
+                    <div class="pc-catcher-remaining">2 innings remaining</div>
+                    <div class="pc-inn-pips">
+                      <div class="pc-inn-pip filled"></div>
+                      <div class="pc-inn-pip filled"></div>
+                      <div class="pc-inn-pip"></div>
+                      <div class="pc-inn-pip"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="pc-catcher-count">2</div>
+                    <div class="pc-catcher-of">of 4 inn.</div>
+                  </div>
+                </div>
+              </div>
               <!-- Button hints showing active mapping -->
               <div class="pc-btn-hints">
                 <div class="pc-btn-hint" style="background:rgba(255,59,48,0.08);border:1px solid rgba(255,59,48,0.2)">
@@ -1326,10 +1354,6 @@
                   <span class="pc-btn-hint-dot" style="background:#1A6BFF"></span>
                   <span style="font-size:10px;font-weight:700;color:#1A6BFF">Ball</span>
                 </div>
-              </div>
-              <div class="pc-alert warn">
-                <div class="pc-alert-dot"></div>
-                <span>Approaching 50 pitch limit, 13 remain.</span>
               </div>
             </div>
             </div><!-- end phone-inner -->
