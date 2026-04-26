@@ -855,4 +855,235 @@ test.describe('Batch fixes (#94-#103)', () => {
     await page.waitForSelector('.modal-overlay', { timeout: 3000 });
     await expect(page.locator('.modal-box')).toContainText('6 innings');
   });
+
+  test('#94: umpire names persist through live game summary visit', async ({ page }) => {
+    await page.click('.new-game-btn');
+    await page.waitForSelector('#screen-setup.active');
+    await page.click('#mode-simple');
+    await page.fill('#s-home', 'Eagles');
+    await page.fill('#s-away', 'Hawks');
+    await page.fill('#hp-name', 'Jake');
+    await page.fill('#ap-name', 'Sam');
+    await page.fill('#s-ump-plate', 'John Smith');
+    await page.fill('#s-ump-base', 'Mike Jones');
+    await page.click('.start-btn');
+    await page.waitForSelector('#screen-game.active');
+    // Visit summary during live game
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'Game summary' }).click();
+    await page.waitForSelector('#screen-summary.active');
+    await expect(page.locator('#sum-pu-name')).toHaveValue('John Smith');
+    await expect(page.locator('#sum-bu-name')).toHaveValue('Mike Jones');
+    // Go back and end game
+    await page.click('text=‹ Back');
+    await page.waitForSelector('#screen-game.active');
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'End game' }).click();
+    await page.locator('.modal-btn.red').click();
+    await page.waitForSelector('#screen-history.active');
+    // Verify umpire names still persist in saved game summary
+    await page.locator('.hist-action-btn', { hasText: 'Summary' }).first().click();
+    await page.waitForSelector('#screen-summary.active');
+    await expect(page.locator('#sum-pu-name')).toHaveValue('John Smith');
+    await expect(page.locator('#sum-bu-name')).toHaveValue('Mike Jones');
+  });
+
+  test('#95: division prefix in email subject', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'Game summary' }).click();
+    await page.waitForSelector('#screen-summary.active');
+    await page.fill('#sum-division', 'Minors 8');
+    await page.click('text=‹ Back');
+    // End game
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'End game' }).click();
+    await page.locator('.modal-btn.red').click();
+    await page.waitForSelector('#screen-history.active');
+    // Open summary and generate export
+    await page.locator('.hist-action-btn', { hasText: 'Summary' }).first().click();
+    await page.waitForSelector('#screen-summary.active');
+    // Save and generate report
+    await page.locator('.summary-action-btn', { hasText: 'Share' }).click();
+    await page.waitForSelector('#active-modal .export-box');
+    // Check export text includes division
+    const exportText = await page.locator('#active-modal .export-box').textContent();
+    expect(exportText).toContain('Minors 8');
+  });
+
+  test('#95: division in export body text', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'Game summary' }).click();
+    await page.waitForSelector('#screen-summary.active');
+    await page.fill('#sum-division', 'Majors');
+    await page.click('text=‹ Back');
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'End game' }).click();
+    await page.locator('.modal-btn.red').click();
+    await page.waitForSelector('#screen-history.active');
+    await page.locator('.hist-action-btn', { hasText: 'Summary' }).first().click();
+    await page.waitForSelector('#screen-summary.active');
+    await page.locator('.summary-action-btn', { hasText: 'Share' }).click();
+    await page.waitForSelector('#active-modal .export-box');
+    const exportText = await page.locator('#active-modal .export-box').textContent();
+    expect(exportText).toContain('Majors');
+  });
+
+  test('#96: live game is always expanded in history', async ({ page }) => {
+    // End a game first so there's a completed game
+    await startGame(page, { mode: 'simple', homeTeam: 'Old', awayTeam: 'Game' });
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'End game' }).click();
+    await page.locator('.modal-btn.red').click();
+    await page.waitForSelector('#screen-history.active');
+    // Start a new game and close to history (live)
+    await startGame(page, { mode: 'simple', homeTeam: 'Live', awayTeam: 'Game' });
+    await page.click('.menu-btn');
+    await page.locator('.hbg-item', { hasText: 'Close' }).click();
+    await page.waitForSelector('#screen-history.active');
+    // Live game card (index 0) should have Resume visible
+    const liveCard = page.locator('.swipe-card-wrap').first();
+    await expect(liveCard.locator('.hist-action-btn', { hasText: 'Resume' })).toBeVisible();
+  });
+
+  test('#96: Hide details toggle collapses expanded card', async ({ page }) => {
+    // Create 3 completed games
+    for (let i = 0; i < 3; i++) {
+      await startGame(page, { mode: 'simple', homeTeam: `T${i}H`, awayTeam: `T${i}A` });
+      await page.click('.menu-btn');
+      await page.locator('.hbg-item', { hasText: 'End game' }).click();
+      await page.locator('.modal-btn.red').click();
+      await page.waitForSelector('#screen-history.active');
+    }
+    // Expand the third card
+    const thirdCard = page.locator('.swipe-card-wrap').nth(2);
+    await thirdCard.locator('text=Show details').click();
+    await expect(page.locator('#hist-detail-2')).toBeVisible();
+    // Now hide it
+    await thirdCard.locator('text=Hide details').click();
+    await expect(page.locator('#hist-detail-2')).toBeHidden();
+  });
+
+  test('#97: game mercy warning at 1 run away', async ({ page }) => {
+    await page.evaluate(() => {
+      (window as any).saveState();
+    }).catch(() => {});
+    await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      if (!s.configs) s.configs = [];
+      if (s.configs[0]) { s.configs[0].mercyGame = 5; s.configs[0].mercyRuns = 0; }
+      localStorage.setItem('spc_v1', JSON.stringify(s));
+    });
+    await page.reload();
+    await page.waitForSelector('#screen-history.active');
+    await startGame(page, { mode: 'simple' });
+    // Add 4 runs (1 away from 5-run game mercy)
+    for (let i = 0; i < 4; i++) {
+      await page.click('.sb-adj >> nth=1');
+    }
+    // Should see warning alert about game mercy
+    await expect(page.locator('.alert.a-warn')).toContainText('game mercy');
+  });
+
+  test('#97: game mercy Continue dismisses modal', async ({ page }) => {
+    await page.evaluate(() => {
+      (window as any).saveState();
+    }).catch(() => {});
+    await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      if (!s.configs) s.configs = [];
+      if (s.configs[0]) s.configs[0].mercyGame = 3;
+      localStorage.setItem('spc_v1', JSON.stringify(s));
+    });
+    await page.reload();
+    await page.waitForSelector('#screen-history.active');
+    await startGame(page, { mode: 'simple' });
+    for (let i = 0; i < 3; i++) {
+      await page.click('.sb-adj >> nth=1');
+    }
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await page.locator('.modal-btn', { hasText: 'Continue' }).click();
+    // Modal should be gone, game continues
+    await expect(page.locator('.modal-overlay')).toHaveCount(0);
+    await expect(page.locator('#screen-game')).toHaveClass(/active/);
+  });
+
+  test('#97: game mercy End game ends the game', async ({ page }) => {
+    await page.evaluate(() => {
+      (window as any).saveState();
+    }).catch(() => {});
+    await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      if (!s.configs) s.configs = [];
+      if (s.configs[0]) s.configs[0].mercyGame = 3;
+      localStorage.setItem('spc_v1', JSON.stringify(s));
+    });
+    await page.reload();
+    await page.waitForSelector('#screen-history.active');
+    await startGame(page, { mode: 'simple' });
+    for (let i = 0; i < 3; i++) {
+      await page.click('.sb-adj >> nth=1');
+    }
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    // Click End game on mercy modal
+    await page.locator('.modal-btn', { hasText: 'End game' }).click();
+    // Should show confirmEndGame modal
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await page.locator('.modal-btn.red', { hasText: 'End now' }).click();
+    await page.waitForSelector('#screen-history.active');
+  });
+
+  test('#98: R column header has centered justify-content', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    const rHeader = page.locator('.inn-sb-hdr', { hasText: 'R' });
+    await expect(rHeader).toHaveCSS('justify-content', 'center');
+  });
+
+  test('#99: tied game at max innings allows extra innings', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Play through 6 innings (12 half-innings), score stays 0-0 (tied)
+    for (let i = 0; i < 12; i++) {
+      await page.click('.end-half-btn');
+      await page.click('.modal-btn.amber');
+    }
+    // Should NOT see game complete modal since tied 0-0
+    await page.waitForTimeout(500);
+    await expect(page.locator('.modal-overlay')).toHaveCount(0);
+    // Should be in inning 7
+    await expect(page.locator('#inn-pill')).toContainText('7');
+  });
+
+  test('#103: adding new catcher auto-selects them', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homeCatcher: 'CatcherA' });
+    // Open catcher picker
+    const catcherChange = page.locator('#catcher-section .btn-sm', { hasText: 'Change' });
+    await catcherChange.click();
+    // Add new catcher
+    await page.fill('#new-c-name', 'New Catcher');
+    await page.fill('#new-c-num', '7');
+    await page.locator('#catcher-section').locator('text=Add').click();
+    // New catcher should be selected
+    const activeRow = page.locator('.player-row', { hasText: 'New Catcher' });
+    await expect(activeRow.locator('.badge-active')).toBeVisible();
+  });
+
+  test('#100: undo after non-pitch out side-retired reverts fully', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Get to 2 outs via non-pitch outs
+    await page.locator('#simple-content .adv-secondary-btn', { hasText: '+ Out' }).click();
+    await page.locator('#simple-content .adv-secondary-btn', { hasText: '+ Out' }).click();
+    // Add a pitch for state to track
+    await page.click('text=+ Pitch');
+    // Third out via non-pitch out
+    await page.locator('#simple-content .adv-secondary-btn', { hasText: '+ Out' }).click();
+    // Side retired modal
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await page.locator('.modal-btn.amber').click();
+    // Now in BOT 1
+    await expect(page.locator('#inn-pill')).toContainText('BOT');
+    // Undo should go back to TOP 1 with 2 outs
+    await page.locator('#undo-btn-simple').click();
+    await expect(page.locator('#inn-pill')).toContainText('TOP');
+  });
 });
