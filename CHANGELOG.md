@@ -4,6 +4,19 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.47 — OG image refresh: real screenshots, balanced layout
+
+**Files:** `marketing/og-image.html`, `marketing/finals/og-image-1200x630.png`, `website/images/og-image-1200x630.png`
+
+### Branding
+- **OG image phones now show real screenshots** — replaced broken `finals/01-advanced-mode-screen.png` and `finals/02-simple-mode-screen.png` paths with `screen-04-advanced.png` and `screen-02-simple.png` (which actually exist in `marketing/`). Front phone shows simple mode (the priority feature for new users), back phone shows advanced.
+- **Phones nudged left** — `.phones { right: 10px → 80px }` so the device cluster sits more comfortably away from the right edge
+
+### Versioning
+- Version bumped to 2.47 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.46 — Website logo update + restored OG image
 
 **Files:** `website/*.html`, `website/favicon.png`, `website/apple-touch-icon.png`, `website/images/og-image-1200x630.png`, `scripts/generate-icons.mjs`, `marketing/finals/og-image-1200x630.png`
