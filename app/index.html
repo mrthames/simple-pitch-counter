@@ -841,7 +841,7 @@ textarea{resize:vertical;min-height:56px}
         <div style="width:56px;height:56px;border-radius:14px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff">#</div>
         <div>
           <div style="font-size:18px;font-weight:700">Simple Pitch Counter</div>
-          <div style="font-size:13px;color:var(--t2)">Version 2.42</div>
+          <div style="font-size:13px;color:var(--t2)">Version 2.43</div>
         </div>
       </div>
       <div style="font-size:14px;color:var(--t2);line-height:1.5">
@@ -1192,6 +1192,7 @@ function recordHBP(){
   ap.pitchTypes=ap.pitchTypes||{B:0,CS:0,SS:0,F:0,BIP:0};
   ap.pitchTypes.B=(ap.pitchTypes.B||0)+1;
   ap.hbps=(ap.hbps||0)+1;
+  ap.bbs=(ap.bbs||0)+1;
   if(!g.atBatLog)g.atBatLog=[];
   g.atBatLog.push('B');
   haptic('medium');animatePop();
@@ -1800,16 +1801,19 @@ function renderPitcherListCardToCanvas(gameData){
     allP.forEach(p=>{
       const s=pitcherDerivedStats(p);const ri2=restInfo(p.pitches);
       const rc=!ri2||ri2.days===0?'#34C759':ri2.days===1?'#FF9500':'#FF3B30';
-      ctx.fillStyle='rgba(255,255,255,.06)';ctx.beginPath();ctx.roundRect(pad,y,W-pad*2,80,14);ctx.fill();
+      const rowH=104;
+      ctx.fillStyle='rgba(255,255,255,.06)';ctx.beginPath();ctx.roundRect(pad,y,W-pad*2,rowH,14);ctx.fill();
       ctx.fillStyle='#fff';ctx.font='bold 22px -apple-system,system-ui,sans-serif';
       ctx.fillText(p.name+(p.num?' #'+p.num:''),pad+16,y+28);
-      ctx.fillStyle='rgba(235,235,245,.5)';ctx.font='500 16px -apple-system,system-ui,sans-serif';
+      ctx.fillStyle='rgba(235,235,245,.5)';ctx.font='500 15px -apple-system,system-ui,sans-serif';
       ctx.fillText(`${p.team} · ${s.ip} IP · Last batter: ${p.lastBatterPitches||0}`,pad+16,y+52);
+      ctx.fillStyle='rgba(235,235,245,.6)';ctx.font='600 14px -apple-system,system-ui,sans-serif';
+      ctx.fillText(`K: ${s.ks} · BB: ${s.bbs} · HBP: ${s.hbps}`,pad+16,y+76);
       ctx.fillStyle='#fff';ctx.font='bold 30px -apple-system,system-ui,sans-serif';
       const ct=String(p.pitches);const cw=ctx.measureText(ct).width;ctx.fillText(ct,W-pad-16-cw,y+34);
       ctx.fillStyle=rc;ctx.font='600 14px -apple-system,system-ui,sans-serif';
       const rt=ri2?ri2.label:'';const rw=ctx.measureText(rt).width;ctx.fillText(rt,W-pad-16-rw,y+56);
-      y+=92;
+      y+=rowH+12;
     });
     y+=10;ctx.fillStyle='rgba(235,235,245,.3)';ctx.font='500 16px -apple-system,system-ui,sans-serif';
     const tag='Simple Pitch Counter';const tagW=ctx.measureText(tag).width;ctx.fillText(tag,(W-tagW)/2,y+=20);
