@@ -4,6 +4,25 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.45 — Blue S app icon, plus iOS dark-mode variant
+
+**Files:** `marketing/logo/`, `scripts/generate-icons.mjs`, `app/Assets.xcassets/AppIcon.appiconset/`, `android/app/src/main/res/mipmap-*/`, `build.gradle.kts`, `project.pbxproj`
+
+### Branding
+- **Light icon updated** — primary mark switched from red S to **blue S** (matches the in-app dark-header navy `#0b1c3a`). Same baseball motif, opaque white background.
+- **iOS dark-mode icon added** — red S on dark grey, swapped automatically when iOS appearance is set to dark
+- Source assets in `marketing/logo/` updated to the new blue-S light + red-S dark PNGs (4267×4267); old red-S light source removed
+- Android does not have a system-level dark icon, so the blue-S variant is used everywhere on Android
+
+### Tooling
+- `scripts/generate-icons.mjs` now reads from two source PNGs and writes both iOS variants (`icon_1024x1024.png` and `icon_1024x1024_dark.png`) plus a Contents.json that registers the dark appearance
+- Added `*.psd` to `.gitignore`
+
+### Versioning
+- Version bumped to 2.45 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.44 — New app icon
 
 **Files:** `marketing/logo/`, `scripts/generate-icons.mjs`, `app/Assets.xcassets/AppIcon.appiconset/`, `android/app/src/main/res/mipmap-*/`, `build.gradle.kts`, `project.pbxproj`
