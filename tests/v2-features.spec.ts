@@ -1236,14 +1236,16 @@ test.describe('Batch fixes (#105-#111)', () => {
     expect(text).not.toBe('00:00');
   });
 
-  test('#111: clicking running clock pauses it', async ({ page }) => {
+  test('#111: clicking running clock pauses it (after confirm)', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     await page.click('.menu-btn');
     await page.locator('#clock-toggle-btn').click();
     const clock = page.locator('#game-clock');
     await clock.click(); // start
     await page.waitForTimeout(1100);
-    await clock.click(); // pause
+    await clock.click(); // request pause
+    await page.waitForSelector('.modal-overlay');
+    await page.locator('.modal-btn.amber').click(); // confirm pause
     await expect(clock).toHaveClass(/paused/);
     const pausedTime = await clock.textContent();
     await page.waitForTimeout(1100);
@@ -1309,6 +1311,243 @@ test.describe('Batch fixes (#105-#111)', () => {
     await page.waitForTimeout(500);
     const text = await clock.textContent();
     expect(text).not.toBe('00:00');
+  });
+});
+
+// ── V2.42 fixes ──
+
+test.describe('#136: Hit By Pitch button', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('HBP button is visible in advanced mode', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    const btn = page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' });
+    await expect(btn).toBeVisible();
+  });
+
+  test('HBP button is visible in simple mode', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    const btn = page.locator('#simple-content .adv-secondary-btn', { hasText: '+ HBP' });
+    await expect(btn).toBeVisible();
+  });
+
+  test('HBP button sits next to + Out', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    const labels = await page.locator('#adv-content .adv-secondary-btn').allTextContents();
+    const outIdx = labels.findIndex(t => t.trim() === '+ Out');
+    const hbpIdx = labels.findIndex(t => t.trim() === '+ HBP');
+    expect(outIdx).toBeGreaterThan(-1);
+    expect(hbpIdx).toBeGreaterThan(-1);
+    expect(Math.abs(hbpIdx - outIdx)).toBe(1);
+  });
+
+  test('tapping HBP advances to next batter', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    await throwPitches(page, 'B', 2);
+    expect(await page.locator('#balls-num').textContent()).toBe('2');
+    await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
+    await waitForFlashToClear(page);
+    // Counts reset for new batter
+    await expect(page.locator('#balls-num')).toHaveText('0');
+    await expect(page.locator('#strikes-num')).toHaveText('0');
+  });
+
+  test('HBP increments pitcher pitch count and ball type', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
+    await waitForFlashToClear(page);
+    const data = await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      const pitcher = s.currentGame.home.pitchers[0];
+      return { pitches: pitcher.pitches, b: pitcher.pitchTypes.B, hbps: pitcher.hbps };
+    });
+    expect(data.pitches).toBe(1);
+    expect(data.b).toBe(1);
+    expect(data.hbps).toBe(1);
+  });
+
+  test('HBP does not increment outs', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
+    await waitForFlashToClear(page);
+    const outs = await page.locator('.out-dot.filled').count();
+    expect(outs).toBe(0);
+  });
+
+  test('HBP does not increment walks', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
+    await waitForFlashToClear(page);
+    const bbs = await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      return s.currentGame.home.pitchers[0].bbs || 0;
+    });
+    expect(bbs).toBe(0);
+  });
+
+  test('HBP can be undone', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
+    await waitForFlashToClear(page);
+    await page.locator('#undo-btn-adv').click();
+    const data = await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      const p = s.currentGame.home.pitchers[0];
+      return { pitches: p.pitches, hbps: p.hbps || 0 };
+    });
+    expect(data.pitches).toBe(0);
+    expect(data.hbps).toBe(0);
+  });
+
+  test('HBP appears in pitcher stats list when advanced mode', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
+    await waitForFlashToClear(page);
+    await page.click('.menu-btn');
+    await page.waitForSelector('#game-hbg-menu.open');
+    await page.locator('#game-hbg-menu .hbg-item').filter({ hasText: 'Pitcher stats' }).click();
+    await expect(page.locator('body')).toContainText(/HBP/);
+  });
+});
+
+test.describe('#137: Hamburger menu closes after toggling clock', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('enabling game clock closes the hamburger menu', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.waitForSelector('#game-hbg-menu.open');
+    await page.locator('#clock-toggle-btn').click();
+    // Menu should no longer be open
+    await expect(page.locator('#game-hbg-menu')).not.toHaveClass(/open/);
+  });
+
+  test('disabling game clock closes the hamburger menu', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Enable first
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    // Re-open and disable
+    await page.click('.menu-btn');
+    await page.waitForSelector('#game-hbg-menu.open');
+    await page.locator('#clock-toggle-btn').click();
+    await expect(page.locator('#game-hbg-menu')).not.toHaveClass(/open/);
+  });
+});
+
+test.describe('#138: Game clock hour rollover', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('fmtClock formats under 60 min as MM:SS', async ({ page }) => {
+    const txt = await page.evaluate(() => (window as any).fmtClock(45 * 60 * 1000 + 23 * 1000));
+    expect(txt).toBe('45:23');
+  });
+
+  test('fmtClock formats exactly 60 min as 1:00:00', async ({ page }) => {
+    const txt = await page.evaluate(() => (window as any).fmtClock(60 * 60 * 1000));
+    expect(txt).toBe('1:00:00');
+  });
+
+  test('fmtClock formats over 60 min as H:MM:SS', async ({ page }) => {
+    const txt = await page.evaluate(() => (window as any).fmtClock(75 * 60 * 1000 + 23 * 1000));
+    expect(txt).toBe('1:15:23');
+  });
+
+  test('fmtClock formats multi-hour times correctly', async ({ page }) => {
+    const txt = await page.evaluate(() => (window as any).fmtClock((2 * 3600 + 5 * 60 + 9) * 1000));
+    expect(txt).toBe('2:05:09');
+  });
+
+  test('live clock displays formatted output via fmtClock', async ({ page }) => {
+    // Verifies that the display path calls fmtClock by running a real clock briefly
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    await page.locator('#game-clock').click();
+    await page.waitForTimeout(1100);
+    // Output should match MM:SS format under one hour
+    await expect(page.locator('#game-clock')).toHaveText(/^\d{2}:\d{2}$/);
+  });
+});
+
+test.describe('#139: Pause confirmation modal', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('starting clock does NOT show modal', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    await page.locator('#game-clock').click(); // start
+    // No modal should appear
+    await expect(page.locator('.modal-overlay')).toHaveCount(0);
+    await expect(page.locator('#game-clock')).toHaveClass(/running/);
+  });
+
+  test('clicking running clock shows pause confirmation modal', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    const clock = page.locator('#game-clock');
+    await clock.click(); // start
+    await page.waitForTimeout(500);
+    await clock.click(); // request pause
+    await expect(page.locator('.modal-overlay')).toBeVisible();
+    await expect(page.locator('.modal-overlay')).toContainText(/Pause game clock/);
+  });
+
+  test('cancelling pause keeps clock running', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    const clock = page.locator('#game-clock');
+    await clock.click(); // start
+    await page.waitForTimeout(500);
+    await clock.click(); // request pause
+    await page.waitForSelector('.modal-overlay');
+    // Click Cancel
+    await page.locator('.modal-btn').filter({ hasText: 'Cancel' }).click();
+    await expect(page.locator('.modal-overlay')).toHaveCount(0);
+    await expect(clock).toHaveClass(/running/);
+  });
+
+  test('confirming pause stops the clock', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    const clock = page.locator('#game-clock');
+    await clock.click(); // start
+    await page.waitForTimeout(500);
+    await clock.click(); // request pause
+    await page.waitForSelector('.modal-overlay');
+    await page.locator('.modal-btn.amber').click(); // confirm
+    await expect(page.locator('.modal-overlay')).toHaveCount(0);
+    await expect(clock).toHaveClass(/paused/);
+  });
+
+  test('resuming a paused clock does NOT show modal', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.locator('#clock-toggle-btn').click();
+    const clock = page.locator('#game-clock');
+    await clock.click(); // start
+    await page.waitForTimeout(500);
+    await clock.click(); // request pause
+    await page.locator('.modal-btn.amber').click(); // confirm pause
+    await clock.click(); // resume - no modal
+    await expect(page.locator('.modal-overlay')).toHaveCount(0);
+    await expect(clock).toHaveClass(/running/);
   });
 });
 
