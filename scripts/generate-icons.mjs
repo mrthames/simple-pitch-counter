@@ -22,6 +22,7 @@ const ANDROID_BG_HEX = '#0b1c3a';
 
 const iosOut = resolve(root, 'app/Assets.xcassets/AppIcon.appiconset');
 const androidRes = resolve(root, 'android/app/src/main/res');
+const websiteOut = resolve(root, 'website');
 
 const ANDROID_DENSITIES = [
   { dir: 'mipmap-mdpi',    fg: 108, legacy: 48 },
@@ -106,6 +107,18 @@ async function updateAndroidBackgroundColor() {
   console.log(`  Android bg color → ${ANDROID_BG_HEX}`);
 }
 
+async function generateWebsiteIcons() {
+  // Standard favicon (used by browsers, RSS readers, link previews).
+  await sharp(SRC_LIGHT).resize(32, 32, { fit: 'cover' }).png()
+    .toFile(resolve(websiteOut, 'favicon.png'));
+  console.log('  Web: favicon.png (32x32)');
+
+  // Apple touch icon (iOS Add to Home Screen, Safari pinned tabs).
+  await sharp(SRC_LIGHT).resize(180, 180, { fit: 'cover' }).png()
+    .toFile(resolve(websiteOut, 'apple-touch-icon.png'));
+  console.log('  Web: apple-touch-icon.png (180x180)');
+}
+
 async function main() {
   console.log(`Light source: ${SRC_LIGHT}`);
   console.log(`Dark source:  ${SRC_DARK}`);
@@ -118,6 +131,9 @@ async function main() {
   console.log('\nGenerating Android icons (light variant only)…');
   for (const d of ANDROID_DENSITIES) await generateAndroidForDensity(d);
   await updateAndroidBackgroundColor();
+
+  console.log('\nGenerating website icons…');
+  await generateWebsiteIcons();
 
   console.log('\nDone.');
 }
