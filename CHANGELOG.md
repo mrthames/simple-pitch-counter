@@ -4,6 +4,21 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.49 — README refresh
+
+**Files:** `README.md`
+
+### Documentation
+- Test counts updated: total 231 → 254 tests; v2-features spec 95 → 118 tests
+- Favicon references updated: `favicon.svg` → `favicon.png` (blue-S app icon mark) plus `apple-touch-icon.png`
+- Added Hit By Pitch button and game-clock-with-confirmation to the key features list
+- Refreshed v2-features spec coverage description to mention the V2.42–V2.43 additions (HBP, hour rollover, pause modal, hamburger close, pitcher-list export)
+
+### Versioning
+- Version bumped to 2.49 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.48 — Homepage hero line break
 
 **Files:** `website/index.html`

@@ -27,6 +27,8 @@ Simple Pitch Counter tracks pitch counts and catcher innings during live games, 
 - **Mercy rule auto-prompt** — when runs scored in a half inning reach the configured mercy limit, a modal prompts to end the half or continue playing; tracks runs from either team
 - **Advanced pitch tracking** — tracks balls, strikes, and outs automatically; records pitch-by-pitch sequences per at-bat with visual chips; auto-advances count on walks, strikeouts, and balls in play
 - **Ball in play outcomes** — when a ball is put in play, a bottom sheet prompts for Safe/Out with automatic out tracking and side-retired detection
+- **Hit By Pitch button** — record HBP with one tap; tracked as a walk on the BB hero count, with HBP also broken out as its own pitcher stat
+- **Game clock with confirmation** — toggleable elapsed-time clock; rolls over from MM:SS to H:MM:SS at the one-hour mark, requires confirmation before pausing to prevent accidental stops
 - **Inning scoreboard** — live inning-by-inning scoreboard in the game view with team abbreviations and R column; also displayed in game history cards and on shared stats card exports
 - **Editable inning cells** — tap past inning cells to correct scores; team totals recalculate automatically
 - **9-inning auto-end** — prompts to end the game after 9 innings when the score is not tied; allows extra innings when tied
@@ -81,7 +83,7 @@ simple-pitch-counter/
 │       ├── java/.../MainActivity.kt  # WebView config, haptics, volume buttons
 │       ├── assets/index.html         # Shared web app (tracked in git)
 │       └── res/                      # Adaptive icons and resources
-├── tests/                  # Playwright E2E tests (231 tests)
+├── tests/                  # Playwright E2E tests (254 tests)
 │   ├── helpers.ts          # Shared test utilities (startGame, addPitches, etc.)
 │   ├── core-game-flow.spec.ts      # Game lifecycle, scoring, outs, undo
 │   ├── advanced-mode.spec.ts       # Pitch types, BSO count, BIP, auto-advance
@@ -108,7 +110,8 @@ simple-pitch-counter/
 │   ├── travel-ball-pitch-counts.html # Travel ball pitch counts
 │   ├── mercy-rule.html             # Mercy rule explainer
 │   ├── what-is-pitch-count.html    # What is a pitch count
-│   ├── favicon.svg         # Baseball emoji favicon
+│   ├── favicon.png         # Blue-S app icon favicon
+│   ├── apple-touch-icon.png # iOS Add to Home Screen icon
 │   └── *.php               # PHP backends (not tracked — contain credentials)
 ├── marketing/              # App Store screenshot assets
 │   ├── screenshots.html    # Screenshot background templates (8 slides)
@@ -122,7 +125,7 @@ simple-pitch-counter/
 
 ## Testing
 
-The project has **231 Playwright E2E tests** covering all app functionality:
+The project has **254 Playwright E2E tests** covering all app functionality:
 
 | Spec file | Tests | Coverage |
 |-----------|-------|----------|
@@ -134,7 +137,7 @@ The project has **231 Playwright E2E tests** covering all app functionality:
 | `shareable-stats` | 18 | Share features, swipe-to-dismiss, image card exports, K/BB/BIP boxes |
 | `history-config` | 19 | History cards, config presets, setup flow, umpire clearing |
 | `about-screen` | 8 | About screen, app info, links, back navigation |
-| `v2-features` | 95 | Name editing, button mapping, pitcher stats list, inning scoreboard, editable cells, 9-inning auto-end, share card scoreboard, history scoreboard, review prompts, batch bug fixes, game clock, acronym labels |
+| `v2-features` | 118 | Name editing, button mapping, pitcher stats list, inning scoreboard, editable cells, 9-inning auto-end, share card scoreboard, history scoreboard, review prompts, batch bug fixes, game clock, acronym labels, Hit By Pitch button, hour rollover, pause confirmation modal, hamburger close, pitcher-list export |
 | `version-sync` | 2 | Version string consistency across Android, iOS, and app UI |
 
 ```bash
@@ -177,7 +180,7 @@ A static marketing site (12 pages) hosted on a Synology NAS via Web Station:
 - Confirmation emails sent to submitters from all three forms
 - Clean URLs via directory-based Nginx routing
 - Open Graph meta tags with branded 1200×630 images for link previews
-- SVG baseball favicon across all pages
+- PNG favicon (blue-S app icon mark) and Apple Touch icon across all pages
 - Deployed at simplepitchcounter.com
 
 ## Deployment
