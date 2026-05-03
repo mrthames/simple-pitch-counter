@@ -4,6 +4,18 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.48 — Homepage hero line break
+
+**Files:** `website/index.html`
+
+### Polish
+- **Forced line break in hero headline** — `Track every pitch. Every game.` was wrapping inconsistently depending on viewport width; replaced the space between sentences with `<br>` so "Every game." always sits below "Track every pitch.", regardless of device size
+
+### Versioning
+- Version bumped to 2.48 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.47 — OG image refresh: real screenshots, balanced layout
 
 **Files:** `marketing/og-image.html`, `marketing/finals/og-image-1200x630.png`, `website/images/og-image-1200x630.png`
