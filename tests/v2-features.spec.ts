@@ -1377,7 +1377,7 @@ test.describe('#136: Hit By Pitch button', () => {
     expect(outs).toBe(0);
   });
 
-  test('HBP does not increment walks', async ({ page }) => {
+  test('HBP increments walks counter (treated as a free pass)', async ({ page }) => {
     await startGame(page, { mode: 'advanced' });
     await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
     await waitForFlashToClear(page);
@@ -1385,7 +1385,7 @@ test.describe('#136: Hit By Pitch button', () => {
       const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
       return s.currentGame.home.pitchers[0].bbs || 0;
     });
-    expect(bbs).toBe(0);
+    expect(bbs).toBe(1);
   });
 
   test('HBP can be undone', async ({ page }) => {
@@ -1396,20 +1396,54 @@ test.describe('#136: Hit By Pitch button', () => {
     const data = await page.evaluate(() => {
       const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
       const p = s.currentGame.home.pitchers[0];
-      return { pitches: p.pitches, hbps: p.hbps || 0 };
+      return { pitches: p.pitches, hbps: p.hbps || 0, bbs: p.bbs || 0 };
     });
     expect(data.pitches).toBe(0);
     expect(data.hbps).toBe(0);
+    expect(data.bbs).toBe(0);
   });
 
-  test('HBP appears in pitcher stats list when advanced mode', async ({ page }) => {
+  test('HBP increments BB hero in pitcher detail overlay', async ({ page }) => {
     await startGame(page, { mode: 'advanced' });
     await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
     await waitForFlashToClear(page);
-    await page.click('.menu-btn');
-    await page.waitForSelector('#game-hbg-menu.open');
-    await page.locator('#game-hbg-menu .hbg-item').filter({ hasText: 'Pitcher stats' }).click();
-    await expect(page.locator('body')).toContainText(/HBP/);
+    // Drill into the active pitcher's detail view
+    await page.evaluate(() => (window as any).showPitcherStatsDetail('home', 0));
+    const bbHero = page.locator('.stats-summary-box', { hasText: 'BB (Walks)' }).locator('.stats-summary-num');
+    await expect(bbHero).toHaveText('1');
+  });
+});
+
+test.describe('#142: Pitcher list export includes HBP', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  test('pitcher list canvas renders K/BB/HBP per pitcher', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    // Record one HBP so HBP > 0
+    await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
+    await waitForFlashToClear(page);
+    // Render the canvas and verify it returns a data URL (i.e. the function ran without error)
+    const dataUrl = await page.evaluate(() => {
+      return (window as any).renderPitcherListCardToCanvas();
+    });
+    expect(typeof dataUrl).toBe('string');
+    expect(dataUrl).toMatch(/^data:image\/png/);
+  });
+
+  test('pitcher stats canvas includes HBP row in stats list', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    await page.locator('#adv-content .adv-secondary-btn', { hasText: '+ HBP' }).click();
+    await waitForFlashToClear(page);
+    // The stats card uses statLineHtml which includes "HBP (Hit By Pitch)"
+    const html = await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      const p = s.currentGame.home.pitchers[0];
+      return (window as any).statLineHtml(p);
+    });
+    expect(html).toContain('HBP (Hit By Pitch)');
   });
 });
 

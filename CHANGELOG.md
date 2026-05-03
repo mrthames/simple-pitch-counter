@@ -4,6 +4,24 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.43 — HBP counts as walk; HBP added to pitcher list export
+
+**Files:** `app/index.html`, `android/app/src/main/assets/index.html`, `build.gradle.kts`, `project.pbxproj`, `tests/v2-features.spec.ts`
+**Issues:** #141, #142
+
+### Bug fixes
+- **HBP now increments BB hero count** (#141) — recording a hit-by-pitch now bumps both the pitcher's `bbs` (walks) and `hbps` counters so the BB (Walks) hero in the stats overlay reflects the runner reaching base. HBP remains tracked separately as its own stat line.
+
+### Improvements
+- **Pitcher-list export image now shows K · BB · HBP per pitcher** (#142) — the shared multi-pitcher card rendered via `renderPitcherListCardToCanvas` now surfaces the K/BB/HBP line below team/IP/last-batter info. Individual stats card already included HBP from V2.42.
+
+### Testing & versioning
+- Updated existing HBP-vs-walks test to assert BB increments (was: BB stays 0)
+- Added 3 tests: BB hero shows 1 after HBP, pitcher-list canvas renders, and stats card statLineHtml includes HBP
+- Version bumped to 2.43 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.42 — Hit By Pitch and game clock UX fixes
 
 **Files:** `app/index.html`, `android/app/src/main/assets/index.html`, `build.gradle.kts`, `project.pbxproj`, `tests/v2-features.spec.ts`
