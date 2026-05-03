@@ -4,6 +4,18 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.50 — Hero font scales down on iPhone widths
+
+**Files:** `website/index.html`
+
+### Polish
+- **Hero `h1` no longer wraps mid-sentence on iPhones** — the `clamp(2.6rem, 5vw, 4rem)` floor was 41.6px, which forced "Track every pitch." to wrap onto two lines on every iPhone width (375–430px). Lowered the floor to `2rem` (32px) so "Track every pitch." stays on one line and the `<br>` cleanly breaks to "Every game." underneath. Verified at 375px / 390px / 430px in headless Chromium.
+
+### Versioning
+- Version bumped to 2.50 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.49 — README refresh
 
 **Files:** `README.md`
