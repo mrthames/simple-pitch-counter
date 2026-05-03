@@ -4,6 +4,23 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.44 — New app icon
+
+**Files:** `marketing/logo/`, `scripts/generate-icons.mjs`, `app/Assets.xcassets/AppIcon.appiconset/`, `android/app/src/main/res/mipmap-*/`, `build.gradle.kts`, `project.pbxproj`
+
+### Branding
+- **New app icon** — red "S" + baseball mark replaces the old icon across iOS and Android. Source assets stored in `marketing/logo/`. iOS universal icon at 1024×1024; Android adaptive foreground + legacy + round at all five density buckets (mdpi → xxxhdpi).
+- Adaptive icon background color updated to match the in-app dark theme (`#0b1c3a`)
+- Removed iOS dark/tinted icon variants (only universal icon remains)
+
+### Tooling
+- New `scripts/generate-icons.mjs` regenerates every iOS/Android icon asset from a single source PNG. Run with `node scripts/generate-icons.mjs` whenever the logo changes.
+
+### Versioning
+- Version bumped to 2.44 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.43 — HBP counts as walk; HBP added to pitcher list export
 
 **Files:** `app/index.html`, `android/app/src/main/assets/index.html`, `build.gradle.kts`, `project.pbxproj`, `tests/v2-features.spec.ts`

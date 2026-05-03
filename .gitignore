@@ -9,6 +9,9 @@ marketing/*.png
 marketing/*.jpg
 !marketing/finals/
 
+# Figma source files — too large for git, kept locally
+*.fig
+
 # Node
 node_modules/
 
