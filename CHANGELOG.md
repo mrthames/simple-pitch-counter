@@ -4,6 +4,24 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.46 — Website logo update + restored OG image
+
+**Files:** `website/*.html`, `website/favicon.png`, `website/apple-touch-icon.png`, `website/images/og-image-1200x630.png`, `scripts/generate-icons.mjs`, `marketing/finals/og-image-1200x630.png`
+
+### Branding
+- **Website favicon and Apple Touch icon** — replaced the old generic baseball SVG and the "P on navy" Apple Touch icon with the new blue-S mark, generated from the same source PNG used for iOS/Android
+- **Nav logo across all 12 site pages** — swapped the CSS-pseudo-element baseball next to "Simple Pitch Counter" for an `<img>` tag pointing at the new favicon, so every page header reflects the actual brand mark
+- **Open Graph image restored** — `website/images/og-image-1200x630.png` was referenced by `index.html` but missing from the repo, breaking link previews on iMessage / Slack / Twitter / Facebook. Re-rendered from the existing `marketing/og-image.html` template (which already pulls from the iOS app icon, so it picks up the new blue S automatically) and copied into the website's images folder. Android-beta OG image refreshed too.
+
+### Tooling
+- `scripts/generate-icons.mjs` extended to also output `website/favicon.png` (32×32) and `website/apple-touch-icon.png` (180×180). One source PNG → all 19 platform/web asset files.
+- Removed `website/favicon.svg` and `website/favicon.ico` (replaced by PNG; modern browsers prefer the PNG-icon link tag)
+
+### Versioning
+- Version bumped to 2.46 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.45 — Blue S app icon, plus iOS dark-mode variant
 
 **Files:** `marketing/logo/`, `scripts/generate-icons.mjs`, `app/Assets.xcassets/AppIcon.appiconset/`, `android/app/src/main/res/mipmap-*/`, `build.gradle.kts`, `project.pbxproj`
