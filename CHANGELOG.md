@@ -4,6 +4,26 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.42 — Hit By Pitch and game clock UX fixes
+
+**Files:** `app/index.html`, `android/app/src/main/assets/index.html`, `build.gradle.kts`, `project.pbxproj`, `tests/v2-features.spec.ts`
+**Issues:** #136, #137, #138, #139
+
+### New features
+- **Hit By Pitch (HBP) button** (#136) — new `+ HBP` action button next to `+ Out` in both simple and advanced game modes. Records as a ball on the pitch breakdown, advances to next batter (walk semantics for inning logic), and tracks HBP as its own pitcher stat alongside K/BB. HBP appears in the live stats line and on the share/export card.
+- **Pause confirmation modal** (#139) — tapping a running game clock now shows a confirmation modal ("Pause game clock?") before stopping it. Starting and resuming a paused clock remain single-tap (no modal).
+
+### Bug fixes
+- **Hamburger menu now closes after toggling game clock** (#137) — fixed event-bubbling bug where `.menu-btn` parent re-toggled the menu open after the child item handler closed it. The menu-btn handlers now ignore clicks bubbled up from `.hbg-item` children.
+- **Game clock rolls over to hours past 60 min** (#138) — `fmtClock()` now switches from `MM:SS` to `H:MM:SS` once elapsed time reaches 1 hour. Affects the live game-header clock, history-card live chip, and any other consumer of `fmtClock`.
+
+### Testing & versioning
+- Added 22 E2E tests covering HBP behavior, hamburger close, hour formatting, and pause modal flow
+- Updated existing pause test to handle the new confirmation modal
+- Version bumped to 2.42 across iOS (`MARKETING_VERSION`), Android (`versionName`), and the in-app About page
+
+---
+
 ## [2026-04-26] V2.41 — Pitch acronym labels, game clock, batch bug fixes, and marketing refresh
 
 **Files:** `index.html`, `ViewController.swift`, `build.gradle.kts`, `project.pbxproj`, `website/index.html`, `marketing/screenshots.html`, `marketing/capture.mjs`

@@ -503,7 +503,7 @@ textarea{resize:vertical;min-height:56px}
       <div class="history-title">Games</div>
       <div style="display:flex;align-items:center;gap:10px">
         <div class="new-game-btn" onclick="goSetup()">+ New Game</div>
-        <div class="hist-menu-btn" onclick="toggleHistoryMenu()">
+        <div class="hist-menu-btn" onclick="toggleHistoryMenu(event)">
           <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="var(--t2)" stroke-width="1.8" stroke-linecap="round"/></svg>
           <div class="hbg-menu" id="history-hbg-menu">
             <button class="hbg-item" onclick="closeHistoryMenu();showScreen('config')">Configuration</button>
@@ -614,7 +614,7 @@ textarea{resize:vertical;min-height:56px}
       </div>
       <div class="header-actions">
         <div class="end-half-btn" onclick="confirmEndHalf()">End half ›</div>
-        <div class="menu-btn" onclick="toggleGameMenu()">
+        <div class="menu-btn" onclick="toggleGameMenu(event)">
           <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/></svg>
           <div class="hbg-menu" id="game-hbg-menu">
             <button class="hbg-item" onclick="closeGameMenu();showStatsQuick()">Pitcher stats</button>
@@ -694,6 +694,7 @@ textarea{resize:vertical;min-height:56px}
       <div class="adv-secondary">
         <div class="adv-secondary-btn" id="undo-btn-adv" onclick="undoLast()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:3px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo</div>
         <div class="adv-secondary-btn" onclick="recordNonPitchOut()">+ Out</div>
+        <div class="adv-secondary-btn" onclick="recordHBP()">+ HBP</div>
         <div class="adv-secondary-btn" onclick="doNextBatter()">Next batter ›</div>
       </div>
     </div>
@@ -715,6 +716,7 @@ textarea{resize:vertical;min-height:56px}
       <div class="adv-secondary">
         <div class="adv-secondary-btn" id="undo-btn-simple" onclick="undoLast()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:-2px;margin-right:3px"><path d="M4 17H14.9999C16.8692 17 17.8038 17 18.5 16.5981C18.956 16.3348 19.3348 15.9561 19.5981 15.5C20 14.8038 20 13.8692 20 12C20 10.1308 20 9.19615 19.5981 8.5C19.3348 8.04394 18.9561 7.66523 18.5 7.40193C17.8038 7 16.8692 7 15 7H8M4 17L7 20M4 17L7 14" stroke="currentColor" stroke-width="1.92" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo</div>
         <div class="adv-secondary-btn" onclick="recordNonPitchOut()">+ Out</div>
+        <div class="adv-secondary-btn" onclick="recordHBP()">+ HBP</div>
         <div class="adv-secondary-btn" onclick="doNextBatter()">Next batter ›</div>
       </div>
     </div>
@@ -839,7 +841,7 @@ textarea{resize:vertical;min-height:56px}
         <div style="width:56px;height:56px;border-radius:14px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff">#</div>
         <div>
           <div style="font-size:18px;font-weight:700">Simple Pitch Counter</div>
-          <div style="font-size:13px;color:var(--t2)">Version 2.41</div>
+          <div style="font-size:13px;color:var(--t2)">Version 2.42</div>
         </div>
       </div>
       <div style="font-size:14px;color:var(--t2);line-height:1.5">
@@ -1041,7 +1043,7 @@ function selectSetupConfig(id){
 }
 function cancelSetup(){showScreen('history');}
 function fmtTime12(t){if(!t)return'';const[h,m]=t.split(':').map(Number);return`${h%12||12}:${m.toString().padStart(2,'0')} ${h>=12?'PM':'AM'}`;}
-function mkPitcher(nm,nu){return{name:nm,num:nu||'',pitches:0,innings:[],history:[],batterBreaks:[],currentBatterPitches:0,done:false,lastBatterPitches:0,pitchTypes:{B:0,CS:0,SS:0,F:0,BIP:0},ks:0,bbs:0,bips:0};}
+function mkPitcher(nm,nu){return{name:nm,num:nu||'',pitches:0,innings:[],history:[],batterBreaks:[],currentBatterPitches:0,done:false,lastBatterPitches:0,pitchTypes:{B:0,CS:0,SS:0,F:0,BIP:0},ks:0,bbs:0,bips:0,hbps:0};}
 function startGame(){
   const hpn=document.getElementById('hp-name').value.trim()||'Pitcher 1';
   const apn=document.getElementById('ap-name').value.trim()||'Pitcher 1';
@@ -1181,6 +1183,22 @@ function confirmMercyEnd(){
   ]);
 }
 
+// ── Hit by pitch ──
+function recordHBP(){
+  const g=state.currentGame;if(!g)return;
+  const ap=activePitcher();if(!ap)return;
+  pushSnap();
+  ap.pitches++;ap.currentBatterPitches++;ap.history.push('B');
+  ap.pitchTypes=ap.pitchTypes||{B:0,CS:0,SS:0,F:0,BIP:0};
+  ap.pitchTypes.B=(ap.pitchTypes.B||0)+1;
+  ap.hbps=(ap.hbps||0)+1;
+  if(!g.atBatLog)g.atBatLog=[];
+  g.atBatLog.push('B');
+  haptic('medium');animatePop();
+  showResultFlash('HBP',()=>advanceBatter('HBP'));
+  saveState();
+}
+
 // ── Non-pitch out (caught stealing, pickoff, etc.) ──
 function recordNonPitchOut(){
   const g=state.currentGame;if(!g)return;
@@ -1316,7 +1334,7 @@ function doNextBatter(){
 // ── Result flash ──
 let _flashTO=null;
 function showResultFlash(result,cb){
-  const map={K:{label:'Strikeout',sub:'K',bg:'var(--red)'},BB:{label:'Walk',sub:'BB',bg:'var(--blue)'},OUT:{label:'Out!',sub:'OUT',bg:'var(--amber)'},SAFE:{label:'Safe!',sub:'',bg:'var(--green)'},END:{label:'Side Retired',sub:'3 Outs',bg:'var(--purple)'}};
+  const map={K:{label:'Strikeout',sub:'K',bg:'var(--red)'},BB:{label:'Walk',sub:'BB',bg:'var(--blue)'},HBP:{label:'Hit By Pitch',sub:'HBP',bg:'var(--blue)'},OUT:{label:'Out!',sub:'OUT',bg:'var(--amber)'},SAFE:{label:'Safe!',sub:'',bg:'var(--green)'},END:{label:'Side Retired',sub:'3 Outs',bg:'var(--purple)'}};
   const r=map[result]||{label:result,sub:'',bg:'var(--blue)'};
   // Remove existing
   document.querySelectorAll('.result-flash').forEach(el=>el.remove());
@@ -1652,11 +1670,11 @@ function enableSwipeDismiss(overlay){
 function pitcherDerivedStats(p){
   const ip=p.innings?.filter(Boolean).length||0;
   const bf=p.batterBreaks?.length||0;
-  const ks=p.ks||0;const bbs=p.bbs||0;
+  const ks=p.ks||0;const bbs=p.bbs||0;const hbps=p.hbps||0;
   const kbb=bbs>0?(ks/bbs).toFixed(2):(ks>0?'∞':'—');
   const pip=ip>0?(p.pitches/ip).toFixed(1):'—';
   const pbf=bf>0?(p.pitches/bf).toFixed(1):'—';
-  return{ip,bf,ks,bbs,kbb,pip,pbf};
+  return{ip,bf,ks,bbs,hbps,kbb,pip,pbf};
 }
 function statLineHtml(p){
   const s=pitcherDerivedStats(p);
@@ -1665,6 +1683,7 @@ function statLineHtml(p){
     ${mkStat('P (Pitches)',p.pitches)}
     ${mkStat('IP (Innings Pitched)',s.ip)}
     ${mkStat('BF (Batters Faced)',s.bf)}
+    ${mkStat('HBP (Hit By Pitch)',s.hbps)}
     ${mkStat('K/BB (Strikeout to Walk)',s.kbb)}
     ${mkStat('P/IP (Pitches per Inning)',s.pip)}
     ${mkStat('P/BF (Pitches per Batter)',s.pbf)}
@@ -1703,7 +1722,7 @@ function renderStatsCardToCanvas(pitcher,gameData){
       const lw=ctx.measureText(h.lbl).width;ctx.fillText(h.lbl,hx+heroW/2-lw/2,y+56);
     });
     y+=heroH+16;
-    const stats=[['P (Pitches)',total],['IP (Innings Pitched)',s.ip],['BF (Batters Faced)',s.bf],['K/BB (Strikeout to Walk)',s.kbb],['P/IP (Pitches per Inning)',s.pip],['P/BF (Pitches per Batter)',s.pbf]];
+    const stats=[['P (Pitches)',total],['IP (Innings Pitched)',s.ip],['BF (Batters Faced)',s.bf],['HBP (Hit By Pitch)',s.hbps],['K/BB (Strikeout to Walk)',s.kbb],['P/IP (Pitches per Inning)',s.pip],['P/BF (Pitches per Batter)',s.pbf]];
     stats.forEach(([lbl,val])=>{
       ctx.fillStyle='rgba(235,235,245,.06)';ctx.fillRect(pad,y,W-pad*2,1);
       ctx.fillStyle='rgba(235,235,245,.6)';ctx.font='500 22px -apple-system,system-ui,sans-serif';
@@ -1892,9 +1911,9 @@ function setBtnMapping(key,val){
 }
 
 // ── Menus ──
-function toggleGameMenu(){document.getElementById('game-hbg-menu').classList.toggle('open');}
+function toggleGameMenu(e){if(e&&e.target&&e.target.closest&&e.target.closest('.hbg-item'))return;document.getElementById('game-hbg-menu').classList.toggle('open');}
 function closeGameMenu(){document.getElementById('game-hbg-menu').classList.remove('open');}
-function toggleHistoryMenu(){document.getElementById('history-hbg-menu').classList.toggle('open');}
+function toggleHistoryMenu(e){if(e&&e.target&&e.target.closest&&e.target.closest('.hbg-item'))return;document.getElementById('history-hbg-menu').classList.toggle('open');}
 function closeHistoryMenu(){document.getElementById('history-hbg-menu').classList.remove('open');}
 document.addEventListener('click',e=>{
   const gm=document.getElementById('game-hbg-menu')?.closest('.menu-btn');
@@ -1917,16 +1936,21 @@ function toggleClockEnabled(){
 }
 function toggleGameClock(){
   const g=state.currentGame;if(!g||!g.clockEnabled)return;
-  if(!g.clockRunning&&!g.clockStartedAt){
-    g.clockStartedAt=Date.now();g.clockRunning=true;
-    startClockInterval();
-  }else if(g.clockRunning){
-    g.clockElapsed=getClockElapsed(g);g.clockStartedAt=null;g.clockRunning=false;
-    stopClockInterval();
-  }else{
-    g.clockStartedAt=Date.now();g.clockRunning=true;
-    startClockInterval();
+  if(g.clockRunning){
+    showModal('Pause game clock?','The clock will stop counting until you resume it.',[
+      {label:'Cancel',fn:'closeModal()'},
+      {label:'Pause',fn:'closeModal();pauseGameClock()',cls:'amber'},
+    ]);
+    return;
   }
+  g.clockStartedAt=Date.now();g.clockRunning=true;
+  startClockInterval();
+  saveState();updateClockDisplay();
+}
+function pauseGameClock(){
+  const g=state.currentGame;if(!g||!g.clockEnabled||!g.clockRunning)return;
+  g.clockElapsed=getClockElapsed(g);g.clockStartedAt=null;g.clockRunning=false;
+  stopClockInterval();
   saveState();updateClockDisplay();
 }
 function getClockElapsed(g){
@@ -1935,7 +1959,8 @@ function getClockElapsed(g){
   return base;
 }
 function fmtClock(ms){
-  const s=Math.floor(ms/1000);const m=Math.floor(s/60);const sec=s%60;
+  const s=Math.floor(ms/1000);const h=Math.floor(s/3600);const m=Math.floor((s%3600)/60);const sec=s%60;
+  if(h>0)return h+':'+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
   return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
 }
 function updateClockDisplay(){
@@ -2267,7 +2292,7 @@ function initSummary(){
       <div class="form-card">${used.map(p=>{
         const ri=restInfo(p.pitches);const rc=!ri?'var(--green)':ri.days===0?'var(--green)':ri.days===1?'var(--amber)':'var(--red)';
         return`<div class="pitcher-stat-row">
-          <div class="pitcher-stat-info"><div class="pitcher-stat-name">${p.name}${p.num?' #'+p.num:''}</div><div class="pitcher-stat-sub">${p.innings?.filter(Boolean).length||0} inn · last batter: ${p.lastBatterPitches||0}</div>${g.mode==='advanced'?`<div class="pitcher-stat-sub">K: ${p.ks||0} · BB: ${p.bbs||0}</div>`:''}</div>
+          <div class="pitcher-stat-info"><div class="pitcher-stat-name">${p.name}${p.num?' #'+p.num:''}</div><div class="pitcher-stat-sub">${p.innings?.filter(Boolean).length||0} inn · last batter: ${p.lastBatterPitches||0}</div>${g.mode==='advanced'?`<div class="pitcher-stat-sub">K: ${p.ks||0} · BB: ${p.bbs||0} · HBP: ${p.hbps||0}</div>`:''}</div>
           <div><div class="pitcher-stat-count">${p.pitches}</div><div class="pitcher-stat-rest" style="color:${rc}">${ri?ri.label:'No rest needed'}</div></div>
           ${g.mode==='advanced'?`<div class="stats-btn" onclick="showSummaryStats('${side}',${roster.pitchers.indexOf(p)})">Stats</div>`:''}
         </div>`;
