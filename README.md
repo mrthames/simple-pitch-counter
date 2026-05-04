@@ -163,7 +163,7 @@ The app is a native iOS shell wrapping a single-page web application:
 The Android app mirrors the iOS architecture — a native Kotlin shell wrapping the same web application:
 
 - **MainActivity.kt** — configures an Android `WebView` with persistent localStorage, portrait lock, native JS alert/confirm/prompt handling, external link handling, haptic feedback bridge (JS → native via `@JavascriptInterface`), dynamic status bar styling with pre-API-30 fallback, volume button capture, Android back button handling, image sharing via `FileProvider`, Google Play In-App Review API prompts, and native inset injection (`--top-inset`, `--bottom-inset`, `--header-pad`) for safe area support across notch and non-notch devices
-- **Adaptive icons** — foreground/background layers supporting circle, squircle, and rounded square launcher masks
+- **Adaptive icons** — foreground/background layers supporting circle, squircle, and rounded square launcher masks; managed via Android Studio → Image Asset Studio (right-click `res/` → New → Image Asset). iOS icons and website favicons are generated separately by `scripts/generate-icons.mjs` from a shared source PNG.
 - **index.html** — the same shared web app as iOS, tracked in git at `android/app/src/main/assets/index.html` and kept in sync with `app/index.html`
 
 ### Website (`website/`)
