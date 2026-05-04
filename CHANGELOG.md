@@ -4,6 +4,19 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.51 — Android adaptive icon padding
+
+**Files:** `scripts/generate-icons.mjs`, `android/app/src/main/res/mipmap-*/ic_launcher_foreground.webp`, `android/app/src/main/res/mipmap-*/ic_launcher_round.webp`
+
+### Bug fixes
+- **Android adaptive icon S no longer overflows the safe zone** — the source logo's S+baseball mark fills ~80% of the source canvas, and `fit: 'cover'` to 108dp pushed it past the 66dp Material safe zone. On Pixel's circular launcher mask the S got clipped at top and bottom and the icon looked oversized.
+- **Fix:** `scripts/generate-icons.mjs` now scales the adaptive foreground (and the legacy round icon) to 72% of the canvas, centered on transparent padding. The system bg color (`#0b1c3a`) shows as a thin navy ring under circle/squircle masks, and the S sits comfortably inside the safe zone. iOS icons and the legacy square Android icon are unchanged (they're not circle-masked).
+
+### Versioning
+- Version bumped to 2.51 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.50 — Hero font scales down on iPhone widths
 
 **Files:** `website/index.html`

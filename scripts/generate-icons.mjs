@@ -20,6 +20,13 @@ const SRC_LIGHT = resolve(root, 'marketing/logo/spc - light mode - blue S.png');
 const SRC_DARK  = resolve(root, 'marketing/logo/spc - dark mode - red S.png');
 const ANDROID_BG_HEX = '#0b1c3a';
 
+// The source PNG has the S+baseball mark filling ~80% of the canvas. On Android's
+// adaptive foreground (108dp) and legacy round icons, edge-to-edge cover would push
+// the S outside the 66dp safe zone — visible as the S getting clipped by the Pixel
+// circle mask. Scaling the foreground content to 72% of the canvas gives ~14dp
+// transparent padding so the system bg color shows as a thin ring on circle masks.
+const ANDROID_FG_SCALE = 0.72;
+
 const iosOut = resolve(root, 'app/Assets.xcassets/AppIcon.appiconset');
 const androidRes = resolve(root, 'android/app/src/main/res');
 const websiteOut = resolve(root, 'website');
@@ -73,27 +80,36 @@ async function generateAndroidForDensity({ dir, fg, legacy }) {
   const outDir = resolve(androidRes, dir);
   await fs.mkdir(outDir, { recursive: true });
 
-  // Adaptive foreground: edge-to-edge logo. The system composites this over the
-  // ic_launcher_background color and then applies the device's icon mask.
-  await sharp(SRC_LIGHT).resize(fg, fg, { fit: 'cover' }).webp({ quality: 95 })
+  // Adaptive foreground: scaled-down logo on a transparent canvas so the system
+  // bg color shows as a ring under circle/squircle masks (keeps the S inside the
+  // 66dp safe zone). The system composites this over ic_launcher_background.
+  const fgInner = Math.round(fg * ANDROID_FG_SCALE);
+  const fgLogo = await sharp(SRC_LIGHT).resize(fgInner, fgInner, { fit: 'contain' }).toBuffer();
+  await sharp({ create: { width: fg, height: fg, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+    .composite([{ input: fgLogo, gravity: 'center' }])
+    .webp({ quality: 95 })
     .toFile(resolve(outDir, 'ic_launcher_foreground.webp'));
 
-  // Legacy square icon (pre-Android 8 launchers).
+  // Legacy square icon (pre-Android 8 launchers): edge-to-edge — no mask applied.
   await sharp(SRC_LIGHT).resize(legacy, legacy, { fit: 'cover' }).webp({ quality: 95 })
     .toFile(resolve(outDir, 'ic_launcher.webp'));
 
-  // Round legacy icon: same content masked to a circle.
+  // Round legacy icon: scaled like the adaptive foreground, on the navy bg, masked to a circle.
+  const legacyInner = Math.round(legacy * ANDROID_FG_SCALE);
+  const legacyLogo = await sharp(SRC_LIGHT).resize(legacyInner, legacyInner, { fit: 'contain' }).toBuffer();
+  const legacyComposite = await sharp({ create: { width: legacy, height: legacy, channels: 4, background: ANDROID_BG_HEX } })
+    .composite([{ input: legacyLogo, gravity: 'center' }])
+    .png().toBuffer();
   const r = legacy / 2;
   const roundMask = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${legacy}" height="${legacy}"><circle cx="${r}" cy="${r}" r="${r}" fill="white"/></svg>`
   );
-  const square = await sharp(SRC_LIGHT).resize(legacy, legacy, { fit: 'cover' }).png().toBuffer();
-  await sharp(square)
+  await sharp(legacyComposite)
     .composite([{ input: roundMask, blend: 'dest-in' }])
     .webp({ quality: 95 })
     .toFile(resolve(outDir, 'ic_launcher_round.webp'));
 
-  console.log(`  Android ${dir}: foreground(${fg}px), legacy(${legacy}px), round(${legacy}px)`);
+  console.log(`  Android ${dir}: foreground(${fg}px @ ${Math.round(ANDROID_FG_SCALE*100)}%), legacy(${legacy}px), round(${legacy}px @ ${Math.round(ANDROID_FG_SCALE*100)}%)`);
 }
 
 async function updateAndroidBackgroundColor() {
