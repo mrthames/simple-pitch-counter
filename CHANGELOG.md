@@ -4,6 +4,25 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.53 — Android icons via Image Asset Studio
+
+**Files:** `android/app/src/main/res/mipmap-*/`, `android/app/src/main/ic_launcher-playstore.png`, `scripts/generate-icons.mjs`, `README.md`
+
+### Branding
+- **Android adaptive icons regenerated via Android Studio's Image Asset Studio** — provides interactive previews under each launcher mask shape (circle, squircle, rounded square, teardrop, full bleed) and a Resize slider to dial in the foreground scale. New 512×512 Play Store listing icon generated as a side effect.
+- iOS icons and website favicons unchanged (still scripted from the shared source PNG).
+
+### Tooling
+- `scripts/generate-icons.mjs` no longer touches Android — Image Asset Studio is now the source of truth there. Removes the `ANDROID_*` constants and density loop. Script is now strictly iOS + website.
+- Removed `scripts/preview-icon-scales.mjs` — Image Asset Studio's live preview replaces it.
+- Fixed XML parsing errors in `ic_launcher_background.xml`, `mipmap-anydpi-v26/ic_launcher.xml`, and `mipmap-anydpi-v26/ic_launcher_round.xml` — Image Asset Studio's template put an Apache 2.0 license comment block above the `<?xml ?>` declaration, which is a hard parse error.
+- README updated to mention the Android-via-Image-Asset-Studio workflow.
+
+### Versioning
+- Version bumped to 2.53 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.52 — Android icon white-frame layout
 
 **Files:** `scripts/generate-icons.mjs`, `scripts/preview-icon-scales.mjs`, `android/app/src/main/res/mipmap-*/`
