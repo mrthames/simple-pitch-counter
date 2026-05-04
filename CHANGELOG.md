@@ -4,6 +4,23 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-03] V2.52 — Android icon white-frame layout
+
+**Files:** `scripts/generate-icons.mjs`, `scripts/preview-icon-scales.mjs`, `android/app/src/main/res/mipmap-*/`
+
+### Bug fixes
+- **Android icon now uses a white-frame layout instead of a navy ring** — V2.51's transparent-padding approach showed a navy ring around the white square, but the visible S still felt too large. New approach pads the source PNG onto a larger white canvas before resizing, so the white extends to the icon edge and the S sits centered with proper breathing room. Visible mark now occupies ~60% of the icon canvas.
+- iOS and the website favicon are unchanged (no circle mask, full bleed reads better).
+
+### Tooling
+- New `scripts/preview-icon-scales.mjs` renders side-by-side preview grids of both icon styles (navy-ring vs white-frame) at multiple scales, output to `test-results/icons-preview/` (gitignored). Lets you iterate on icon padding locally without committing.
+- `scripts/generate-icons.mjs` simplified — `ANDROID_FG_SCALE` removed; replaced with `SRC_MARK_RATIO` (a property of the source) and `ANDROID_MARK_RATIO` (the tunable knob).
+
+### Versioning
+- Version bumped to 2.52 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-05-03] V2.51 — Android adaptive icon padding
 
 **Files:** `scripts/generate-icons.mjs`, `android/app/src/main/res/mipmap-*/ic_launcher_foreground.webp`, `android/app/src/main/res/mipmap-*/ic_launcher_round.webp`
