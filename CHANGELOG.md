@@ -4,6 +4,18 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-08] V2.56 — Hotfix: calc() whitespace in safe-area paddings
+
+**Files:** `app/index.html`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`, `android/app/build.gradle.kts`
+
+### Bug fix
+- **#156 follow-up — Safe-area padding rules silently no-op'd in WebKit.** Several `calc(var(--bottom-inset)+Npx)` and `calc(var(--top-inset)+var(--header-pad))` expressions were missing whitespace around the `+` operator. WebKit follows the CSS spec strictly here — without spaces, the parser rejects the expression and the property falls back, so the Game Summary's `padding-bottom` was effectively `0` regardless of the value. V2.55 bumped the value from 60px → 120px but neither was applied. Whitespace added across all 7 affected rules (history list, setup nav/content, summary nav/content, config nav, modal overlay, export/config/about screens). The fix lands the long-intended bottom padding so Save/Share aren't clipped at the bottom of the Game Summary on iPhone 17.
+
+### Versioning
+- Version bumped to 2.56 across iOS, Android, and the in-app About page (hotfix `.01` increment — pure CSS parsing fix, no behavior change)
+
+---
+
 ## [2026-05-08] V2.55 — Production bug fixes batch (#154–#158)
 
 **Files:** `app/index.html`, `app/ViewController.swift`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`, `android/app/build.gradle.kts`, `tests/v2-features.spec.ts`, `tests/about-screen.spec.ts`
