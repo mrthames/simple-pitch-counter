@@ -4,6 +4,30 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-08] V2.55 — Production bug fixes batch (#154–#158)
+
+**Files:** `app/index.html`, `app/ViewController.swift`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`, `android/app/build.gradle.kts`, `tests/v2-features.spec.ts`, `tests/about-screen.spec.ts`
+
+### Bug fixes (iPhone 17 production use)
+- **#154 — Delete pitcher from Edit Pitcher modal** (`editPlayerName`, new `deletePlayer`): pitchers and catchers can now be removed from the roster via a Delete button in the edit modal. Confirms before deleting, blocks deletion if it's the only pitcher/catcher, and updates the active-pitcher/catcher index correctly so deleting the active player doesn't leave the game in a dangling state.
+- **#155 — Umpire feedback box widened to 3 lines** (`screen-summary` form, new `.form-row-stack` and `.form-textarea`): the "Describe feedback" field for both umpires switched from a single-line `<input>` to a stacked, full-width `<textarea rows="3">`, so notes have room to breathe.
+- **#156 — Game Summary bottom padding** (`.summary-content`): bumped `padding-bottom` from `bottom-inset+60px` to `bottom-inset+120px` so Save/Share/Generate Report buttons aren't clipped at the bottom on iPhone 17.
+- **#157 — Volume button capture hardened on iOS 17+** (`ViewController.swift`): the embedded `MPVolumeView` slider is now found via a recursive subview walk and re-located on every reset (iOS 17+ nests it deeper than `subviews.first` reaches), and the reset uses `setValue(_:animated:)` for reliability. Without this, the system slider would silently get pinned at min/max and subsequent presses wouldn't fire `outputVolume` KVO.
+- **#158 — Share Pitcher Stats image now matches UI** (`renderStatsCardToCanvas`): top-stats line under the player name now reads `${total} pitches · ${IP} IP · Last batter: ${n}` instead of duplicating BF (BF still appears in the stats table below).
+
+### Tests added (11 new, 264 total)
+- `#154`: Edit modal shows Delete; deleting removes pitcher; refuses to delete the only pitcher.
+- `#155`: feedback details element is `<textarea>` with `rows="3"`.
+- `#156`: `.summary-content` rule has `padding-bottom` containing `120px`.
+- `#157`: simple/advanced volume mappings dispatch the right action via `window.onPhysicalButton`; no-op when no current game.
+- `#158`: rendered share image's top line contains "Last batter" and not " BF".
+- `tests/about-screen.spec.ts` version assertion switched to a regex (`/Version \d+\.\d+/`) so it stops drifting between releases.
+
+### Versioning
+- Version bumped to 2.55 across iOS (`MARKETING_VERSION`), Android (`versionName`), and the in-app About page (bug-fix `.02` increment per scheme)
+
+---
+
 ## [2026-05-03] V2.53 — Android icons via Image Asset Studio
 
 **Files:** `android/app/src/main/res/mipmap-*/`, `android/app/src/main/ic_launcher-playstore.png`, `scripts/generate-icons.mjs`, `README.md`

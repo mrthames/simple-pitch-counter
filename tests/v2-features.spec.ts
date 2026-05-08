@@ -1677,3 +1677,161 @@ test.describe('Batch fixes (#121-#123)', () => {
     await expect(badge).toContainText('LIVE');
   });
 });
+
+test.describe('Batch fixes (#154-#158)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await clearState(page);
+  });
+
+  // #154: Delete pitcher from edit modal
+  test('#154: edit pitcher modal shows Delete button', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homePitcher: 'Jake M.' });
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.locator('#pitcher-select-list .edit-name-btn').first().click();
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    await expect(page.locator('.modal-btn.red')).toContainText('Delete');
+  });
+
+  test('#154: deleting a pitcher removes them from roster', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homePitcher: 'Jake M.' });
+    // Add a second pitcher so deletion is allowed
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.fill('#new-p-name', 'Backup P.');
+    await page.locator('#pitcher-select-list .add-player-form .btn-sm').click();
+    // Now Backup P. is active. Reopen picker and edit Jake M.
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.locator('#pitcher-select-list .edit-name-btn').first().click();
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    page.once('dialog', d => d.accept());
+    await page.locator('.modal-btn.red').click();
+    // Roster should now have only Backup P.
+    const pitcherCount = await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      return s.currentGame.home.pitchers.length;
+    });
+    expect(pitcherCount).toBe(1);
+  });
+
+  test('#154: cannot delete the only pitcher on the roster', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homePitcher: 'Solo P.' });
+    await page.click('#p-change-btn');
+    await page.waitForSelector('#pitcher-select-list[style*="block"]');
+    await page.locator('#pitcher-select-list .edit-name-btn').first().click();
+    await page.waitForSelector('.modal-overlay', { timeout: 3000 });
+    let alertText = '';
+    page.once('dialog', async d => { alertText = d.message(); await d.accept(); });
+    await page.locator('.modal-btn.red').click();
+    expect(alertText).toContain('only');
+    const pitcherCount = await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      return s.currentGame.home.pitchers.length;
+    });
+    expect(pitcherCount).toBe(1);
+  });
+
+  // #155: Umpire feedback textarea
+  test('#155: umpire feedback details use a textarea, not a single-line input', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    // Open game summary while game is live
+    await page.click('.menu-btn');
+    await page.waitForSelector('#game-hbg-menu.open');
+    await page.locator('#game-hbg-menu .hbg-item').filter({ hasText: 'Game summary' }).click();
+    await page.waitForSelector('#screen-summary.active');
+    // Reveal the feedback details row
+    await page.evaluate(() => { (document.getElementById('pu-iss-detail') as HTMLElement).style.display = 'block'; });
+    const detail = page.locator('#sum-pu-comments');
+    await expect(detail).toBeVisible();
+    const tagName = await detail.evaluate((el: HTMLElement) => el.tagName.toLowerCase());
+    expect(tagName).toBe('textarea');
+    const rows = await detail.getAttribute('rows');
+    expect(rows).toBe('3');
+  });
+
+  // #156: Game summary bottom padding
+  test('#156: summary content has enough bottom padding for save/share buttons', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await page.click('.menu-btn');
+    await page.waitForSelector('#game-hbg-menu.open');
+    await page.locator('#game-hbg-menu .hbg-item').filter({ hasText: 'Game summary' }).click();
+    await page.waitForSelector('#screen-summary.active');
+    const ruleValue = await page.evaluate(() => {
+      for (const sheet of Array.from(document.styleSheets)) {
+        try {
+          for (const rule of Array.from(sheet.cssRules) as CSSStyleRule[]) {
+            if (rule.selectorText === '.summary-content') return rule.style.paddingBottom;
+          }
+        } catch {}
+      }
+      return null;
+    });
+    expect(ruleValue).toContain('120px');
+  });
+
+  // #157: Volume button JS handler dispatches correct action
+  test('#157: simple-mode volUp triggers addPitch', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    const before = await page.locator('#simple-count-num').textContent();
+    expect(before).toBe('0');
+    await page.evaluate(() => { (window as any).onPhysicalButton('volUp'); });
+    const after = await page.locator('#simple-count-num').textContent();
+    expect(after).toBe('1');
+  });
+
+  test('#157: simple-mode volDown triggers next batter', async ({ page }) => {
+    await startGame(page, { mode: 'simple' });
+    await addSimplePitches(page, 2);
+    // Verify at-bat shows 2 pitches
+    await expect(page.locator('#simple-batter-num')).toHaveText('2');
+    await page.evaluate(() => { (window as any).onPhysicalButton('volDown'); });
+    // After next batter, at-bat counter resets to 0
+    await expect(page.locator('#simple-batter-num')).toHaveText('0');
+  });
+
+  test('#157: advanced-mode volUp triggers called strike', async ({ page }) => {
+    await startGame(page, { mode: 'advanced' });
+    await page.evaluate(() => { (window as any).onPhysicalButton('volUp'); });
+    // Strike should now be 1 — read advanced strike counter
+    const strikes = await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem('spc_v1') || '{}');
+      return s.currentGame.strikes;
+    });
+    expect(strikes).toBe(1);
+  });
+
+  test('#157: volume buttons do nothing if no current game', async ({ page }) => {
+    // No game started — onPhysicalButton should be a safe no-op
+    const result = await page.evaluate(() => {
+      try { (window as any).onPhysicalButton('volUp'); return 'ok'; } catch (e) { return String(e); }
+    });
+    expect(result).toBe('ok');
+  });
+
+  // #158: Share pitcher stats image matches UI
+  test('#158: share image top stats line shows Last batter, not BF', async ({ page }) => {
+    await startGame(page, { mode: 'simple', homePitcher: 'Jake M.' });
+    await addSimplePitches(page, 3);
+    // Render the canvas and inspect the drawn text via instrumentation
+    const drawnLines = await page.evaluate(() => {
+      const calls: string[] = [];
+      const orig = CanvasRenderingContext2D.prototype.fillText;
+      CanvasRenderingContext2D.prototype.fillText = function (text: string) {
+        calls.push(text);
+        return orig.apply(this, arguments as any);
+      };
+      const game = JSON.parse(localStorage.getItem('spc_v1') || '{}').currentGame;
+      const pitcher = game.home.pitchers[0];
+      (window as any).renderStatsCardToCanvas(pitcher, game);
+      CanvasRenderingContext2D.prototype.fillText = orig;
+      return calls;
+    });
+    const topLine = drawnLines.find(l => l.includes('pitches') && l.includes('IP'));
+    expect(topLine).toBeTruthy();
+    expect(topLine).toContain('Last batter');
+    expect(topLine).not.toMatch(/\sBF\b/);
+    expect(topLine).toContain('pitches');
+  });
+});
