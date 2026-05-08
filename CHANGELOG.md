@@ -4,6 +4,18 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-05-08] V2.57 — Hotfix: tune Game Summary bottom padding
+
+**Files:** `app/index.html`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`, `android/app/build.gradle.kts`
+
+### Bug fix
+- `.summary-content` `padding-bottom` reduced from `calc(var(--bottom-inset) + 120px)` to `calc(var(--bottom-inset) + 24px)`. V2.55's `120px` was guessed from the broken (silently-zero) baseline, so once V2.56 made the rule actually apply, the cushion below Save/Share was way too generous. `24px` over the safe-area inset gives a small, intentional breathing room above the home indicator.
+
+### Versioning
+- Version bumped to 2.57 across iOS, Android, and the in-app About page (hotfix `.01` increment — single CSS value tune)
+
+---
+
 ## [2026-05-08] V2.56 — Hotfix: calc() whitespace in safe-area paddings
 
 **Files:** `app/index.html`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`, `android/app/build.gradle.kts`

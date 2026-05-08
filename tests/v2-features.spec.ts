@@ -1752,7 +1752,7 @@ test.describe('Batch fixes (#154-#158)', () => {
   });
 
   // #156: Game summary bottom padding
-  test('#156: summary content has enough bottom padding for save/share buttons', async ({ page }) => {
+  test('#156: summary content has bottom padding combining safe-area inset and a positive offset', async ({ page }) => {
     await startGame(page, { mode: 'simple' });
     await page.click('.menu-btn');
     await page.waitForSelector('#game-hbg-menu.open');
@@ -1768,7 +1768,10 @@ test.describe('Batch fixes (#154-#158)', () => {
       }
       return null;
     });
-    expect(ruleValue).toContain('120px');
+    // Must include the safe-area inset variable AND whitespace around `+`
+    // (whitespace is required by the CSS calc() spec — WebKit silently rejects
+    // expressions like `calc(var(--x)+10px)`; see V2.56 hotfix).
+    expect(ruleValue).toMatch(/var\(--bottom-inset\)\s\+\s\d+px/);
   });
 
   // #157: Volume button JS handler dispatches correct action
