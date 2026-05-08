@@ -94,7 +94,17 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         vv.isUserInteractionEnabled = false
         view.addSubview(vv)
         volumeView = vv
-        systemVolumeSlider = vv.subviews.first(where: { $0 is UISlider }) as? UISlider
+        systemVolumeSlider = findVolumeSlider(in: vv)
+    }
+
+    // Recursively walk the MPVolumeView hierarchy to find its embedded UISlider.
+    // iOS 17+ nests the slider deeper than `subviews.first`, so a flat search misses it.
+    private func findVolumeSlider(in root: UIView) -> UISlider? {
+        if let s = root as? UISlider { return s }
+        for sub in root.subviews {
+            if let s = findVolumeSlider(in: sub) { return s }
+        }
+        return nil
     }
 
     override func observeValue(forKeyPath keyPath: String?,
@@ -122,10 +132,12 @@ class ViewController: UIViewController, WKNavigationDelegate, WKUIDelegate, WKSc
         prevVolume = newVol
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            if self.systemVolumeSlider == nil, let vv = self.volumeView {
-                self.systemVolumeSlider = vv.subviews.first(where: { $0 is UISlider }) as? UISlider
+            // Re-find on every reset — slider reference can be invalidated when
+            // MPVolumeView rebuilds its private hierarchy (observed on iOS 17+).
+            if let vv = self.volumeView {
+                self.systemVolumeSlider = self.findVolumeSlider(in: vv)
             }
-            self.systemVolumeSlider?.value = 0.5
+            self.systemVolumeSlider?.setValue(0.5, animated: false)
             self.prevVolume = 0.5
         }
     }

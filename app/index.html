@@ -405,6 +405,9 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 .form-row-val{flex:1;font-size:16px;letter-spacing:-.3px}
 .form-input{flex:1;font-size:16px;color:var(--text);border:none;background:transparent;outline:none;letter-spacing:-.3px;min-height:44px;padding:0}
 .form-input::placeholder{color:var(--t3)}
+.form-row-stack{flex-direction:column;align-items:stretch;padding:10px 16px;gap:6px}
+.form-row-stack .form-row-lbl{flex:0 0 auto}
+.form-textarea{width:100%;resize:vertical;line-height:1.4;padding:6px 0;font-family:inherit}
 .config-name-display{font-size:13px;font-weight:600;color:var(--text)}
 /* Team section labels */
 .team-lbl{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px;padding:5px 8px;border-radius:6px;display:inline-block}
@@ -423,7 +426,7 @@ button{touch-action:manipulation;-webkit-user-select:none;user-select:none;curso
 }
 .summary-nav-title{font-size:17px;font-weight:700}
 .summary-content{padding:0 20px;display:flex;flex-direction:column;gap:16px;
-  padding-bottom:calc(var(--bottom-inset)+60px)}
+  padding-bottom:calc(var(--bottom-inset)+120px)}
 .final-score-card{background:var(--dark);border-radius:18px;padding:18px 20px}
 .final-tag{font-size:11px;font-weight:700;color:var(--dark-label);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 .final-teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
@@ -777,13 +780,13 @@ textarea{resize:vertical;min-height:56px}
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('pu-iss-detail').style.display='none'"><input type="radio" name="pu-iss" value="No" checked style="width:18px;height:18px"> No</label>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('pu-iss-detail').style.display='block'"><input type="radio" name="pu-iss" value="Yes" style="width:18px;height:18px"> Yes</label>
         </div>
-        <div class="form-row" id="pu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-pu-comments" placeholder="Describe feedback"></div>
+        <div class="form-row form-row-stack" id="pu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><textarea class="form-input form-textarea" id="sum-pu-comments" rows="3" placeholder="Describe feedback"></textarea></div>
         <div class="form-row"><div class="form-row-lbl">Base</div><input class="form-input" id="sum-bu-name" placeholder="Name" autocapitalize="words"></div>
         <div class="form-row"><div class="form-row-lbl">Feedback?</div>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('bu-iss-detail').style.display='none'"><input type="radio" name="bu-iss" value="No" checked style="width:18px;height:18px"> No</label>
           <label style="font-size:14px;display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer" onclick="document.getElementById('bu-iss-detail').style.display='block'"><input type="radio" name="bu-iss" value="Yes" style="width:18px;height:18px"> Yes</label>
         </div>
-        <div class="form-row" id="bu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><input class="form-input" id="sum-bu-comments" placeholder="Describe feedback"></div>
+        <div class="form-row form-row-stack" id="bu-iss-detail" style="display:none"><div class="form-row-lbl">Details</div><textarea class="form-input form-textarea" id="sum-bu-comments" rows="3" placeholder="Describe feedback"></textarea></div>
       </div>
     </div>
     <div id="sum-actions" style="display:flex;gap:8px">
@@ -841,7 +844,7 @@ textarea{resize:vertical;min-height:56px}
         <div style="width:56px;height:56px;border-radius:14px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff">#</div>
         <div>
           <div style="font-size:18px;font-weight:700">Simple Pitch Counter</div>
-          <div style="font-size:13px;color:var(--t2)">Version 2.53</div>
+          <div style="font-size:13px;color:var(--t2)">Version 2.55</div>
         </div>
       </div>
       <div style="font-size:14px;color:var(--t2);line-height:1.5">
@@ -1585,7 +1588,7 @@ function editPlayerName(type,idx){
   window._editPlayerType=type;window._editPlayerIdx=idx;
   const ov=document.createElement('div');ov.className='modal-overlay';ov.id='active-modal';
   ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
-  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title">Edit ${type==='pitcher'?'Pitcher':'Catcher'}</div><div style="margin:12px 0"><input class="form-input" type="text" id="edit-player-name" value="${player.name}" placeholder="Name" autocapitalize="words" style="margin-bottom:8px"><input class="form-input" type="text" id="edit-player-num" value="${player.num||''}" placeholder="Number"></div><div class="modal-btns"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="savePlayerName()">Save</div></div></div>`;
+  ov.innerHTML=`<div class="modal-box"><button class="modal-close-x" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button><div class="modal-title">Edit ${type==='pitcher'?'Pitcher':'Catcher'}</div><div style="margin:12px 0"><input class="form-input" type="text" id="edit-player-name" value="${player.name}" placeholder="Name" autocapitalize="words" style="margin-bottom:8px"><input class="form-input" type="text" id="edit-player-num" value="${player.num||''}" placeholder="Number"></div><div class="modal-btns" style="margin-bottom:8px"><div class="modal-btn red" onclick="deletePlayer()">Delete</div></div><div class="modal-btns"><div class="modal-btn" onclick="closeModal()">Cancel</div><div class="modal-btn primary" onclick="savePlayerName()">Save</div></div></div>`;
   document.body.appendChild(ov);
   document.getElementById('edit-player-name').focus();
 }
@@ -1597,6 +1600,30 @@ function savePlayerName(){
   const roster=fRoster();
   const player=window._editPlayerType==='pitcher'?roster.pitchers[window._editPlayerIdx]:roster.catchers[window._editPlayerIdx];
   if(player){player.name=name;player.num=num;}
+  closeModal();saveState();renderGame();
+}
+function deletePlayer(){
+  const g=state.currentGame;if(!g)return;
+  const type=window._editPlayerType;const idx=window._editPlayerIdx;
+  const roster=fRoster();
+  const list=type==='pitcher'?roster.pitchers:roster.catchers;
+  const player=list[idx];if(!player)return;
+  if(list.length<=1){alert(`Cannot delete the only ${type} on the roster.`);return;}
+  const hasStats=type==='pitcher'?(player.pitches>0||(player.innings||[]).some(Boolean)):(player.innings||[]).some(Boolean);
+  const msg=hasStats
+    ?`Delete ${player.name}? Their recorded ${type==='pitcher'?'pitches and innings':'innings caught'} will be removed.`
+    :`Delete ${player.name}?`;
+  if(!confirm(msg))return;
+  list.splice(idx,1);
+  if(type==='pitcher'){
+    const activeIdx=getPI();
+    if(activeIdx===idx)setPI(0);
+    else if(activeIdx>idx)setPI(activeIdx-1);
+  }else{
+    const activeIdx=getCI();
+    if(activeIdx===idx)setCI(list.length>0?0:null);
+    else if(activeIdx!==null&&activeIdx>idx)setCI(activeIdx-1);
+  }
   closeModal();saveState();renderGame();
 }
 
@@ -1708,7 +1735,7 @@ function renderStatsCardToCanvas(pitcher,gameData){
     ctx.fillStyle='#fff';ctx.font='bold 32px -apple-system,system-ui,sans-serif';
     ctx.fillText(pitcher.name+(pitcher.num?' #'+pitcher.num:''),pad,y+=32);
     ctx.fillStyle='rgba(235,235,245,.5)';ctx.font='500 22px -apple-system,system-ui,sans-serif';
-    ctx.fillText(`${total} pitches · ${s.ip} IP · ${s.bf} BF`,pad,y+=34);
+    ctx.fillText(`${total} pitches · ${s.ip} IP · Last batter: ${pitcher.lastBatterPitches||0}`,pad,y+=34);
     ctx.fillStyle=!ri||ri.days===0?'#34C759':ri.days===1?'#FF9500':'#FF3B30';
     ctx.font='600 20px -apple-system,system-ui,sans-serif';
     ctx.fillText(restText,pad,y+=30);y+=20;
