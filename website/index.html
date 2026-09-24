@@ -772,6 +772,50 @@
   .bmc-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
   .bmc-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
 
+  /* ── SISTER APP ── */
+  .sister {
+    padding: 0 8% 80px;
+    background: var(--cream);
+    display: flex;
+    justify-content: center;
+  }
+  .sister-card {
+    max-width: 600px;
+    width: 100%;
+    border-top: 1.5px solid rgba(11,28,58,0.10);
+    padding-top: 36px;
+    text-align: center;
+  }
+  .sister-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .sister-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    color: var(--navy);
+    margin-bottom: 10px;
+  }
+  .sister-desc {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+  .sister-link {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--red);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .sister-link:hover { color: #a82e22; }
+
   /* ── RESOURCES ── */
   .resources {
     padding: 90px 8%;
@@ -894,6 +938,7 @@
     .phone-inner { transform: scale(0.52); width: 192.3%; }
     .download { padding: 60px 6%; }
     .support { padding: 50px 6%; }
+    .sister { padding: 0 6% 50px; }
   }
 </style>
 <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
@@ -1455,6 +1500,16 @@
       <svg viewBox="0 0 32 32" fill="currentColor"><path d="M28.19 9.614c-0.864-0.515-1.859-0.596-3.051-0.373-0.769 0.144-1.605 0.44-2.501 0.891 0.013-0.313 0.020-0.623 0.020-0.928h-0.010c0.027-0.14 0.041-0.282 0.041-0.425 0-2.421-3.958-4.383-8.84-4.383s-8.84 1.963-8.84 4.383c0 0.143 0.014 0.285 0.041 0.425h-0.005c-0.034 5.090 1.014 10.19 0.933 15.275-0.039 2.419 2.969 4.343 7.848 4.343s7.3-1.97 7.3-4.343c0-0.323 0.006-0.646 0.017-0.971 2.561 0.138 4.707-1.032 6.212-2.675 1.564-1.706 2.522-3.908 2.768-5.973s-0.209-4.217-1.936-5.247zM13.883 6.867c3.725 0 6.744 1.022 6.744 2.282s-3.019 2.281-6.744 2.281-6.744-1.022-6.744-2.281 3.019-2.282 6.744-2.282zM27.902 14.64c-0.187 1.569-0.946 3.386-2.151 4.701-1.158 1.264-2.621 2.040-4.46 1.938 0.268-2.879 0.803-5.76 1.119-8.443 2.596-1.659 4.043-1.673 4.676-1.295 0.641 0.382 1.002 1.531 0.815 3.1z"/></svg>
       Buy me a coffee
     </a>
+  </div>
+</section>
+
+<!-- SISTER APP -->
+<section class="sister">
+  <div class="sister-card">
+    <div class="sister-label">From the same maker</div>
+    <div class="sister-title">Simple Fielding</div>
+    <p class="sister-desc">Drag the ball to where it's hit and watch all nine fielders move to their jobs: who fields it, the cutoff, who covers each base, and who backs up. A free way to teach defensive positioning, for Little League baseball and fastpitch softball.</p>
+    <a href="https://simplefielding.com" class="sister-link">Try Simple Fielding &rarr;</a>
   </div>
 </section>
 

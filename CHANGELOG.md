@@ -4,6 +4,21 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-09-24] Website — Simple Fielding cross-link and game-day coaching article
+
+**Files:** `website/index.html`, `website/game-day-coaching-tools.html`, `website/articles.html`, `website/sitemap.xml`, `website/generate-og-images.mjs`, `website/images/og-game-day-coaching-tools.png`
+
+### Website updates
+- **"From the same maker" section on the homepage** — a small section under "Keep this app free" introducing Simple Fielding, the sister app for teaching defensive positioning, with a link to simplefielding.com
+- **New article: "Running the Field on Game Day"** (`/game-day-coaching-tools/`) — a game-day guide for youth coaches covering pitch counts and rest days, catcher innings, positions and playing time, and teaching cutoffs, covers and backups. Explains how Simple Pitch Counter and Simple Fielding split the job. Article JSON-LD, Open Graph tags and canonical URL match the other guides.
+- Added to the guides index (card + `ItemList` schema) and `sitemap.xml`
+- OG image rendered from `og-template.html`; `generate-og-images.mjs` now accepts optional filenames to render just those images
+
+### Versioning
+- No app version bump — website-only change; the app is untouched
+
+---
+
 ## [2026-05-08] V2.57 — Hotfix: tune Game Summary bottom padding
 
 **Files:** `app/index.html`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`, `android/app/build.gradle.kts`
