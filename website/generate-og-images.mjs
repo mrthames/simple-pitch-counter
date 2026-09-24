@@ -42,7 +42,18 @@ const articles = [
     title: 'Travel Ball vs. Rec League Pitch Counts',
     subtitle: 'Why travel ball parents need to track on their own',
   },
+  {
+    file: 'og-game-day-coaching-tools.png',
+    tag: 'For Coaches',
+    title: 'Running the Field on Game Day',
+    subtitle: 'Pitch counts, positions and defense for youth baseball and softball coaches',
+  },
 ];
+
+// Optional: pass one or more filenames to render only those images,
+// e.g. `node generate-og-images.mjs og-game-day-coaching-tools.png`
+const only = process.argv.slice(2);
+const selected = only.length ? articles.filter(a => only.includes(a.file)) : articles;
 
 const templatePath = join(__dirname, 'og-template.html');
 const imagesDir = join(__dirname, 'images');
@@ -52,7 +63,7 @@ try { mkdirSync(imagesDir, { recursive: true }); } catch {}
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 1200, height: 630 } });
 
-for (const article of articles) {
+for (const article of selected) {
   const page = await context.newPage();
   await page.goto(`file://${templatePath.replace(/\\/g, '/')}`);
   await page.waitForLoadState('networkidle');

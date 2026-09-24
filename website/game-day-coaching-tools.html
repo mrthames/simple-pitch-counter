@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A game-day guide for youth baseball and softball coaches: managing pitch counts and rest days, catcher innings, positions and playing time, and teaching kids cutoffs, covers and backups.">
+<link rel="canonical" href="https://simplepitchcounter.com/game-day-coaching-tools/">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="Running the Field on Game Day: Pitch Counts, Positions and Defense for Youth Coaches">
+<meta property="og:description" content="A game-day guide for youth baseball and softball coaches: managing pitch counts and rest days, catcher innings, positions and playing time, and teaching kids cutoffs, covers and backups.">
+<meta property="og:image" content="https://simplepitchcounter.com/images/og-game-day-coaching-tools.png">
+<meta property="og:url" content="https://simplepitchcounter.com/game-day-coaching-tools/">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<title>Running the Field on Game Day: Pitch Counts, Positions and Defense for Youth Coaches</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Running the Field on Game Day: Pitch Counts, Positions and Defense for Youth Coaches",
+  "description": "A game-day guide for youth baseball and softball coaches: managing pitch counts and rest days, catcher innings, positions and playing time, and teaching kids cutoffs, covers and backups.",
+  "image": "https://simplepitchcounter.com/images/og-game-day-coaching-tools.png",
+  "mainEntityOfPage": "https://simplepitchcounter.com/game-day-coaching-tools/",
+  "author": {
+    "@type": "Organization",
+    "name": "Simple Pitch Counter",
+    "url": "https://simplepitchcounter.com"
+  },
+  "datePublished": "2026-09-24",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Simple Pitch Counter",
+    "url": "https://simplepitchcounter.com"
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0b1c3a;
+    --cream: #f7f4ed;
+    --cream-dark: #ede9e0;
+    --red: #c8392b;
+    --gold: #e8a030;
+    --text: #0b1c3a;
+    --text-muted: #4a5568;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(11,28,58,0.96); backdrop-filter: blur(12px);
+    padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+    height: 60px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #f7f4ed; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .nav-logo .ball { width: 28px; height: 28px; background: #f7f4ed; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; overflow: hidden; }
+  .nav-logo .ball::before, .nav-logo .ball::after { content: ''; position: absolute; border: 1.5px solid #c8392b; border-radius: 50%; width: 60%; height: 200%; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(20deg); }
+  .nav-logo .ball::after { transform: translate(-50%, -50%) rotate(-20deg); }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: rgba(247,244,237,0.75); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.03em; transition: color 0.2s; }
+  .nav-links a:hover { color: #f7f4ed; }
+  .nav-hamburger {
+    display: none; width: 36px; height: 36px;
+    background: rgba(255,255,255,0.1); border: none; border-radius: 8px;
+    cursor: pointer; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-hamburger svg { display: block; }
+  .nav-overlay {
+    display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+    background: rgba(11,28,58,0.98); backdrop-filter: blur(12px); z-index: 99;
+    flex-direction: column; align-items: center; justify-content: flex-start;
+    padding-top: 60px; gap: 8px;
+  }
+  .nav-overlay.open { display: flex; }
+  .nav-overlay a {
+    color: rgba(247,244,237,0.85); text-decoration: none; font-size: 1.1rem;
+    font-weight: 500; padding: 14px 40px; letter-spacing: 0.03em;
+    transition: color 0.2s; width: 100%; text-align: center;
+  }
+  .nav-overlay a:hover { color: #f7f4ed; }
+
+  .page-header {
+    padding: 130px 8% 70px;
+    background: var(--navy);
+  }
+  .page-header-eyebrow {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-header-eyebrow::before { content: ''; display: block; width: 28px; height: 1.5px; background: var(--gold); }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: #f7f4ed; margin-bottom: 14px;
+  }
+  .page-header-sub { font-size: 0.9rem; color: rgba(247,244,237,0.55); font-weight: 300; }
+
+  .content { max-width: 760px; margin: 0 auto; padding: 70px 8% 100px; }
+
+  .article-section { margin-bottom: 50px; }
+  .article-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem; color: var(--navy);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--cream-dark);
+  }
+  .article-section h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem; color: var(--navy);
+    margin-bottom: 12px; margin-top: 28px;
+  }
+  .article-section p {
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-muted);
+    margin-bottom: 14px; font-weight: 300;
+  }
+  .article-section p:last-child { margin-bottom: 0; }
+  .article-section a { color: var(--red); text-decoration: none; }
+  .article-section a:hover { text-decoration: underline; }
+  .article-section strong { color: var(--text); font-weight: 600; }
+  .article-section ul, .article-section ol {
+    margin-bottom: 14px; padding-left: 0; list-style: none;
+  }
+  .article-section ul li, .article-section ol li {
+    font-size: 0.95rem; line-height: 1.8; color: var(--text-muted);
+    padding: 4px 0 4px 20px; font-weight: 300; position: relative;
+  }
+  .article-section ul li::before {
+    content: '\2022'; position: absolute; left: 0;
+    color: var(--red); font-weight: 700;
+  }
+
+  .highlight-box {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 50px;
+  }
+  .highlight-box p {
+    color: rgba(247,244,237,0.8);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    font-weight: 300;
+    margin: 0;
+  }
+  .highlight-box p strong { color: #f7f4ed; font-weight: 600; }
+
+  .rules-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    font-size: 0.92rem;
+  }
+  .rules-table th {
+    background: var(--navy);
+    color: #f7f4ed;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .rules-table td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--cream-dark);
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+  .rules-table tr:nth-child(even) td {
+    background: rgba(11,28,58,0.03);
+  }
+  .rules-table .highlight-cell {
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  .cta-box {
+    background: linear-gradient(135deg, var(--navy) 0%, #1a2d4d 100%);
+    border-radius: 14px;
+    padding: 36px 36px;
+    margin: 50px 0;
+    text-align: center;
+  }
+  .cta-box h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: #f7f4ed;
+    margin-bottom: 12px;
+  }
+  .cta-box p {
+    color: rgba(247,244,237,0.7);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    font-weight: 300;
+    margin-bottom: 22px;
+  }
+  .cta-box a {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.92rem;
+    transition: background 0.2s;
+  }
+  .cta-box a:hover { background: #a82e22; }
+
+  footer {
+    background: var(--navy); padding: 40px 8%;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; color: rgba(247,244,237,0.8); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: rgba(247,244,237,0.5); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+  .footer-links a:hover { color: #f7f4ed; }
+  .footer-copy { color: rgba(247,244,237,0.3); font-size: 0.78rem; width: 100%; text-align: center; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 8px; }
+
+  .related-guides { margin-top: 60px; padding-top: 40px; border-top: 2px solid var(--cream-dark); }
+  .related-guides h2 {
+    font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--navy); margin-bottom: 20px;
+  }
+  .related-guides-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .related-card {
+    background: #fff; border: 1.5px solid rgba(11,28,58,0.08); border-radius: 10px;
+    padding: 20px; text-decoration: none; transition: transform 0.15s, box-shadow 0.2s;
+  }
+  .related-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,28,58,0.07); }
+  .related-card-title { font-family: 'DM Serif Display', serif; font-size: 0.95rem; color: var(--navy); margin-bottom: 6px; }
+  .related-card-desc { font-size: 0.8rem; color: var(--text-muted); font-weight: 300; line-height: 1.5; }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    footer { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+    .related-guides-grid { grid-template-columns: 1fr; }
+    .rules-table { font-size: 0.82rem; }
+    .rules-table th, .rules-table td { padding: 9px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo"><img src="/favicon.png" alt="" width="28" height="28" style="border-radius:6px;display:block">Simple Pitch Counter</a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#how-it-works">How it works</a>
+    <a href="/articles">Guides</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/contact">Contact</a>
+    <a href="/feedback" style="color:#e8a030">Feedback</a>
+  </div>
+  <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu">
+    <svg width="18" height="14" viewBox="0 0 18 14" fill="none"><path d="M0 1h18M0 7h18M0 13h18" stroke="rgba(255,255,255,0.7)" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+</nav>
+<div class="nav-overlay" id="nav-overlay">
+  <a href="/">Home</a>
+  <a href="/#features">Features</a>
+  <a href="/#how-it-works">How it works</a>
+  <a href="/articles">Guides</a>
+    <a href="/privacy">Privacy</a>
+  <a href="/contact">Contact</a>
+  <a href="/feedback" style="color:#e8a030">Feedback</a>
+</div>
+
+<div class="page-header">
+  <div class="page-header-eyebrow">For Coaches</div>
+  <h1>Running the Field on Game Day</h1>
+  <p class="page-header-sub">Pitch counts, positions and defense: what youth baseball and softball coaches juggle, and how to keep it all straight</p>
+</div>
+
+<div class="content">
+
+  <div class="highlight-box">
+    <p><strong>The short version:</strong> On game day a youth coach is tracking arms, planning who plays where, and trying to make sure nine kids know where to go when the ball is hit. Plan before the first pitch, give pitch counting to someone whose only job is counting, and teach defensive jobs at practice, not in the middle of an inning.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>What You're Actually Juggling</h2>
+    <p>Ask any volunteer coach what game day feels like and you'll hear some version of "a lot at once." Between the first warm-up throw and the handshake line, you're keeping track of:</p>
+    <ul>
+      <li><strong>Pitch counts and rest days.</strong> Who pitched this week, how many pitches they threw, and who is eligible today.</li>
+      <li><strong>Catcher innings.</strong> Catching and pitching affect each other, so the lineup card and the pitching plan have to agree.</li>
+      <li><strong>Positions and playing time.</strong> Most rec leagues expect every kid to play both infield and outfield, and many require a minimum number of innings or at-bats.</li>
+      <li><strong>Defensive positioning.</strong> Where each of the nine players goes on every kind of play, not just the kid who fields the ball.</li>
+    </ul>
+    <p>None of these is hard by itself. The trouble is that they all land on you in the same two hours.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>Pitch Counts and Rest Rules</h2>
+    <p>Pitch count rules exist to protect young arms, and they're one of the few game-day details that can get a game protested. In Little League baseball, the daily maximum depends on the pitcher's age, and the number of pitches thrown decides how many calendar days of rest are required before they pitch again. A pitcher who throws 66 or more needs four days; 1 to 20 pitches needs none.</p>
+    <p>A few habits make this much easier:</p>
+    <ul>
+      <li><strong>Know who's eligible before you get to the field.</strong> Write down who can pitch today and how many pitches each kid has before the next rest tier.</li>
+      <li><strong>Plan around the thresholds.</strong> Pulling a pitcher at 35 pitches instead of 38 can make them available a day sooner.</li>
+      <li><strong>Give counting to one person.</strong> A parent volunteer who is only counting pitches will be more accurate than a coach counting in their head.</li>
+    </ul>
+    <p>For the full age-by-age chart, see our <a href="/pitch-count-rules">pitch count rules guide</a>. Softball and travel organizations often use different limits, so check the rules that apply to your league.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>Catchers and the Lineup Card</h2>
+    <p>Catching is the other half of the arm-care puzzle. In Little League baseball, a player who catches four or more innings can't pitch later that same day, and a pitcher who throws 41 or more pitches can't move behind the plate for the rest of the day. Those rules are easy to break by accident when you're shuffling positions in the fourth inning.</p>
+    <p>The fix is to decide your catchers when you decide your pitchers. If you want a kid to catch early and pitch in relief later, map out exactly when the switch happens and keep them under four innings behind the plate. Our <a href="/catcher-innings-rules">catcher innings guide</a> walks through the common mistakes.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>Positions and Playing Time</h2>
+    <p>A written defensive plan, inning by inning, saves you from making substitutions on the fly. Build it the night before and fill in pitchers and catchers first, since those positions have rules attached. Then rotate everyone else so each kid gets real time where they'll see the ball. When a pitcher runs up a count faster than expected, you'll adjust one inning instead of rebuilding the whole plan.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>Knowing Where Every Kid Goes on a Play</h2>
+    <p>When the ball is hit, only one player fields it, but everyone else has a job too: covering a base, lining up as the cutoff or relay, or backing up a throw so an overthrow doesn't turn into two extra bases. Young players who don't know their job tend to stand still or chase the ball. Some examples worth teaching early:</p>
+    <ul>
+      <li><strong>Ground ball to the left side.</strong> The first baseman covers first, the catcher runs down the line to back up the throw, and the right fielder backs up from behind.</li>
+      <li><strong>Base hit to the outfield.</strong> A middle infielder goes out as the cutoff so the outfielder has a short, easy throw instead of a long one that sails.</li>
+      <li><strong>Steal of second.</strong> Many teams have the second baseman cover with a right-handed batter up and the shortstop cover with a lefty, since batters tend to pull the ball toward the other side.</li>
+      <li><strong>Balls to the right side.</strong> The pitcher breaks toward first base on anything hit to the right side, in case the first baseman has to field it.</li>
+    </ul>
+    <p>Your league may teach some of these differently, and that's fine. What matters is that every player hears one answer, the same way every time.</p>
+  </div>
+
+  <div class="article-section">
+    <h2>Teach Defense Before Game Day</h2>
+    <p>Game day is a bad time to explain a relay. Kids learn positioning best when they can see the whole field at once. A few ideas that work:</p>
+    <ul>
+      <li><strong>Walk-throughs at practice.</strong> Put all nine players in position, call out a situation, and have everyone jog to their spot before you ever hit a ball.</li>
+      <li><strong>One situation per practice.</strong> Bunts one week, first-and-third the next. Trying to cover every play at once overwhelms younger players.</li>
+      <li><strong>Show it on a screen.</strong> A quick diagram on an iPad in the dugout, or on a projector at a team meeting, helps visual learners see why they're going where they're going.</li>
+    </ul>
+  </div>
+
+  <div class="article-section">
+    <h2>Two Free Tools That Split the Job</h2>
+    <p>We built <a href="/">Simple Pitch Counter</a> for the arm-care side of game day. You tap each pitch, it keeps each pitcher's total, and when the game ends it shows the rest days each pitcher needs and gives you a summary you can send to your league. It tracks catchers too, so the catcher-pitcher rules are easier to follow.</p>
+    <p>For the defensive side, we made a sister app called <a href="https://simplefielding.com">Simple Fielding</a>. You drag the ball from home plate to where it's hit, and all nine fielders animate to their jobs: who fields it, who's the cutoff or relay, who covers each base, and who backs up. It covers ground balls, base hits, fly balls and tag-ups, bunts, steals, first-and-third double steals and pickoffs, with a whiteboard mode for drawing your own plays and a projector mode for walking the whole team through them. It supports Little League baseball, 50/70 fields and fastpitch softball.</p>
+    <p>Both are free, with no ads and no accounts. Simple Fielding runs in any web browser today, with iPhone and Android versions on the way.</p>
+  </div>
+
+  <div class="cta-box">
+    <h3>See Where Everyone Goes</h3>
+    <p>Simple Fielding shows all nine fielders moving on every kind of play. Use it at practice, in the dugout, or on a projector before the season starts.</p>
+    <a href="https://simplefielding.com">Try Simple Fielding</a>
+  </div>
+
+  <div class="article-section">
+    <h2>The Bottom Line</h2>
+    <p>Game day goes smoother when the decisions are made before you get to the field. Know who can pitch and catch, write down your positions, and put someone in charge of the pitch count. Then spend practice time teaching kids where to go when the ball isn't hit to them. A team that knows its jobs plays better defense.</p>
+  </div>
+
+  <div class="related-guides">
+    <h2>Related Guides</h2>
+    <div class="related-guides-grid">
+      <a href="/pitch-count-rules" class="related-card">
+        <div class="related-card-title">Pitch Count Rules 2026</div>
+        <div class="related-card-desc">Daily maximums, rest-day charts, and the finish-the-batter rule for every age group.</div>
+      </a>
+      <a href="/catcher-innings-rules" class="related-card">
+        <div class="related-card-title">Catcher Innings Rules</div>
+        <div class="related-card-desc">How the catcher-pitcher eligibility restrictions work and why both positions are tracked.</div>
+      </a>
+      <a href="/parents-guide" class="related-card">
+        <div class="related-card-title">The Parent's Guide to Pitch Counting</div>
+        <div class="related-card-desc">For the volunteer who just said yes to counting pitches and isn't sure where to start.</div>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">Simple Pitch Counter</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/pitch-count-rules">Pitch Count Rules</a>
+    <a href="/parents-guide">Parent's Guide</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="/contact">Contact</a>
+    <a href="/feedback">Feedback</a>
+  </div>
+  <div class="footer-copy">&copy; 2026 Simple Pitch Counter. All rights reserved.</div>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('nav-hamburger');
+  const overlay = document.getElementById('nav-overlay');
+  hamburger.addEventListener('click', () => overlay.classList.toggle('open'));
+  overlay.addEventListener('click', (e) => { if (e.target.tagName === 'A') overlay.classList.remove('open'); });
+</script>
+</body>
+</html>
