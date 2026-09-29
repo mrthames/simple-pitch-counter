@@ -19,6 +19,19 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-09-29] V2.59 — Android: WebView debugging in debug builds only
+
+**Files:** `android/app/src/main/java/com/thamesproductions/pitchcounter/MainActivity.kt`, `android/app/build.gradle.kts`, `app/index.html`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`
+
+### Security
+- **Remote WebView inspection is off in release builds.** `WebView.setWebContentsDebuggingEnabled` was always `true`, so anyone with the Play build and a USB cable could open the app's page in `chrome://inspect`, read its local storage and run script in it. It now follows the app's debuggable flag: on for debug builds, off for release. This uses `ApplicationInfo.FLAG_DEBUGGABLE` rather than `BuildConfig.DEBUG`, which AGP 8 no longer generates unless asked to.
+- Note for testing: Google APIs emulator images are `userdebug` builds, and on those the WebView allows inspection of every app regardless. Check release behavior on a real phone.
+
+### Versioning
+- Version bumped to 2.59 across iOS, Android, and the in-app About page
+
+---
+
 ## [2026-09-28] V2.58 — Android: target API 36 (Android 16)
 
 **Files:** `android/app/build.gradle.kts`, `android/build.gradle.kts`, `android/gradle/wrapper/gradle-wrapper.properties`, `android/app/src/main/AndroidManifest.xml`, `android/app/src/main/java/com/thamesproductions/pitchcounter/MainActivity.kt`, `android/app/src/main/assets/index.html`, `app/index.html`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`
