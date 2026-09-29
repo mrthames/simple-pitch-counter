@@ -2,6 +2,7 @@ package com.thamesproductions.pitchcounter
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -62,7 +63,10 @@ class MainActivity : AppCompatActivity() {
             getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
 
-        WebView.setWebContentsDebuggingEnabled(true)
+        // Remote inspection (chrome://inspect) only in debug builds, never in what ships to Play
+        WebView.setWebContentsDebuggingEnabled(
+            (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        )
 
         webView = WebView(this).apply {
             settings.javaScriptEnabled = true
