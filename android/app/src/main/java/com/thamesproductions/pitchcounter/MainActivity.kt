@@ -9,9 +9,9 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Base64
+import android.graphics.Color
 import android.view.KeyEvent
 import android.view.View
-import android.view.WindowInsetsController
 import android.webkit.JavascriptInterface
 import android.webkit.JsPromptResult
 import android.webkit.JsResult
@@ -22,9 +22,15 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.EditText
+import android.widget.FrameLayout
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.play.core.review.ReviewManagerFactory
 import java.io.File
 import java.io.FileOutputStream
@@ -34,11 +40,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private lateinit var vibrator: Vibrator
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    // System bar heights in CSS px, pushed to the page as --top-inset / --bottom-inset
+    private var topInsetCss = 0f
+    private var bottomInsetCss = 0f
 
-        window.statusBarColor = 0xFFF2F2F7.toInt()
-        window.navigationBarColor = 0xFFF2F2F7.toInt()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        // Android 15+ enforces edge-to-edge for apps targeting 35+, and Android 16 removes the
+        // opt-out. Draw edge-to-edge on every version so the page's inset padding means the same
+        // thing everywhere; bar colors are ignored on 35+, so the page paints behind the bars.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.light(0xE6F2F2F7.toInt(), 0xE6F2F2F7.toInt())
+        )
+        super.onCreate(savedInstanceState)
 
         vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val mgr = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -76,17 +90,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onPageFinished(view: WebView, url: String) {
                 super.onPageFinished(view, url)
-                val density = resources.displayMetrics.density
-                val statusBarCss = getStatusBarHeight() / density
-                val navBarCss = getNavBarHeight() / density
-                view.evaluateJavascript(
-                    "document.documentElement.style.setProperty('--android-status-bar','${statusBarCss}px');" +
-                    "document.documentElement.style.setProperty('--top-inset','${statusBarCss}px');" +
-                    "document.documentElement.style.setProperty('--android-nav-bar','${navBarCss}px');" +
-                    "document.documentElement.style.setProperty('--bottom-inset','${navBarCss}px');" +
-                    "document.documentElement.style.setProperty('--header-pad','8px')",
-                    null
-                )
+                pushInsetsToPage()
             }
         }
 
@@ -125,7 +129,23 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        setContentView(webView)
+        // The container absorbs the keyboard and side insets; adjustResize no longer resizes an
+        // edge-to-edge window, so the keyboard would otherwise cover the inputs.
+        val container = FrameLayout(this)
+        container.addView(webView, FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+        ViewCompat.setOnApplyWindowInsetsListener(container) { v, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            v.setPadding(bars.left, 0, bars.right, maxOf(ime.bottom - bars.bottom, 0))
+            val density = resources.displayMetrics.density
+            topInsetCss = bars.top / density
+            bottomInsetCss = bars.bottom / density
+            pushInsetsToPage()
+            WindowInsetsCompat.CONSUMED
+        }
+        setContentView(container)
         webView.loadUrl("file:///android_asset/index.html")
 
         onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
@@ -180,30 +200,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateStatusBar(isDark: Boolean) {
-        if (isDark) {
-            window.statusBarColor = 0xFF0B1C3A.toInt()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.decorView.windowInsetsController?.setSystemBarsAppearance(
-                    0, WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                window.decorView.systemUiVisibility =
-                    window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-            }
-        } else {
-            window.statusBarColor = 0xFFF2F2F7.toInt()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.decorView.windowInsetsController?.setSystemBarsAppearance(
-                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                window.decorView.systemUiVisibility =
-                    window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            }
-        }
+        // The page paints behind the status bar, so only the icon color needs to follow it
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightStatusBars = !isDark
+    }
+
+    private fun pushInsetsToPage() {
+        if (!::webView.isInitialized) return
+        webView.evaluateJavascript(
+            "document.documentElement.style.setProperty('--android-status-bar','${topInsetCss}px');" +
+            "document.documentElement.style.setProperty('--top-inset','${topInsetCss}px');" +
+            "document.documentElement.style.setProperty('--android-nav-bar','${bottomInsetCss}px');" +
+            "document.documentElement.style.setProperty('--bottom-inset','${bottomInsetCss}px');" +
+            "document.documentElement.style.setProperty('--header-pad','8px')",
+            null
+        )
     }
 
     private fun shareImage(base64Data: String) {
@@ -226,16 +237,6 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             android.util.Log.e("SimplePitchCounter", "Share failed", e)
         }
-    }
-
-    private fun getStatusBarHeight(): Int {
-        val resId = resources.getIdentifier("status_bar_height", "dimen", "android")
-        return if (resId > 0) resources.getDimensionPixelSize(resId) else 0
-    }
-
-    private fun getNavBarHeight(): Int {
-        val resId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-        return if (resId > 0) resources.getDimensionPixelSize(resId) else 0
     }
 
     inner class WebAppInterface {

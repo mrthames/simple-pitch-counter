@@ -17,14 +17,14 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.thamesproductions.pitchcounter"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.thamesproductions.pitchcounter"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = gitCommitCount.get()
-        versionName = "2.57"
+        versionName = "2.58"
     }
 
     signingConfigs {
@@ -69,6 +69,7 @@ tasks.named("preBuild") {
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.activity:activity:1.10.1")
     implementation("androidx.webkit:webkit:1.12.1")
     implementation("com.google.android.play:review:2.0.2")
     implementation("com.google.android.play:review-ktx:2.0.2")

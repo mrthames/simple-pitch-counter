@@ -172,11 +172,11 @@ Each page must be deployed to **two locations** for clean URL support:
 
 ```bash
 # Root location (backward compatibility)
-scp -O -P <port> website/index.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/
+scp -O -P <port> website/index.html <user>@<nas-host>:<site-root>/simplepitchcounter.com/
 
 # Subpage — both root .html and directory index.html
-scp -O -P <port> website/android-beta.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/android-beta.html
-scp -O -P <port> website/android-beta.html <user>@<nas-host>:/volume1/Websites/simplepitchcounter.com/android-beta/index.html
+scp -O -P <port> website/android-beta.html <user>@<nas-host>:<site-root>/simplepitchcounter.com/android-beta.html
+scp -O -P <port> website/android-beta.html <user>@<nas-host>:<site-root>/simplepitchcounter.com/android-beta/index.html
 ```
 
 Repeat the two-location pattern for `privacy`, `contact`, and `feedback` pages.
