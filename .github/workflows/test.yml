@@ -12,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Nothing personal in the repository
+        run: bash tools/check-for-personal-data.sh
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
