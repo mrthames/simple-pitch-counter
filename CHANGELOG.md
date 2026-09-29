@@ -19,6 +19,26 @@ All changes to `index.html` are documented here. Add this file to the project so
 
 ---
 
+## [2026-09-28] V2.58 — Android: target API 36 (Android 16)
+
+**Files:** `android/app/build.gradle.kts`, `android/build.gradle.kts`, `android/gradle/wrapper/gradle-wrapper.properties`, `android/app/src/main/AndroidManifest.xml`, `android/app/src/main/java/com/thamesproductions/pitchcounter/MainActivity.kt`, `android/app/src/main/assets/index.html`, `app/index.html`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`
+
+### Platform
+- **Target and compile SDK raised from 35 to 36.** Google Play blocks updates to apps that don't target API 36 after August 31, 2026. `minSdk` stays at 26.
+- **Build toolchain raised only as far as API 36 needs:** Android Gradle Plugin 8.7.3 → 8.9.3 (the first line that supports compileSdk 36), Gradle wrapper 8.9 → 8.11.1 (the minimum for AGP 8.9). Kotlin (2.1.0) and the existing AndroidX libraries are unchanged.
+- **Added `androidx.activity:activity:1.10.1`** explicitly for `enableEdgeToEdge()`. AppCompat was already pulling in an older version transitively.
+
+### Android 16 behavior changes
+- **Edge-to-edge, now enforced without an opt-out.** The app now calls `enableEdgeToEdge()` on every Android version, so it looks the same on Android 8 through 16. System-bar insets are read from the real `WindowInsets` (status bar, navigation bar and display cutout) instead of the `status_bar_height`/`navigation_bar_height` resource dimensions, then passed to the page as `--top-inset`/`--bottom-inset`. The deprecated `window.statusBarColor` calls are gone (Android 15+ ignores them); the game screen still switches the status-bar icons light or dark.
+- **The keyboard no longer covers text fields.** `adjustResize` does nothing in an edge-to-edge window, so the WebView's container now takes the keyboard (IME) inset as bottom padding, and the side insets as left/right padding.
+- **Large screens: rotation no longer reloads the page.** On displays 600dp and wider, Android 16 ignores `screenOrientation="sensorPortrait"`, so tablets and foldables can now rotate. The activity now handles orientation, size and layout changes itself (`configChanges`), so rotating, folding or resizing the window doesn't recreate it and reload the WebView mid-game.
+- **Predictive back:** checked and needs no change. The existing `OnBackPressedDispatcher` callback already follows the Android 16 back model; the back key and the back gesture both step back through the app's screens, and back from the Games list exits to the launcher.
+
+### Versioning
+- Version bumped to 2.58 across iOS, Android, and the in-app About page. The `assets/index.html` build copy is re-synced with `app/index.html`.
+
+---
+
 ## [2026-05-08] V2.57 — Hotfix: tune Game Summary bottom padding
 
 **Files:** `app/index.html`, `app/Little League Pitch Counter.xcodeproj/project.pbxproj`, `android/app/build.gradle.kts`
